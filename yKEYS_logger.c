@@ -13,13 +13,26 @@ static void  o___PROGRAM_________o () { return; }
 char
 ykeys_logger_init       (void)
 {
-   strlcpy (g_log  , "", LEN_FULL);
-   strlcpy (g_mode , "", LEN_FULL);
-   strlcpy (g_multi, "", LEN_FULL);
-   strlcpy (g_errs, "", LEN_FULL);
-   g_all   = 0;
-   g_total = 0;
-   g_curr  = 0;
+   /*---(logs)---------------------------*/
+   myKEYS.h_logkeys  = 'y';
+   strlcpy (myKEYS.h_log  , "", LEN_FULL);
+   strlcpy (myKEYS.h_mode , "", LEN_FULL);
+   strlcpy (myKEYS.h_multi, "", LEN_FULL);
+   strlcpy (myKEYS.h_errs , "", LEN_FULL);
+   /*---(positions)----------------------*/
+   myKEYS.h_all      = 0;
+   myKEYS.h_total    = 0;
+   myKEYS.h_curr     = 0;
+   /*---(errors)-------------------------*/
+   myKEYS.h_locked   = '-';
+   myKEYS.h_errors   = 0;
+   myKEYS.h_warnings = 0;
+   myKEYS.h_skips    = 0;
+   /*---(counters)-----------------------*/
+   myKEYS.h_acks     = 0;
+   myKEYS.h_spaces   = 0;
+   myKEYS.h_noops    = 0;
+   /*---(complete)-----------------------*/
    return 0;
 }
 
@@ -40,22 +53,22 @@ ykeys__roll             (void)
    DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
    /*---(log)----------------------------*/
    DEBUG_KEYS   yLOG_snote   ("log");
-   strlcpy (t, g_log   + x_off, LEN_FULL);
-   strlcpy (g_log  , t        , LEN_FULL);
+   strlcpy (t, myKEYS.h_log   + x_off, LEN_FULL);
+   strlcpy (myKEYS.h_log  , t        , LEN_FULL);
    /*---(mode)---------------------------*/
    DEBUG_KEYS   yLOG_snote   ("mode");
-   strlcpy (t, g_mode  + x_off, LEN_FULL);
-   strlcpy (g_mode , t        , LEN_FULL);
+   strlcpy (t, myKEYS.h_mode  + x_off, LEN_FULL);
+   strlcpy (myKEYS.h_mode , t        , LEN_FULL);
    /*---(error)--------------------------*/
    DEBUG_KEYS   yLOG_snote   ("error");
-   strlcpy (t, g_errs + x_off, LEN_FULL);
-   strlcpy (g_errs, t        , LEN_FULL);
+   strlcpy (t, myKEYS.h_errs + x_off, LEN_FULL);
+   strlcpy (myKEYS.h_errs, t        , LEN_FULL);
    /*---(multi)--------------------------*/
    DEBUG_KEYS   yLOG_snote   ("multi");
-   strlcpy (t, g_multi + x_off, LEN_FULL);
-   strlcpy (g_multi, t        , LEN_FULL);
+   strlcpy (t, myKEYS.h_multi + x_off, LEN_FULL);
+   strlcpy (myKEYS.h_multi, t        , LEN_FULL);
    /*---(position)-----------------------*/
-   g_total -= x_off;
+   myKEYS.h_total -= x_off;
    /*---(complete)-----------------------*/
    DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    return 0;
@@ -66,22 +79,22 @@ ykeys__multi            (int a_pos)
 {
    char        x_mode      =  ' ';
    /*---(defense)------------------------*/
-   if (a_pos < 0 || a_pos >  g_total)                             return 0;
-   if (g_log [a_pos] == G_KEY_NULL )                        return 0;
-   if (g_log [a_pos] == G_KEY_SPACE)                        return 0;
-   if (g_log [a_pos] == G_CHAR_SPACE)                       return 0;
+   if (a_pos < 0 || a_pos >  myKEYS.h_total)                             return 0;
+   if (myKEYS.h_log [a_pos] == G_KEY_NULL )                        return 0;
+   if (myKEYS.h_log [a_pos] == G_KEY_SPACE)                        return 0;
+   if (myKEYS.h_log [a_pos] == G_CHAR_SPACE)                       return 0;
    /*---(key for mode)-------------------*/
-   x_mode = g_mode [a_pos];
-   if (a_pos > 0 && x_mode == PMOD_REPEAT)  x_mode = g_mode [a_pos - 1];
-   if (a_pos > 1 && x_mode == PMOD_REPEAT)  x_mode = g_mode [a_pos - 2];
-   if (a_pos > 2 && x_mode == PMOD_REPEAT)  x_mode = g_mode [a_pos - 3];
-   if (a_pos > 3 && x_mode == PMOD_REPEAT)  x_mode = g_mode [a_pos - 4];
+   x_mode = myKEYS.h_mode [a_pos];
+   if (a_pos > 0 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.h_mode [a_pos - 1];
+   if (a_pos > 1 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.h_mode [a_pos - 2];
+   if (a_pos > 2 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.h_mode [a_pos - 3];
+   if (a_pos > 3 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.h_mode [a_pos - 4];
    switch (x_mode) {
    case MODE_SOURCE  : case MODE_COMMAND : case MODE_SEARCH  : case SMOD_HINT  :
-      if (strchr (g_multisrc, g_log [a_pos]) != NULL)       return 1;
+      if (yKEYS_is_multi_src (myKEYS.h_log [a_pos]))  return 1;
       break;
    case MODE_MAP     :
-      if (strchr (g_multimap, g_log [a_pos]) != NULL)       return 1;
+      if (yKEYS_is_multi_map (myKEYS.h_log [a_pos]))  return 1;
       break;
    }
    /*---(complete)-----------------------*/
@@ -96,32 +109,32 @@ yKEYS_logger            (uchar a_key)
    int         x_multi     =  '-';
    /*---(key)----------------------------*/
    x_key = chrvisible (a_key);
-   g_log   [g_total]     = x_key;
-   g_log   [g_total + 1] = 0;
+   myKEYS.h_log   [myKEYS.h_total]     = x_key;
+   myKEYS.h_log   [myKEYS.h_total + 1] = 0;
    /*---(mode)---------------------------*/
-   g_mode  [g_total]     = yMODE_curr ();
-   g_mode  [g_total + 1] = 0;
+   myKEYS.h_mode  [myKEYS.h_total]     = yMODE_curr ();
+   myKEYS.h_mode  [myKEYS.h_total + 1] = 0;
    /*---(error)--------------------------*/
-   g_errs [g_total]     = '-';
-   g_errs [g_total + 1] = 0;
+   myKEYS.h_errs [myKEYS.h_total]     = '-';
+   myKEYS.h_errs [myKEYS.h_total + 1] = 0;
    /*---(multi)--------------------------*/
-   x_multi = ykeys__multi (g_total);
-   switch (g_multi [g_total - 1]) {
+   x_multi = ykeys__multi (myKEYS.h_total);
+   switch (myKEYS.h_multi [myKEYS.h_total - 1]) {
    case 'p' :
-      g_multi [g_total] = 's';
+      myKEYS.h_multi [myKEYS.h_total] = 's';
       break;
    case 's' : case '-' : default  :
-      if (x_multi)  g_multi [g_total] = 'p';
-      else          g_multi [g_total] = '-';
+      if (x_multi)  myKEYS.h_multi [myKEYS.h_total] = 'p';
+      else          myKEYS.h_multi [myKEYS.h_total] = '-';
       break;
    }
-   g_multi [g_total + 1] = 0;
+   myKEYS.h_multi [myKEYS.h_total + 1] = 0;
    /*---(update count)-------------------*/
-   ++g_all;
-   g_curr = g_total;
-   ++g_total;
+   ++(myKEYS.h_all);
+   myKEYS.h_curr = myKEYS.h_total;
+   ++(myKEYS.h_total);
    /*---(roll)---------------------------*/
-   if (g_total >= LEN_FULL - 2)  ykeys__roll ();
+   if (myKEYS.h_total >= LEN_FULL - 2)  ykeys__roll ();
    /*---(macro)--------------------------*/
    IF_MACRO_RECORDING {
       yMACRO_rec_key (x_key);
@@ -147,18 +160,18 @@ yKEYS_unique            (void)
    uchar       c1, c2, c3, c4;
    /*---(header)-------------------------*/
    DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_sint    (g_total);
+   DEBUG_LOOP   yLOG_sint    (myKEYS.h_total);
    /*---(basic defense)------------------*/
-   if (g_total < 2) {
+   if (myKEYS.h_total < 2) {
       DEBUG_LOOP   yLOG_snote   ("too few keys, unique");
       DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
    /*---(prepare)------------------------*/
-   c3 = g_log   [g_total - 2];
-   m3 = g_multi [g_total - 2];
-   c4 = g_log   [g_total - 1];
-   m4 = g_multi [g_total - 1];
+   c3 = myKEYS.h_log   [myKEYS.h_total - 2];
+   m3 = myKEYS.h_multi [myKEYS.h_total - 2];
+   c4 = myKEYS.h_log   [myKEYS.h_total - 1];
+   m4 = myKEYS.h_multi [myKEYS.h_total - 1];
    /*---(filter)-------------------------*/
    DEBUG_LOOP   yLOG_sint    (m3);
    if (strchr ("ps-", m3) == NULL) {
@@ -197,12 +210,12 @@ yKEYS_unique            (void)
    /*---(single)-------------------------*/
    if (m3 == '-' && m4 == '-' && c3 == c4)       return 0;
    /*---(filter)-------------------------*/
-   if (g_total < 4)                               return 1;
+   if (myKEYS.h_total < 4)                               return 1;
    /*---(prepare)------------------------*/
-   c1 = g_log   [g_total - 4];
-   m1 = g_multi [g_total - 4];
-   c2 = g_log   [g_total - 3];
-   m2 = g_multi [g_total - 3];
+   c1 = myKEYS.h_log   [myKEYS.h_total - 4];
+   m1 = myKEYS.h_multi [myKEYS.h_total - 4];
+   c2 = myKEYS.h_log   [myKEYS.h_total - 3];
+   m2 = myKEYS.h_multi [myKEYS.h_total - 3];
    /*---(filter)-------------------------*/
    if (strchr ("ps-", m1) == NULL)               return 0;
    if (strchr ("ps-", m2) == NULL)               return 0;
@@ -222,10 +235,17 @@ yKEYS_unique            (void)
 /*====================------------------------------------====================*/
 static void  o___STATUS__________o () { return; }
 
-int   yKEYS_count      (void) { return g_total; }
-int   yKEYS_position   (void) { return g_curr; }
-uchar yKEYS_current    (void) { if (g_curr < 0 || g_curr >= g_total)   return 0; return g_log [g_curr]; }
-char  yKEYS_oldkeys    (void) { if (g_curr < g_total - 1)  return 1; return 0; }
+int   yKEYS_count      (void) { return myKEYS.h_total; }
+int   yKEYS_position   (void) { return myKEYS.h_curr; }
+uchar yKEYS_current    (void) { if (myKEYS.h_curr < 0 || myKEYS.h_curr >= myKEYS.h_total)   return 0; return myKEYS.h_log [myKEYS.h_curr]; }
+
+char
+yKEYS_oldkeys           (void)
+{
+   if (myKEYS.h_curr < myKEYS.h_total - 1)  return 1;
+   if (myKEYS.h_curr < myKEYS.h_total)      return 2;
+   return 0;
+}
 
 
 
@@ -234,9 +254,130 @@ char  yKEYS_oldkeys    (void) { if (g_curr < g_total - 1)  return 1; return 0; }
 /*====================------------------------------------====================*/
 static void  o___ACTION__________o () { return; }
 
-char yKEYS_repos             (int a_pos) { if (a_pos < 0 || a_pos >= g_total) return -1; g_curr = a_pos; return 0;}
-char yKEYS_toend             (void)      { if (g_total > 0) g_curr = g_total - 1; else g_curr = 0; return 0; } 
-char yKEYS_error             (void)      { if (g_total > 0) g_errs [g_total - 1] = 'E'; return 0; }
+char yKEYS_repos             (int a_pos) { if (a_pos < 0 || a_pos >= myKEYS.h_total) return -1; myKEYS.h_curr = a_pos; return 0;}
+char yKEYS_toend             (void)      { if (myKEYS.h_total > 0) myKEYS.h_curr = myKEYS.h_total - 1; else myKEYS.h_curr = 0; return 0; } 
 
+
+
+/*====================------------------------------------====================*/
+/*===----                       error handling                         ----===*/
+/*====================------------------------------------====================*/
+static void  o___ERRORS__________o () { return; }
+
+/*
+ *  yKEYS_set_lock and yKEYS_set_error are explicitly set within mode
+ *  handlers to make sure the take effect -- don't relay on clever return
+ *  codes or message passing.
+ *
+ *  yKEYS_set_warning is the default of a negative return from a mode
+ *  handler, if error or lock not already set.
+ *
+ *  yKEYS_set_lock
+ *  -- something really wrong that continued typing makes notification hard
+ *  -- allows a status bar or other visual notification
+ *  -- yMODE processes no input until ее received
+ *  -- illegal mode changes, making accepting more keys very dangerous
+ *  -- repeats on complicated actions, would be deceptive
+ *
+ *  yKEYS_set_error
+ *  -- something wrong, but not dangerous
+ *  -- allows a status bar or other visual notification
+ *  -- does not effect further key processing
+ *  -- includes illegal keys for mode
+ *  -- or, action not possible in context
+ *
+ *  yKEYS_set_warning
+ *  -- not right, but automatically recovered/addressed
+ *  -- like, navigation that bounces off beg/end
+ *  -- or, no more input to process
+ *
+ *  if x_major has a value, it is a part of a sequence.  if a zero
+ *  is returned, then time to handle repeats
+ *
+ *
+ *  yKEYS_test_unlock
+ *  -- checks for last two characters to be ее in input stream
+ *  -- single е is common, or е separated by other characters
+ *  -- double е is easy to type, but uncommon enough to be unlock
+ *
+ *
+ */
+
+char
+yKEYS_set_error         (void)
+{
+   if (myKEYS.h_total > 0) {
+      myKEYS.h_errs [myKEYS.h_total - 1] = 'E';
+      yKEYS_repeat_reset ();
+      ++(myKEYS.h_errors);
+   }
+   return 0;
+}
+
+char
+yKEYS_set_lock          (void)
+{
+   if (myKEYS.h_total > 0) { 
+      myKEYS.h_errs [myKEYS.h_total - 1] = '╧';
+      yKEYS_lock ();
+      yKEYS_repeat_reset ();
+      ++(myKEYS.h_errors);
+   }
+   return 0;
+}
+
+char
+yKEYS_set_warning       (void)
+{  /* set if not already set */
+   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == '-') {
+      myKEYS.h_errs [myKEYS.h_total - 1] = 'w';
+      ++(myKEYS.h_warnings);
+   }
+   return 0;
+}
+
+char
+yKEYS_set_skip          (void)
+{  /* set if not already set */
+   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == '-') {
+      myKEYS.h_errs [myKEYS.h_total - 1] = '╖';
+      ++(myKEYS.h_skips);
+   }
+   return 0;
+}
+
+char
+yKEYS_test_unlock       (void)
+{
+   if (myKEYS.h_total >= 2) {
+      if (myKEYS.h_log [myKEYS.h_total - 2] == 'е' && myKEYS.h_log [myKEYS.h_total - 1] == 'е') {
+         myKEYS.h_errs [myKEYS.h_total - 1] = '╧';
+         yKEYS_unlock ();
+         ++(myKEYS.h_skips);
+         return 1;
+      }
+   }
+   return 0;
+}
+
+char yKEYS_lock              (void)      { myKEYS.h_locked = 'y'; }
+char yKEYS_unlock            (void)      { myKEYS.h_locked = '-'; }
+
+char
+yKEYS_is_error          (void)
+{
+   if (myKEYS.h_total > 0) {
+      if (myKEYS.h_errs [myKEYS.h_total - 1] == 'E') return 1;
+      if (myKEYS.h_locked == 'y')             return 1;
+   }
+   return 0;
+}
+
+char
+yKEYS_is_locked         (void)
+{
+   if (myKEYS.h_locked == 'y')  return 1;
+   return 0;
+}
 
 

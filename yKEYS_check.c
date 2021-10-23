@@ -5,26 +5,47 @@
 
 
 
-char   g_vsimple   [LEN_DESC ]   = "_ Kk jJ ~                 ©";
-char   g_vgoto     [LEN_DESC ]   = "TK tkmjb JB   azud AZUD .  ";
-char   g_vpage     [LEN_DESC ]   = "   tk jb      azud AZUD    ";
-char   g_vends     [LEN_DESC ]   = "T  tkmjb  B M azud      .  ";
-char   g_vscroll   [LEN_DESC ]   = " K tkmjb J    azud      .  ";
+static  uchar   s_vsimple   [LEN_DESC ]   = "_ Kk jJ ~                 ©  ";
+static  uchar   s_vgoto     [LEN_DESC ]   = "TK tkmjb JB   azud AZUD .   g";
+static  uchar   s_vpage     [LEN_DESC ]   = "   tk jb      azud AZUD      ";
+static  uchar   s_vends     [LEN_DESC ]   = "T  tkmjb  B M azud      .    ";
+static  uchar   s_vscroll   [LEN_DESC ]   = " K tkmjb J    azud      .    ";
 
-char   g_hsimple   [LEN_DESC ]   = "0 Hh lL $                 ©";
-char   g_hgoto     [LEN_DESC ]   = "SH shcle LE   azud AZUD .  ";
-char   g_hpage     [LEN_DESC ]   = "   sh le      azud AZUD    ";
-char   g_hends     [LEN_DESC ]   = "S  shcle  E C azud      .  ";
-char   g_hscroll   [LEN_DESC ]   = " H shcle L    azud      .  ";
+static  uchar   s_hsimple   [LEN_DESC ]   = "0 Hh lL $                 ©  ";
+static  uchar   s_hgoto     [LEN_DESC ]   = "SH shcle LE   azud AZUD .   g";
+static  uchar   s_hpage     [LEN_DESC ]   = "   sh le      azud AZUD      ";
+static  uchar   s_hends     [LEN_DESC ]   = "S  shcle  E C azud      .    ";
+static  uchar   s_hscroll   [LEN_DESC ]   = " H shcle L    azud      .    ";
+static  uchar   s_hword     [LEN_DESC ]   = "wbe WBE";
 
-char   g_hword     [LEN_DESC ]   = "wbe WBE";
+static  uchar   s_multimap  [LEN_DESC ]   = "cgz e  dx a   DA";
+static  uchar   s_multivisu [LEN_DESC ]   = "cgz e pd  a   DA";
+static  uchar   s_multiwdr  [LEN_DESC ]   = "cg  e         ";
 
-char   g_multimap  [LEN_DESC ]   = "cgz e  dx a   DA";
-char   g_multivisu [LEN_DESC ]   = "cgz e pd  a   DA";
-char   g_multiwdr  [LEN_DESC ]   = "cg  e         ";
+static  uchar   s_multisrc  [LEN_DESC ]   = "cgz    dx   Ff";
+static  uchar   s_multiselc [LEN_DESC ]   = "cgz         Ff";
 
-char   g_multisrc  [LEN_DESC ]   = "cgz    dx   Ff";
-char   g_multiselc [LEN_DESC ]   = "cgz         Ff";
+static  uchar   s_repeat    [LEN_DESC ]   = "123456789";
+static  uchar   s_search    [LEN_DESC ]   = "[<>]";
 
-char   g_repeat    [LEN_DESC ]   = "123456789";
-char   g_search    [LEN_DESC ]   = "[<>]";
+static  uchar   s_macro     [LEN_LABEL]   = "@qQ";
+static  uchar   s_findchar  [LEN_LABEL]   = "#fFnN";
+
+
+char yKEYS_is_repeater       (uchar a_minor) { if (strchr (s_repeat   , a_minor) != NULL)  return 1; return 0; }
+
+char yKEYS_is_multi_map      (uchar a_minor) { if (strchr (s_multimap , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_multi_visu     (uchar a_minor) { if (strchr (s_multivisu, a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_multi_wdr      (uchar a_minor) { if (strchr (s_multiwdr , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_multi_src      (uchar a_minor) { if (strchr (s_multisrc , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_multi_selc     (uchar a_minor) { if (strchr (s_multiselc, a_minor) != NULL)  return 1; return 0; }
+
+char yKEYS_is_horz_simple    (uchar a_minor) { if (strchr (s_hsimple  , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_horz_goto      (uchar a_minor) { if (strchr (s_hgoto    , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_horz_scroll    (uchar a_minor) { if (strchr (s_hscroll  , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_horz_word      (uchar a_minor) { if (strchr (s_hword    , a_minor) != NULL)  return 1; return 0; }
+
+char yKEYS_is_macro          (uchar a_minor) { if (strchr (s_macro    , a_minor) != NULL)  return 1; return 0; }
+char yKEYS_is_findchar       (uchar a_minor) { if (strchr (s_findchar , a_minor) != NULL)  return 1; return 0; }
+
+

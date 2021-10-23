@@ -15,14 +15,16 @@
 #define     P_PURPOSE   ""
 
 #define     P_NAMESAKE  "hermes-tresmegistus (thrice greatest)"
+#define     P_PRONOUNCE ""
 #define     P_HERITAGE  ""
+#define     P_SHORTER   "god of letters and writing"
 #define     P_IMAGERY   ""
-#define     P_REASON    "god of letters and writing"
+#define     P_REASON    ""
 
 #define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
 
 #define     P_BASENAME  "yMODE"
-#define     P_FULLNAME  "/usr/local/lib64/libyMODE"
+#define     P_FULLPATH  "/usr/local/lib64/libyMODE"
 #define     P_SUFFIX    ""
 #define     P_CONTENT   ""
 
@@ -36,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.0-, separated into independent library"
-#define     P_VERNUM    "2.0h"
-#define     P_VERTXT    "logger and repeat mode in place"
+#define     P_VERNUM    "2.0i"
+#define     P_VERTXT    "unit tested solid non-macro grouping"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -59,54 +61,54 @@
 
 
 
-extern char  g_vsimple   [LEN_DESC ];
-extern char  g_vgoto     [LEN_DESC ];
-extern char  g_vpage     [LEN_DESC ];
-extern char  g_vends     [LEN_DESC ];
-extern char  g_vscroll   [LEN_DESC ];
+typedef    struct    cMY    tMY;
+struct cMY {
+   /*---(global flags)---------*/
+   char        done;                        /* flag indicating ready to quit  */
+   char        redraw;                      /* force redraw based on changes  */
+   char        repeating;                   /* note for repeating actions     */
+   char        log_keys;                    /* allows keys to be hidden       */
+   /*---(history logs)---------*/
+   char        h_logkeys;                   /* log current keys (y/-)         */
+   char        h_mode      [LEN_FULL];      /* mode when key logged           */
+   char        h_log       [LEN_FULL];      /* key logged                     */
+   char        h_multi     [LEN_FULL];      /* prefix for multi key           */
+   char        h_errs      [LEN_FULL];      /* key handling error/warns       */
+   char        h_locked;                    /* key handling locked due to err */
+   short       h_all;                       /* all keys counted, from init    */
+   short       h_total;                     /* end of key log position        */
+   short       h_curr;                      /* current key position           */
+   char        h_last      [LEN_LABEL];     /* last keys for display          */
+   /*---(history counts)-------*/
+   short       h_acks;                      /* count of display acks          */
+   short       h_spaces;                    /* count of spaces/no action      */
+   short       h_noops;                     /* count of no-op keys            */
+   short       h_errors;                    /* count of key errors            */
+   short       h_warnings;                  /* count of key warnings          */
+   short       h_skips;                     /* count of keys skipped (locked) */
+   /*---(loop speed)-----------*/
+   float       l_delay;                     /* requested loop sleep timing    */
+   float       l_update;                    /* requested screen update timing */
+   int         l_skip;                      /* diff between playback and exec */
+   /*---(loop tracking)--------*/
+   int         l_secs;                      /* loop sleep second part         */
+   long        l_nsec;                      /* loop sleep nanosec part        */
+   int         l_loops;                     /* loops before screen update     */
+   char        l_blocking;                  /* keyboard input blocks          */
+   /*---(repeat main)----------*/
+   int         r_asked;                     /* originally requested repeats   */
+   int         r_count;                     /* remaining repeats              */
+   char        r_repeating;                 /* repeat status (y/-)            */
+   /*---(repeat groups)--------*/
+   char        r_level;                     /* repeat/grouping level          */
+   short       r_reps    [LEN_LABEL];       /* repeats by group level         */
+   uchar       r_macro   [LEN_LABEL];       /* macro abbr for level           */
+   short       r_beg     [LEN_LABEL];       /* current position               */
+   short       r_end     [LEN_LABEL];       /* current position               */
+   /*---(done)-----------------*/
+};
+extern tMY         myKEYS;
 
-extern char  g_hsimple   [LEN_DESC ];
-extern char  g_hgoto     [LEN_DESC ];
-extern char  g_hpage     [LEN_DESC ];
-extern char  g_hends     [LEN_DESC ];
-extern char  g_hscroll   [LEN_DESC ];
-
-extern char  g_hword     [LEN_DESC ];
-
-extern char  g_multimap  [LEN_DESC ];
-extern char  g_multivisu [LEN_DESC ];
-extern char  g_multiwdr  [LEN_DESC ];
-
-extern char  g_multisrc  [LEN_DESC ];
-extern char  g_multiselc [LEN_DESC ];
-
-extern char  g_repeat    [LEN_DESC ];
-extern char  g_search    [LEN_DESC ];
-
-extern char  g_logkeys;
-extern char  g_log       [LEN_FULL];
-extern char  g_multi     [LEN_FULL];
-extern char  g_mode      [LEN_FULL];
-extern char  g_errs      [LEN_FULL];
-extern int   g_all;
-extern int   g_total;
-extern int   g_curr;
-extern char  g_last      [LEN_LABEL];
-extern int   g_acks;
-extern int   g_spaces;
-extern int   g_noops;
-
-
-
-/*---(repeating)------------*/
-extern int   g_requested;
-extern int   g_repeats;
-extern char  g_repeating;
-/*---(groups)---------------*/
-extern int   g_level;
-extern int   g_rep     [LEN_LABEL];
-extern uchar g_src     [LEN_LABEL];
-extern int   g_pos     [LEN_LABEL];
 
 
 
@@ -140,7 +142,15 @@ char        yKEYS_oldkeys           (void);
 /*---(action)---------------*/
 char        yKEYS_repos             (int a_pos);
 char        yKEYS_toend             (void);
-char        yKEYS_error             (void);
+/*---(errors)---------------*/
+char        yKEYS_set_warning       (void);
+char        yKEYS_set_error         (void);
+char        yKEYS_set_lock          (void);
+char        yKEYS_set_skip          (void);
+char        yKEYS_is_error          (void);
+char        yKEYS_is_locked         (void);
+char        yKEYS_lock              (void);
+char        yKEYS_unlock            (void);
 /*---(done)-----------------*/
 
 
@@ -169,6 +179,8 @@ char        yKEYS_repeat_umode      (uchar a_major, uchar a_minor);
 char        yKEYS_status            (char *a_msg);
 
 
+char        ykeys_group_reset       (void);
+char        ykeys_group_check_end   (void);
 
 
 #endif

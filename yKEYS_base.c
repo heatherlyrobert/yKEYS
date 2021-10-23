@@ -4,21 +4,10 @@
 #include    "yKEYS_priv.h"
 
 
+tMY         myKEYS;
 
-char  g_logkeys   = 'y';
-char  g_log   [LEN_FULL];
-char  g_multi [LEN_FULL];
-char  g_mode  [LEN_FULL];
-char  g_errs [LEN_FULL];
 
-int   g_all       = 0;                      /* all key count, from init       */
-int   g_total      = 0;                      /* end of key log postion         */
-int   g_curr      = 0;                      /* current key position           */
-
-char  g_last  [LEN_LABEL];
-int   g_acks      = 0;
-int   g_spaces    = 0;
-int   g_noops     = 0;
+char  g_last      [LEN_LABEL] = "";
 
 
 
@@ -46,8 +35,8 @@ yKEYS_version           (void)
    return yKEYS_ver;
 }
 
-char yKEYS_logging_on  (void) { g_logkeys = 'y'; return 0; }
-char yKEYS_logging_off (void) { g_logkeys = '-'; return 0; }
+char yKEYS_logging_on  (void) { myKEYS.h_logkeys = 'y'; return 0; }
+char yKEYS_logging_off (void) { myKEYS.h_logkeys = '-'; return 0; }
 
 
 
@@ -64,22 +53,22 @@ yvikeys_keys_dump       (FILE *a_file)
    int         i           =    0;
    /*---(header)-------------------------*/
    fprintf (a_file, "yVIKEYS, key logging report                                                               (:dump keys)\n");
-   fprintf (a_file, "len = %d¦", g_total);
+   fprintf (a_file, "len = %d¦", myKEYS.h_total);
    fprintf (a_file, "          ");
-   for (i = 0; i < (g_total / 10) + 1; ++i)  fprintf (a_file, "%-10d", i);
+   for (i = 0; i < (myKEYS.h_total / 10) + 1; ++i)  fprintf (a_file, "%-10d", i);
    fprintf (a_file, "\n");
    fprintf (a_file, "type----  ");
-   for (i = 0; i < (g_total / 10) + 1; ++i)  fprintf (a_file, "-123456789");
+   for (i = 0; i < (myKEYS.h_total / 10) + 1; ++i)  fprintf (a_file, "-123456789");
    fprintf (a_file, "\n");
-   fprintf (a_file, "keys      %s¦", g_log);
-   fprintf (a_file, "mode      %s¦", g_mode);
-   fprintf (a_file, "multi     %s¦", g_multi);
-   fprintf (a_file, "error     %s¦", g_errs);
+   fprintf (a_file, "keys      %s¦", myKEYS.h_log);
+   fprintf (a_file, "mode      %s¦", myKEYS.h_mode);
+   fprintf (a_file, "multi     %s¦", myKEYS.h_multi);
+   fprintf (a_file, "error     %s¦", myKEYS.h_errs);
    fprintf (a_file, "type----  ");
-   for (i = 0; i < (g_total / 10) + 1; ++i)  fprintf (a_file, "-123456789");
+   for (i = 0; i < (myKEYS.h_total / 10) + 1; ++i)  fprintf (a_file, "-123456789");
    fprintf (a_file, "\n");
    fprintf (a_file, "          ");
-   for (i = 0; i < (g_total / 10) + 1; ++i)  fprintf (a_file, "%-10d", i);
+   for (i = 0; i < (myKEYS.h_total / 10) + 1; ++i)  fprintf (a_file, "%-10d", i);
    fprintf (a_file, "\n");
    /*---(complete)-----------------------*/
    return 0;
@@ -88,9 +77,10 @@ yvikeys_keys_dump       (FILE *a_file)
 char
 yKEYS_init              (void)
 {
+   char        rc          =    0;
    /*> yvikeys_view_keys ("-- -");                                                    <*/
-   ykeys_logger_init ();
-   ykeys_repeat_init ();
+   rc = ykeys_logger_init ();
+   rc = ykeys_repeat_init ();
    return 0;
 }
 
@@ -142,29 +132,44 @@ ykeys__input            (uchar a_key)
 {
    /*---(locals)-----------+-----+-----+-*/
    uchar       x_key       = ' ';
+   char        x_lock      =   0;
    /*---(header)-------------------------*/
-   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
    /*---(repeating)---------*/
-   if (yKEYS_oldkeys ()) {
+   if (yKEYS_oldkeys () == 1) {
       DEBUG_KEYS   yLOG_note    ("normal mode, group repeating older keys");
-      x_key = g_log [g_curr];
-      ++g_curr;
+      x_key = myKEYS.h_log [myKEYS.h_curr];
+      ++myKEYS.h_curr;
    }
    /*---(not-repeating)-----*/
    else {
+      /*---(check key)---------*/
       x_key  = a_key;
-      DEBUG_KEYS   yLOG_char    ("log_keys"  , g_logkeys);
+      DEBUG_KEYS   yLOG_char    ("log_keys"  , myKEYS.h_logkeys);
       if (x_key == 0) {
          DEBUG_KEYS   yLOG_note    ("null key, nothing to do");
-      } else if (g_logkeys == 'y') {
+      } else if (myKEYS.h_logkeys == 'y') {
          DEBUG_KEYS   yLOG_note    ("normal mode, new keystroke and recording");
          yKEYS_logger (x_key);
       } else {
          DEBUG_KEYS   yLOG_note    ("normal mode, NO recording");
       }
+      /*---(check locking)-----*/
+      x_lock = yKEYS_is_locked ();
+      DEBUG_KEYS   yLOG_value   ("x_lock"    , x_lock);
+      if (x_lock) {
+         if (yKEYS_test_unlock ()) {
+            DEBUG_LOOP   yLOG_note    ("received ¥¥ and key, unlocking");
+            x_key = 1;
+         } else {
+            DEBUG_LOOP   yLOG_note    ("not ready to unlock, skipping");
+            x_key = 1;
+         }
+      }
+      /*---(done)--------------*/
    }
    /*---(complete)-----------------------*/
-   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return x_key;
 }
 
@@ -177,22 +182,27 @@ yKEYS_input             (char a_env, uchar a_key)
    char        x_used      =   0;
    /*---(header)-------------------------*/
    DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
-   DEBUG_KEYS   yLOG_char    ("a_env"     , a_env);
-   DEBUG_KEYS   yLOG_value   ("a_key"     , a_key);
-   DEBUG_KEYS   yLOG_char    ("macro rec" , yMACRO_rec_mode ());
+   DEBUG_KEYS   yLOG_complex ("a_env"     , "%c, %3d, %c", a_env, a_key, yMACRO_rec_mode ());
    /*---(fixes)--------------------------*/
    a_key = ykeys__input_fix (a_env, a_key);
    /*---(normal)-------------------------*/
    IF_MACRO_NOT_PLAYING   x_ch = ykeys__input (a_key);
    /*---(run, delay, or playback)--------*/
    IF_MACRO_PLAYING       x_ch = yMACRO_exec  (a_key);
+   /*---(categorize)---------------------*/
+   switch (x_ch) {
+   case 0           :  ++myKEYS.h_noops;                     break;
+   case 1           :  yKEYS_set_skip ();  x_ch = 0;  break;
+   case G_KEY_ACK   :  ++myKEYS.h_acks;                      break;
+   case G_KEY_SPACE :  ++myKEYS.h_spaces;                    break;
+   }
    /*---(complete)-----------------------*/
    DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return x_ch;
 }
 
 char         /*-> process input string in main loop --[ ------ [ge.C74.153.42]*/ /*-[02.0000.00#.D]-*/ /*-[--.---.---.--]-*/
-yKEYS_string         (uchar *a_keys)
+yKEYS_string            (uchar *a_keys)
 {
    /*---(locals)-----------+-----------+-*/
    char        rce         =  -10;     /* return code for errors              */
@@ -202,6 +212,8 @@ yKEYS_string         (uchar *a_keys)
    int         x_len       =    0;
    uchar       x_ch        =  ' ';     /* current keystroke                   */
    char        x_keys      [LEN_RECD];
+   char        x_error     =    0;          /* count of badly handled keys    */
+   char        x_old       =  '-';
    /*---(header)-------------------------*/
    DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
    DEBUG_LOOP   yLOG_point   ("a_keys"    , a_keys);
@@ -212,54 +224,58 @@ yKEYS_string         (uchar *a_keys)
    }
    strlcpy    (x_keys, a_keys  , LEN_RECD);
    strlencode (x_keys, ySTR_MAX, LEN_RECD);
-   DEBUG_LOOP   yLOG_info    ("x_keys"    , x_keys);
    x_len = strlen (a_keys);
-   DEBUG_LOOP   yLOG_value   ("x_len"     , x_len);
+   DEBUG_LOOP   yLOG_complex ("x_keys"    , "%3då%sæ", x_len, x_keys);
    --rce;
    for (i = 0; i < x_len; ++i) {
-      DEBUG_LOOP   yLOG_value   ("LOOP"      , i);
       /*---(get next char)---------------*/
       if (i != j) {
-         DEBUG_LOOP   yLOG_note    ("new keystroke");
-         DEBUG_LOOP   yLOG_value   ("a_keys[i]" , a_keys[i]);
-         DEBUG_LOOP   yLOG_char    ("a_keys[i]" , chrvisible (a_keys[i]));
          x_ch = chrworking (a_keys [i]);
+         DEBUG_LOOP   yLOG_complex ("new key"   , "%3di, %3dj, %3d, %c  -----------------------------------------------", i, j, x_ch, chrvisible (x_ch));
       } else {
-         DEBUG_LOOP   yLOG_note    ("repeat loop");
          x_ch = 0;
+         DEBUG_LOOP   yLOG_complex ("repeat key", "%3di, %3dj, %3d, %c  -----------------------------------------------", i, j, x_ch, chrvisible (x_ch));
       }
       j = i;
-      DEBUG_LOOP   yLOG_value   ("x_ch"      , x_ch);
-      DEBUG_LOOP   yLOG_char    ("x_ch"      , chrvisible (x_ch));
       /*---(handle input)----------------*/
       x_ch = yKEYS_input ('-', x_ch);
-      DEBUG_LOOP   yLOG_value   ("x_ch"      , x_ch);
-      if (x_ch  == G_KEY_ACK)     ++g_acks;
-      if (x_ch  == G_KEY_SPACE)   ++g_spaces;
-      if (x_ch  == 0)             ++g_noops;
       /*---(handle keystroke)------------*/
-      rc = yMODE_handle (x_ch);
-      DEBUG_LOOP   yLOG_value   ("rc"        , rc);
+      if (!yKEYS_is_locked ()) {
+         rc = yMODE_handle (x_ch);
+         DEBUG_LOOP   yLOG_complex ("normal"    , "%3d, %c, %4d", x_ch, chrvisible (x_ch), rc);
+         if (rc < 0)  ++x_error;
+      } else {
+         DEBUG_LOOP   yLOG_complex ("skipped"   , "%3d, %c", x_ch, chrvisible (x_ch));
+      }
       /*---(check for macro)-------------*/
-      DEBUG_LOOP   yLOG_char    ("macro exe" , yMACRO_exe_mode ());
-      DEBUG_LOOP   yLOG_value   ("macro cnt" , yKEYS_repeats ());
-      DEBUG_LOOP   yLOG_value   ("s_nkey"    , g_total);
-      DEBUG_LOOP   yLOG_value   ("s_gpos"    , g_curr);
+      DEBUG_LOOP   yLOG_complex ("macro"     , "exe %c, rep %3d, h_total %3d, h_curr %3d", yMACRO_exe_mode (), yKEYS_repeats (), myKEYS.h_total, myKEYS.h_curr);
       IF_MACRO_MOVING  {
          DEBUG_LOOP   yLOG_note    ("macro running and used step, back up loop counter");
          --i;
       }
-      if (yKEYS_oldkeys ()) {
+      /*---(check for old keys)----------*/
+      rc = yKEYS_oldkeys ();
+      DEBUG_LOOP   yLOG_value   ("old keys"  , rc);
+      if (rc == 1) {
          DEBUG_LOOP   yLOG_note    ("group using older keystrokes, back up loop counter");
          --i;
+         x_old = 'y';
+      } else {
+         x_ch = chrworking (a_keys [i]);
+         DEBUG_LOOP   yLOG_complex ("group?"    , "%3d, %3d, %c", i, x_ch, chrvisible (x_ch));
+         if (x_ch == ')') {
+            rc = ykeys_group_check_end ();
+            DEBUG_LOOP   yLOG_value   ("check"     , rc);
+            if (rc > 0)   --i;
+         }
       }
       /*---(done)------------------------*/
    }
    DEBUG_LOOP   yLOG_note    ("main loop done");
-   if (rc >= 0)  rc = 0;
+   if (x_error < -99)  x_error = -99;
    /*---(complete)-----------------------*/
    DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
-   return rc;
+   return x_error;
 }
 
 
@@ -276,8 +292,9 @@ ykeys__unit_quiet       (void)
 {
    int         x_narg       = 1;
    char       *x_args [20]  = {"yKEYS_unit" };
-   yKEYS_init ();
-   return 0;
+   char        rc           =    0;
+   rc = yKEYS_init ();
+   return rc;
 }
 
 char       /*----: set up program urgents/debugging --------------------------*/
@@ -285,13 +302,16 @@ ykeys__unit_loud        (void)
 {
    int         x_narg       = 1;
    char       *x_args [20]  = {"yKEYS_unit" };
+   char        rc           =    0;
    yURG_logger   (x_narg, x_args);
    yURG_urgs     (x_narg, x_args);
    yURG_name  ("kitchen"      , YURG_ON);
    yURG_name  ("ystr"         , YURG_ON);
+   yURG_name  ("mode"         , YURG_ON);
+   yURG_name  ("keys"         , YURG_ON);
    DEBUG_KEYS  yLOG_info     ("yKEYS"     , yKEYS_version   ());
-   yKEYS_init ();
-   return 0;
+   rc = yKEYS_init ();
+   return rc;
 }
 
 char       /*----: stop logging ----------------------------------------------*/
@@ -311,31 +331,33 @@ yKEYS__unit             (char *a_question, char a_index)
    char        t           [LEN_RECD ] = "";
    int         x_beg       =    0;
    char        x_open      =  '[';
+   int         i           =    0;
+   char        x_list      [LEN_RECD]  = "";
    /*---(preprare)-----------------------*/
    strlcpy  (unit_answer, "KEYS unit        : question not understood", LEN_FULL);
    /*---(dependency list)----------------*/
-   if (g_total > 40) {
-      x_beg  = g_total - 40;
+   if (myKEYS.h_total > 40) {
+      x_beg  = myKEYS.h_total - 40;
       x_open = '<';
    }
    if      (strcmp (a_question, "log"            )   == 0) {
-      sprintf (t, "%s", g_log   + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS log         : %3d %3d %3d %c%-.40s]", g_all, g_total, g_curr, x_open, t);
+      sprintf (t, "%s", myKEYS.h_log   + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS log         : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
    }
    else if (strcmp (a_question, "mode"           )   == 0) {
-      sprintf (t, "%s", g_mode  + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS mode        : %3d %3d %3d %c%-.40s]", g_all, g_total, g_curr, x_open, t);
+      sprintf (t, "%s", myKEYS.h_mode  + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS mode        : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
    }
    else if (strcmp (a_question, "multi"          )   == 0) {
-      sprintf (t, "%s", g_multi + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS multi       : %3d %3d %3d %c%-.40s]", g_all, g_total, g_curr, x_open, t);
+      sprintf (t, "%s", myKEYS.h_multi + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS multi       : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
    }
    else if (strcmp (a_question, "error"          )   == 0) {
-      sprintf (t, "%s", g_errs  + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS error       : %3d %3d %3d %c%-.40s]", g_all, g_total, g_curr, x_open, t);
+      sprintf (t, "%s", myKEYS.h_errs  + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS error       : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
    }
    else if (strcmp (a_question, "full"           )   == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS full        : %3d %3d %3d [%s]", g_all, g_total, g_curr, g_log);
+      snprintf (unit_answer, LEN_FULL, "KEYS full        : %3d %3d %3d [%s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, myKEYS.h_log);
    }
    else if (strcmp (a_question, "status"         )   == 0) {
       yKEYS_status (t);
@@ -343,23 +365,27 @@ yKEYS__unit             (char *a_question, char a_index)
       snprintf (unit_answer, LEN_FULL, "%-.60s", t);
    }
    else if (strcmp (a_question, "pos"          )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", g_all, g_total, g_curr);
+      snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr);
    }
-   /*> else if (strcmp (a_question, "acks"         )  == 0) {                                                          <* 
-    *>    snprintf (unit_answer, LEN_FULL, "KEYS acks        : %3da %3ds %3dz", s_acks, s_spaces, s_noops);   <* 
-    *> }                                                                                                               <*/
+   else if (strcmp (a_question, "acks"         )  == 0) {
+      snprintf (unit_answer, LEN_FULL, "KEYS acks        : %3da  %3ds  %3dz  %3de  %3dw   locked %c  %3ds", myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_locked, myKEYS.h_skips);
+   }
    else if (strcmp (a_question, "repeats"      )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS repeats     : %c  %4d  %4d", g_repeating, g_requested, g_repeats);
+      snprintf (unit_answer, LEN_FULL, "KEYS repeats     : %c  %4d  %4d", myKEYS.r_repeating, myKEYS.r_asked, myKEYS.r_count);
    }
-   /*> else if (strcmp (a_question, "groups"       )  == 0) {                                        <* 
-    *>    for (i = 1; i <= 5; ++i) {                                                                 <* 
-    *>       if (s_pos [i] >= 0)  sprintf (t, "%02d/%c/%03d", s_rep [i], s_src [i], s_pos [i]);      <* 
-    *>       else                 sprintf (t, "--/-/---");                                           <* 
-    *>       strlcat (x_list, t, LEN_FULL);                                                          <* 
-    *>       if (i < 5)  strlcat (x_list, ", ", LEN_FULL);                                           <* 
-    *>    }                                                                                          <* 
-    *>    snprintf (yVIKEYS__unit_answer, LEN_FULL, "KEYS groups      : %1d %s", s_level, x_list);   <* 
-    *> }                                                                                             <*/
+   else if (strcmp (a_question, "groups"       )  == 0) {
+      for (i = 1; i <= 5; ++i) {
+         if (myKEYS.r_beg [i] >= 0) {
+            if (myKEYS.r_end [i] >= 0)
+               sprintf (t, "%02d(%c)%03d:%03d", myKEYS.r_reps [i], myKEYS.r_macro [i], myKEYS.r_beg [i], myKEYS.r_end [i]);
+            else 
+               sprintf (t, "%02d(%c)%03d:···", myKEYS.r_reps [i], myKEYS.r_macro [i], myKEYS.r_beg [i]);
+         } else sprintf (t, "············");
+         strlcat (x_list, t, LEN_FULL);
+         if (i < 5)  strlcat (x_list, ", ", LEN_FULL);
+      }
+      snprintf (unit_answer, LEN_FULL, "KEYS groups      : %1d %s", myKEYS.r_level, x_list);
+   }
    /*---(complete)-----------------------*/
    return unit_answer;
 }
