@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.0-, separated into independent library"
-#define     P_VERNUM    "2.0i"
-#define     P_VERTXT    "unit tested solid non-macro grouping"
+#define     P_VERNUM    "2.0j"
+#define     P_VERTXT    "unit tested all logger functions and made big improvements"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -68,24 +68,35 @@ struct cMY {
    char        redraw;                      /* force redraw based on changes  */
    char        repeating;                   /* note for repeating actions     */
    char        log_keys;                    /* allows keys to be hidden       */
-   /*---(history logs)---------*/
+   /*---(history every)--------*/
+   char        h_every     [LEN_HUGE];      /* every key (hidden or not)      */
+   short       h_grand;                     /* total of every key             */
+   /*---(history normal)-------*/
    char        h_logkeys;                   /* log current keys (y/-)         */
-   char        h_mode      [LEN_FULL];      /* mode when key logged           */
-   char        h_log       [LEN_FULL];      /* key logged                     */
-   char        h_multi     [LEN_FULL];      /* prefix for multi key           */
-   char        h_errs      [LEN_FULL];      /* key handling error/warns       */
+   uchar       h_mode      [LEN_FULL];      /* mode when key logged           */
+   uchar       h_log       [LEN_FULL];      /* key logged                     */
+   uchar       h_multi     [LEN_FULL];      /* prefix for multi key           */
+   uchar       h_errs      [LEN_FULL];      /* key handling error/warns       */
    char        h_locked;                    /* key handling locked due to err */
+   /*---(history positions)----*/
    short       h_all;                       /* all keys counted, from init    */
    short       h_total;                     /* end of key log position        */
    short       h_curr;                      /* current key position           */
+   char        h_used;                      /* is last logged handled already */
    char        h_last      [LEN_LABEL];     /* last keys for display          */
    /*---(history counts)-------*/
    short       h_acks;                      /* count of display acks          */
    short       h_spaces;                    /* count of spaces/no action      */
    short       h_noops;                     /* count of no-op keys            */
+   short       h_combos;                    /* count of combo (p multi)       */
+   /*---(history errors)-------*/
    short       h_errors;                    /* count of key errors            */
    short       h_warnings;                  /* count of key warnings          */
    short       h_skips;                     /* count of keys skipped (locked) */
+   /*---(history grouping)-----*/
+   short       h_open;                      /* count of open parens           */
+   short       h_close;                     /* count of close parens          */
+   char        h_balanced;                  /* parens are balanced (y/-)      */
    /*---(loop speed)-----------*/
    float       l_delay;                     /* requested loop sleep timing    */
    float       l_update;                    /* requested screen update timing */
@@ -132,6 +143,7 @@ char        ykeys_logger_init       (void);
 char        ykeys__roll             (void);
 char        ykeys__multi            (int a_pos);
 char        yKEYS_logger            (uchar a_key);
+char        ykeys_logstr            (char a_mode, uchar *a_keys);
 /*---(undo)-----------------*/
 char        yKEYS_unique            (void);
 /*---(status)---------------*/
@@ -176,7 +188,7 @@ char        yKEYS_repeat_umode      (uchar a_major, uchar a_minor);
 
 /*===[[ yMACRO_rptg.c ]]======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
-char        yKEYS_status            (char *a_msg);
+char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 
 
 char        ykeys_group_reset       (void);

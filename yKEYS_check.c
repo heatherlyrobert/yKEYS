@@ -18,12 +18,12 @@ static  uchar   s_hends     [LEN_DESC ]   = "S  shcle  E C azud      .    ";
 static  uchar   s_hscroll   [LEN_DESC ]   = " H shcle L    azud      .    ";
 static  uchar   s_hword     [LEN_DESC ]   = "wbe WBE";
 
-static  uchar   s_multimap  [LEN_DESC ]   = "cgz e  dx a   DA";
-static  uchar   s_multivisu [LEN_DESC ]   = "cgz e pd  a   DA";
+static  uchar   s_multimap  [LEN_DESC ]   = "cgz e pdx ai  DA";
+static  uchar   s_multivisu [LEN_DESC ]   = "cgz e pd  ai  DA";
 static  uchar   s_multiwdr  [LEN_DESC ]   = "cg  e         ";
 
-static  uchar   s_multisrc  [LEN_DESC ]   = "cgz    dx   Ff";
-static  uchar   s_multiselc [LEN_DESC ]   = "cgz         Ff";
+static  uchar   s_multisrc  [LEN_DESC ]   = "cgz   pdx     Ff";
+static  uchar   s_multiselc [LEN_DESC ]   = "cgz   p       Ff";
 
 static  uchar   s_repeat    [LEN_DESC ]   = "123456789";
 static  uchar   s_search    [LEN_DESC ]   = "[<>]";

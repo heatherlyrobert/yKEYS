@@ -22,6 +22,7 @@ uchar       yKEYS_input             (char a_env, uchar a_key);
 char        yKEYS_string            (uchar *a_keys);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
+char        yKEYS_handled           (void);
 char        yKEYS_unique            (void);
 /*---(status)---------------*/
 int         yKEYS_count             (void);
@@ -30,6 +31,7 @@ uchar       yKEYS_current           (void);
 char        yKEYS_oldkeys           (void);
 /*---(action)---------------*/
 char        yKEYS_repos             (int a_pos);
+char        yKEYS_nextpos           (void);
 char        yKEYS_toend             (void);
 /*---(errors)---------------*/
 char        yKEYS_set_warning       (void);
@@ -40,10 +42,10 @@ char        yKEYS_is_error          (void);
 char        yKEYS_is_locked         (void);
 char        yKEYS_lock              (void);
 char        yKEYS_unlock            (void);
-char        yKEYS_test_unlock       (void);
+char        yKEYS_check_unlock      (void);
 /*---(reporting)------------*/
 char*       yKEYS_last              (void);
-char        yKEYS_status            (char *a_msg);
+char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 /*---(repeat)---------------*/
 
 /*---(status)---------------*/

@@ -16,7 +16,7 @@ char  g_last      [LEN_LABEL] = "";
 /*====================------------------------------------====================*/
 static void      o___UTILITY_________________o (void) {;}
 
-char        yKEYS_ver [200] = "";
+char        yKEYS_ver [LEN_HUND] = "";
 
 char*        /*--> return library versioning info --------[ leaf-- [ ------ ]-*/
 yKEYS_version           (void)
@@ -31,7 +31,7 @@ yKEYS_version           (void)
 #else
    strncpy (t, "[unknown    ]", 15);
 #endif
-   snprintf (yKEYS_ver, 100, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
+   snprintf (yKEYS_ver, LEN_HUND, "%s   %s : %s", t, P_VERNUM, P_VERTXT);
    return yKEYS_ver;
 }
 
@@ -158,7 +158,7 @@ ykeys__input            (uchar a_key)
       x_lock = yKEYS_is_locked ();
       DEBUG_KEYS   yLOG_value   ("x_lock"    , x_lock);
       if (x_lock) {
-         if (yKEYS_test_unlock ()) {
+         if (yKEYS_check_unlock ()) {
             DEBUG_LOOP   yLOG_note    ("received ¥¥ and key, unlocking");
             x_key = 1;
          } else {
@@ -191,11 +191,14 @@ yKEYS_input             (char a_env, uchar a_key)
    IF_MACRO_PLAYING       x_ch = yMACRO_exec  (a_key);
    /*---(categorize)---------------------*/
    switch (x_ch) {
-   case 0           :  ++myKEYS.h_noops;                     break;
-   case 1           :  yKEYS_set_skip ();  x_ch = 0;  break;
-   case G_KEY_ACK   :  ++myKEYS.h_acks;                      break;
-   case G_KEY_SPACE :  ++myKEYS.h_spaces;                    break;
+   case 0              :  ++myKEYS.h_noops;                     break;
+   case 1              :  yKEYS_set_skip ();  x_ch = 0;         break;
+   case G_KEY_ACK      :  ++myKEYS.h_acks;                      break;
+   case G_KEY_SPACE    :  ++myKEYS.h_spaces;                    break;
+   case G_CHAR_SPACE   :  ++myKEYS.h_spaces;                    break;
+   case G_CHAR_STORAGE :  ++myKEYS.h_spaces;                    break;
    }
+   /*---(logger)-------------------------*/
    /*---(complete)-----------------------*/
    DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return x_ch;
@@ -330,7 +333,7 @@ yKEYS__unit             (char *a_question, char a_index)
    /*---(locals)-----------+-----+-----+-*/
    char        t           [LEN_RECD ] = "";
    int         x_beg       =    0;
-   char        x_open      =  '[';
+   char        x_open      =  'å';
    int         i           =    0;
    char        x_list      [LEN_RECD]  = "";
    /*---(preprare)-----------------------*/
@@ -342,33 +345,35 @@ yKEYS__unit             (char *a_question, char a_index)
    }
    if      (strcmp (a_question, "log"            )   == 0) {
       sprintf (t, "%s", myKEYS.h_log   + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS log         : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
+      snprintf (unit_answer, LEN_FULL, "KEYS log         : %c%-.40sæ", x_open, t);
    }
    else if (strcmp (a_question, "mode"           )   == 0) {
       sprintf (t, "%s", myKEYS.h_mode  + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS mode        : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
+      snprintf (unit_answer, LEN_FULL, "KEYS mode        : %c%-.40sæ", x_open, t);
    }
    else if (strcmp (a_question, "multi"          )   == 0) {
       sprintf (t, "%s", myKEYS.h_multi + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS multi       : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
+      snprintf (unit_answer, LEN_FULL, "KEYS multi       : %c%-.40sæ", x_open, t);
    }
    else if (strcmp (a_question, "error"          )   == 0) {
       sprintf (t, "%s", myKEYS.h_errs  + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS error       : %3d %3d %3d %c%-.40s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, x_open, t);
+      snprintf (unit_answer, LEN_FULL, "KEYS error       : %c%-.40sæ", x_open, t);
    }
-   else if (strcmp (a_question, "full"           )   == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS full        : %3d %3d %3d [%s]", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr, myKEYS.h_log);
-   }
-   else if (strcmp (a_question, "status"         )   == 0) {
-      yKEYS_status (t);
-      strltrim (t, ySTR_BOTH, LEN_RECD);
-      snprintf (unit_answer, LEN_FULL, "%-.60s", t);
+   else if (strcmp (a_question, "every"          )   == 0) {
+      x_beg  = 0;
+      x_open = 'å';
+      if (myKEYS.h_grand > 70) {
+         x_beg  = myKEYS.h_grand - 70;
+         x_open = '<';
+      }
+      sprintf (t, "%s", myKEYS.h_every + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS every       : %c%-.70sæ", x_open, t);
    }
    else if (strcmp (a_question, "pos"          )  == 0) {
       snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr);
    }
-   else if (strcmp (a_question, "acks"         )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS acks        : %3da  %3ds  %3dz  %3de  %3dw   locked %c  %3ds", myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_locked, myKEYS.h_skips);
+   else if (strcmp (a_question, "counts"       )  == 0) {
+      snprintf (unit_answer, LEN_FULL, "KEYS counts      : %3dg § %3da %3dt %c %3dc %c § %3da %3ds %3dz %3dp § %3de %3dw %3ds %c § %2do %2dc %c", myKEYS.h_grand, myKEYS.h_all, myKEYS.h_total, myKEYS.h_logkeys, myKEYS.h_curr, myKEYS.h_used, myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_combos, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_skips, myKEYS.h_locked, myKEYS.h_open, myKEYS.h_close, myKEYS.h_balanced);
    }
    else if (strcmp (a_question, "repeats"      )  == 0) {
       snprintf (unit_answer, LEN_FULL, "KEYS repeats     : %c  %4d  %4d", myKEYS.r_repeating, myKEYS.r_asked, myKEYS.r_count);
