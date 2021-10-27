@@ -18,7 +18,7 @@ typedef  unsigned char        uchar;
 char*       yKEYS_version           (void);
 char        yKEYS_init              (void);
 char        yKEYS_wrap              (void);
-uchar       yKEYS_input             (char a_env, uchar a_key);
+char        yKEYS_input             (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        yKEYS_string            (uchar *a_keys);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
@@ -42,7 +42,7 @@ char        yKEYS_is_error          (void);
 char        yKEYS_is_locked         (void);
 char        yKEYS_lock              (void);
 char        yKEYS_unlock            (void);
-char        yKEYS_check_unlock      (void);
+char        yKEYS_check_unlock      (uchar *a_key);
 /*---(reporting)------------*/
 char*       yKEYS_last              (void);
 char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);

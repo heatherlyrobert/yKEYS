@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.0-, separated into independent library"
-#define     P_VERNUM    "2.0j"
-#define     P_VERTXT    "unit tested all logger functions and made big improvements"
+#define     P_VERNUM    "2.0k"
+#define     P_VERTXT    "really improved base input/logging and working in unit testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -69,7 +69,8 @@ struct cMY {
    char        repeating;                   /* note for repeating actions     */
    char        log_keys;                    /* allows keys to be hidden       */
    /*---(history every)--------*/
-   char        h_every     [LEN_HUGE];      /* every key (hidden or not)      */
+   char        h_every     [LEN_HUGE];      /* every key  (hidden or not)     */
+   char        h_emode     [LEN_HUGE];      /* every mode (hidden or not)     */
    short       h_grand;                     /* total of every key             */
    /*---(history normal)-------*/
    char        h_logkeys;                   /* log current keys (y/-)         */
@@ -127,7 +128,8 @@ extern tMY         myKEYS;
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(input)----------------*/
 uchar       ykeys__input_fix        (char a_env, uchar a_key);
-uchar       ykeys__input            (uchar a_key);
+char        yKEYS_input             (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys_input_force       (char a_env, uchar *a_key, uchar *a_str, int *n);
 /*---(unittest)-------------*/
 char        ykeys__unit_quiet       (void);
 char        ykeys__unit_loud        (void);
@@ -143,6 +145,7 @@ char        ykeys_logger_init       (void);
 char        ykeys__roll             (void);
 char        ykeys__multi            (int a_pos);
 char        yKEYS_logger            (uchar a_key);
+char        ykeys_logger_force      (uchar a_key);
 char        ykeys_logstr            (char a_mode, uchar *a_keys);
 /*---(undo)-----------------*/
 char        yKEYS_unique            (void);
