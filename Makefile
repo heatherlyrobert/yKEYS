@@ -6,7 +6,7 @@
 # basename of executable, header, and all code files
 NAME_BASE  = yKEYS
 # additional standard and outside libraries
-LIB_STD    = 
+LIB_STD    = -lm
 # all heatherly libraries used, debug versions whenever available
 LIB_MINE   = -lyMODE_debug -lyMACRO_debug -lySTR_debug
 # directory for production code, no trailing slash

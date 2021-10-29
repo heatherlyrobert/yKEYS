@@ -78,6 +78,7 @@ yKEYS_init              (void)
    /*> yvikeys_view_keys ("-- -");                                                    <*/
    rc = ykeys_logger_init ();
    rc = ykeys_repeat_init ();
+   rc = ykeys_loop_init   ();
    return 0;
 }
 
@@ -324,6 +325,88 @@ yKEYS_string            (uchar *a_keys)
    return x_error;
 }
 
+char         /*-> handle main loop for ncurses -------[ ------ [gn.842.232.99]*/ /*-[01.0000.000.!]-*/ /*-[--.---.---.--]-*/
+yKEYS_main              (char *a_delay, char *a_update, char *a_altinput ())
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   int         x_loop      =    0;
+   int         x_ch        =  ' ';
+   uchar       x_key       =  ' ';
+   char        x_draw      =  '-';
+   char        x_group     =  '-';
+   char        t           [LEN_DESC]  = "";
+   /*---(prepare)------------------------*/
+   DEBUG_TOPS   yLOG_note    ("entering main processing loop");
+   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
+   DEBUG_GRAF   yLOG_point   ("a_altinput", a_altinput);
+   DEBUG_TOPS   yLOG_break   ();
+   /*> yvikeys_loop_set     (a_delay, a_update);                                      <*/
+   /*> yVIKEYS_view_all (0.0);                                                        <*/
+   /*---(CLA for script)-----------------*/
+   /*> DEBUG_TOPS   yLOG_info    ("script"    , myVIKEYS.m_script);                   <*/
+   /*> if (strcmp (myVIKEYS.m_script, "") != 0) {                                     <* 
+    *>    DEBUG_TOPS   yLOG_note    ("command line script argument");                 <* 
+    *>    sprintf (t, ":script %s", myVIKEYS.m_script);                               <* 
+    *>    DEBUG_TOPS   yLOG_info    ("t"         , t);                                <* 
+    *>    rc = yVIKEYS_cmds_direct (t);                                               <* 
+    *>    DEBUG_TOPS   yLOG_value   ("cmds"      , rc);                               <* 
+    *> }                                                                              <*/
+   /*---(main-loop)----------------------*/
+   while (1) {
+      /*---(alternate input)-------------*/
+      /*> DEBUG_GRAF  yLOG_point   ("a_altinput", a_altinput);                        <*/
+      /*> if (a_altinput != NULL)   a_altinput ();                                    <*/
+      /*---(get input)-------------------*/
+      /*> x_ch = yvikeys_loop_getch ();                                               <* 
+       *> DEBUG_GRAF  yLOG_value   ("x_ch"      , x_ch);                              <* 
+       *> yvikeys_loop_beg   ();                                                      <*/
+      /*---(specialty actions)-----------*/
+      /*> if (x_ch == KEY_RESIZE)  yVIKEYS_resize (0, 0, 0);                          <* 
+       *> if (x_ch == -102)        yVIKEYS_resize (0, 0, 0);                          <* 
+       *> if (x_ch < 0)  x_key = 0;                                                   <* 
+       *> else           x_key = x_ch;                                                <*/
+      x_key = x_ch;
+      /*---(keyboard input)--------------*/
+      DEBUG_GRAF  yLOG_value   ("x_key"     , x_key);
+      /*> x_key = yVIKEYS_main_input  (RUN_USER, x_key);                              <*/
+      /*> x_key = yKEYS_input (myVIKEYS.env, x_key);                                  <*/
+      if (x_key == G_KEY_SKIP)  continue;   /* for macros to skip spaces, etc  */
+      /*---(handling)--------------------*/
+      /*> yVIKEYS_main_handle (x_key);                                                <*/
+      /*> rc = yMODE_handle (x_key);                                                  <*/
+      /*> if (yVIKEYS_quit ())  break;                                                <*/
+      /*---(repeating)-------------------*/
+      /*> if (x_key == ')' && yvikeys_macro_emode () == MACRO_STOP) {                           <* 
+       *>    DEBUG_GRAF  yLOG_note    ("kick into grouping (non-macro) fast execution mode");   <* 
+       *>    yvikeys_macro_set2blitz ();                                                        <* 
+       *>    x_group = 'y';                                                                     <* 
+       *>    continue;                                                                          <* 
+       *> }                                                                                     <* 
+       *> if (!yvikeys_keys_repeating () && x_group == 'y') {                                   <* 
+       *>    DEBUG_GRAF  yLOG_note    ("end grouping (non-macro) fast execution mode");         <* 
+       *>    yvikeys_macro_set2run ();                                                          <* 
+       *>    x_group = '-';                                                                     <* 
+       *> }                                                                                     <*/
+      /*---(showing)---------------------*/
+      ++x_loop;
+      x_draw = '-';
+      /*> if ((x_loop % myVIKEYS.loops) == 0) {                                       <* 
+       *>    x_draw = 'y';                                                            <* 
+       *>    yvikeys_loop_prog ();                                                    <* 
+       *>    yVIKEYS_view_all (0.0);                                                  <* 
+       *> }                                                                           <*/
+      /*---(sleeping)--------------------*/
+      /*> yvikeys_loop_sleep (x_key, x_draw);                                         <*/
+      /*---(done)------------------------*/
+   }
+   DEBUG_TOPS  yLOG_break   ();
+   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   DEBUG_TOPS  yLOG_note    ("exiting main processing loop");
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
 
 
 /*====================------------------------------------====================*/
@@ -450,6 +533,16 @@ yKEYS__unit             (char *a_question, char a_index)
       }
       snprintf (unit_answer, LEN_FULL, "KEYS groups      : %1d %s", myKEYS.r_level, x_list);
    }
+   else if (strcmp (a_question, "loop"        )   == 0) {
+      yKEYS_loop_status ('m', 70, t);
+      snprintf (unit_answer, LEN_RECD, "KEYS loop        : %s", t + 8);
+   }
+   /*> else if (strcmp (a_question, "update"      )   == 0) {                                                                                                                  <* 
+    *>    snprintf (unit_answer, LEN_RECD, "LOOP update      : %-5s = %5.3f, %6d loop(s)", s_update_info [s_update].terse, s_update_info [s_update].update, myVIKEYS.loops);   <* 
+    *> }                                                                                                                                                                       <*/
+   /*> else if (strcmp (a_question, "saved"       )   == 0) {                                                            <* 
+    *>    snprintf (unit_answer, LEN_RECD, "LOOP saved       : delay %-5s, update %-5s", s_save_delay, s_save_update);   <* 
+    *> }                                                                                                                 <*/
    /*---(complete)-----------------------*/
    return unit_answer;
 }

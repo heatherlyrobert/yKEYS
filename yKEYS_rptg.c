@@ -174,3 +174,29 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
    /*---(complete)-----------------------*/
    return 0;
 }
+
+char
+yKEYS_loop_status       (char a_size, short a_wide, char *a_list)
+{
+   char        t           [LEN_LABEL] = "";
+   char        x_delay     [LEN_LABEL] = "";
+   char        x_skip      [LEN_LABEL] = "";
+   char        x_update    [LEN_LABEL] = "";
+   char        x_nsec      [LEN_LABEL] = "";
+   char        x_loops     [LEN_LABEL] = "";
+   sprintf (x_delay , "%8.6f", myKEYS.l_delay);
+   sprintf (t       , "%2d"  , myKEYS.l_skip);
+   strlpad (t, x_skip  , '.', '>', 2);
+   sprintf (t       , "%.4f", myKEYS.l_update);
+   strlpad (t, x_update, '.', '>', 8);
+   sprintf (t       , "%8ld" , myKEYS.l_nsec);
+   strlpad (t, x_nsec  , '.', '>', 8);
+   sprintf (t       , "%4d"  , myKEYS.l_loops);
+   strlpad (t, x_loops , '.', '>', 4);
+   sprintf (a_list, "loop    %-5.5s %-8.8s %-2.2s, %-5.5s %-8.8s, %1ds %8dns, %-4.4s  %c    ´",
+         g_delays  [g_cdelay ].terse, x_delay, x_skip,
+         g_updates [g_cupdate].terse, x_update,
+         myKEYS.l_secs, x_nsec, x_loops, myKEYS.l_blocking);
+   return 0;
+}
+

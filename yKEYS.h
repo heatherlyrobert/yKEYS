@@ -22,7 +22,6 @@ char        ykeys__input             (char a_env, uchar *a_key, uchar *a_str, in
 char        yKEYS_string            (uchar *a_keys);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
-/*> char        yKEYS_handled           (void);                                       <*/
 char        yKEYS_unique            (void);
 /*---(status)---------------*/
 int         yKEYS_count             (void);
@@ -45,7 +44,6 @@ char        yKEYS_unlock            (void);
 char        yKEYS_check_unlock      (uchar *a_key);
 /*---(reporting)------------*/
 char*       yKEYS_last              (void);
-char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 /*---(repeat)---------------*/
 
 /*---(status)---------------*/
@@ -91,6 +89,14 @@ char        yKEYS_is_vert_goto      (uchar a_minor);
 char        yKEYS_is_vert_scroll    (uchar a_minor);
 char        yKEYS_is_vert_ends      (uchar a_minor);
 
+
+char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
+char        yKEYS_logger_status     (char a_size, short a_wide, char *a_list);
+char        yKEYS_loop_status       (char a_size, short a_wide, char *a_list);
+
+char        yKEYS_loop_set          (char *a_delay, char *a_update);
+char        yKEYS_loop_normal       (void);
+char        yKEYS_loop_macro        (char a_delay, char a_update);
 
 
 #endif

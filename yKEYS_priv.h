@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
-#define     P_VERNUM    "2.1a"
-#define     P_VERTXT    "grouping and all unit testing caught up, clean"
+#define     P_VERNUM    "2.1b"
+#define     P_VERTXT    "cleaned and unit tested delay and update setting (no calcs)"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -51,6 +51,7 @@
 #include    <stdio.h>             /* clibc  standard input/output             */
 #include    <stdlib.h>            /* clibc  standard general purpose          */
 #include    <string.h>            /* clibc  standard string handling          */
+#include    <math.h>              /* clibc  standard math library             */
 /*---(custom)----------------------------*/
 #include    <yURG.h>              /* heatherly urgent processing              */
 #include    <yLOG.h>              /* heatherly program logging                */
@@ -121,10 +122,35 @@ struct cMY {
 };
 extern tMY         myKEYS;
 
+#define     MAX_DELAY   15
+typedef  struct cDELAY tDELAY;
+struct cDELAY {
+   char        terse       [LEN_LABEL];
+   char        desc        [LEN_LABEL];
+   float       delay;
+};
+extern const tDELAY g_delays [MAX_DELAY];
+extern char    g_cdelay;
+extern char    g_ndelay;
+extern float   g_bdelay;
+extern char    g_sdelay   [LEN_LABEL];
+
+#define     MAX_UPDATE  15
+typedef  struct cUPDATE tUPDATE;
+struct cUPDATE {
+   char        terse       [LEN_LABEL];
+   char        desc        [LEN_LABEL];
+   float       update;
+};
+extern const tUPDATE g_updates [MAX_UPDATE];
+extern char    g_nupdate;
+extern char    g_cupdate;
+extern float   g_bupdate;
+extern char    g_supdate  [LEN_LABEL];
 
 
 
-/*===[[ yMACRO_base.c ]]======================================================*/
+/*===[[ yKEYS_base.c ]]=======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(input)----------------*/
 uchar       ykeys__input_fix        (char a_env, uchar a_key);
@@ -137,7 +163,7 @@ char        ykeys__unit_end         (void);
 char*       yKEYS__unit             (char *a_question, char a_index);
 
 
-/*===[[ yMACRO_logger.c ]]====================================================*/
+/*===[[ yKEYS_logger.c ]]=====================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(program)--------------*/
 char        ykeys_logger_init       (void);
@@ -170,7 +196,7 @@ char        yKEYS_unlock            (void);
 
 
 
-/*===[[ yMACRO_repeat.c ]]====================================================*/
+/*===[[ yKEYS_repeat.c ]]=====================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(program)--------------*/
 char        ykeys_repeat_init       (void);
@@ -189,13 +215,24 @@ char        yKEYS_repeat_umode      (uchar a_major, uchar a_minor);
 /*---(done)-----------------*/
 
 
-/*===[[ yMACRO_rptg.c ]]======================================================*/
+/*===[[ yKEYS_rptg.c ]]=======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 
 
 char        ykeys_group_reset       (void);
 char        ykeys_group_check_end   (void);
+
+
+
+/*===[[ yKEYS_loop.c ]]=======================================================*/
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        ykeys_loop_init         (void);
+char        ykeys__loop_calc        (void);
+char        ykeys_loop_update       (char *a_update);
+char        ykeys_loop_delay        (char *a_delay);
+char        yKEYS_loop_normal       (void);
+
 
 
 #endif
