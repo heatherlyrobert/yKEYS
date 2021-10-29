@@ -37,9 +37,9 @@
 #define     P_CREATED   ""
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
-#define     P_VERMINOR  "2.0-, separated into independent library"
-#define     P_VERNUM    "2.0k"
-#define     P_VERTXT    "really improved base input/logging and working in unit testing"
+#define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
+#define     P_VERNUM    "2.1a"
+#define     P_VERTXT    "grouping and all unit testing caught up, clean"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -128,8 +128,8 @@ extern tMY         myKEYS;
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 /*---(input)----------------*/
 uchar       ykeys__input_fix        (char a_env, uchar a_key);
-char        yKEYS_input             (char a_env, uchar *a_key, uchar *a_str, int *n);
-char        ykeys_input_force       (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys__input_force      (char a_env, uchar *a_key, uchar *a_str, int *n);
 /*---(unittest)-------------*/
 char        ykeys__unit_quiet       (void);
 char        ykeys__unit_loud        (void);

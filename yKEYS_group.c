@@ -89,8 +89,8 @@ yKEYS_group_end         (void)
       }
       /*---(update)----------------------*/
       DEBUG_KEYS   yLOG_snote   ("next");
-      if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos       (myKEYS.r_beg  [n] + 1);
-      else                                    yMACRO_exe_repos  (myKEYS.r_beg  [n] + 1);
+      if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos       (myKEYS.r_beg  [n]);
+      else                                    yMACRO_exe_repos  (myKEYS.r_beg  [n]);
       --(myKEYS.r_reps [n]);
       DEBUG_KEYS   yLOG_sint    (myKEYS.r_reps  [n]);
       DEBUG_KEYS   yLOG_schar   (myKEYS.r_macro [n]);
@@ -148,16 +148,25 @@ yKEYS_group_hmode       (uchar a_major, uchar a_minor)
 {
    char        rc          =    0;
    DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_char    ("yMODE_curr", yMODE_curr ());
+   DEBUG_KEYS   yLOG_info    ("GROUPING"  , MODES_GROUPING);
+   if (strchr (MODES_GROUPING, yMODE_curr ()) == NULL) {
+      DEBUG_KEYS   yLOG_note    ("can not process grouping in this mode");
+      DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
    DEBUG_KEYS   yLOG_char    ("a_minor"   , a_minor);
    switch (a_minor) {
    case '(' :
       DEBUG_KEYS   yLOG_note    ("begin group, handle now");
-      yKEYS_group_beg ();
+      rc = yKEYS_group_beg ();
+      DEBUG_KEYS   yLOG_value   ("logger"    , rc);
       rc = 1;
       break;
    case ')' :
       DEBUG_KEYS   yLOG_note    ("end group, handle in main");
-      /*> yKEYS_group_end ();                                                         <*/
+      rc = yKEYS_group_end ();
+      if (rc > 0)  yKEYS_logger ('('); /* must log here or miss token */
       rc = 1;
       break;
    default  :

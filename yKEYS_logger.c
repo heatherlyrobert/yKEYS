@@ -54,6 +54,24 @@ ykeys_logger_init       (void)
 static void  o___HISTORY_________o () { return; }
 
 char
+ykeys__roll_every       (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        x_off       = LEN_HUGE / 2;
+   char        t           [LEN_HUGE];
+   /*---(log)----------------------------*/
+   strlcpy (t, myKEYS.h_every + x_off, LEN_HUGE);
+   strlcpy (myKEYS.h_every, t        , LEN_HUGE);
+   /*---(mode)---------------------------*/
+   strlcpy (t, myKEYS.h_emode + x_off, LEN_HUGE);
+   strlcpy (myKEYS.h_emode, t        , LEN_HUGE);
+   /*---(position)-----------------------*/
+   myKEYS.h_grand -= x_off;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
 ykeys__roll             (void)
 {
    /*---(locals)-----------+-----+-----+-*/
@@ -142,6 +160,8 @@ yKEYS_logger            (uchar a_key)
    myKEYS.h_emode [myKEYS.h_grand + 1] = 0;
    ++(myKEYS.h_grand);
    DEBUG_LOOP   yLOG_svalue  ("grand"     , myKEYS.h_grand);
+   /*---(TAIL -- check roll)-------------*/
+   if (myKEYS.h_grand >= LEN_HUGE - 2)  ykeys__roll_every ();
    /*---(check logging)------------------*/
    DEBUG_KEYS   yLOG_schar   (myKEYS.h_logkeys);
    --rce;  if (myKEYS.h_logkeys != 'y') {
@@ -243,7 +263,7 @@ ykeys_logstr            (char a_mode, uchar *a_keys)
    return 0;
 }
 
-char yKEYS_handled           (void) { myKEYS.h_used = 'y'; ++(myKEYS.h_curr); return 0; }
+/*> char yKEYS_handled           (void) { myKEYS.h_used = 'y'; ; return 0; }          <*/
 
 
 

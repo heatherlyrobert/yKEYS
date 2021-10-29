@@ -18,11 +18,11 @@ typedef  unsigned char        uchar;
 char*       yKEYS_version           (void);
 char        yKEYS_init              (void);
 char        yKEYS_wrap              (void);
-char        yKEYS_input             (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        yKEYS_string            (uchar *a_keys);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
-char        yKEYS_handled           (void);
+/*> char        yKEYS_handled           (void);                                       <*/
 char        yKEYS_unique            (void);
 /*---(status)---------------*/
 int         yKEYS_count             (void);
@@ -68,19 +68,28 @@ char*       yKEYS__unit             (char *a_question, char a_index);
 
 
 
-/*---(check)----------------*/
+/*---(overall)--------------*/
 char        yKEYS_is_repeater       (uchar a_minor);
+char        yKEYS_is_macro          (uchar a_minor);
+char        yKEYS_is_search         (uchar a_minor);
+/*---(multi)----------------*/
 char        yKEYS_is_multi_map      (uchar a_minor);
 char        yKEYS_is_multi_visu     (uchar a_minor);
 char        yKEYS_is_multi_wdr      (uchar a_minor);
 char        yKEYS_is_multi_src      (uchar a_minor);
 char        yKEYS_is_multi_selc     (uchar a_minor);
+/*---(horizontal)-----------*/
 char        yKEYS_is_horz_simple    (uchar a_minor);
 char        yKEYS_is_horz_goto      (uchar a_minor);
 char        yKEYS_is_horz_scroll    (uchar a_minor);
 char        yKEYS_is_horz_word      (uchar a_minor);
-char        yKEYS_is_macro          (uchar a_minor);
-char        yKEYS_is_findchar       (uchar a_minor);
+char        yKEYS_is_horz_ends      (uchar a_minor);
+char        yKEYS_is_horz_char      (uchar a_minor);
+/*---(vertical)-------------*/
+char        yKEYS_is_vert_simple    (uchar a_minor);
+char        yKEYS_is_vert_goto      (uchar a_minor);
+char        yKEYS_is_vert_scroll    (uchar a_minor);
+char        yKEYS_is_vert_ends      (uchar a_minor);
 
 
 
