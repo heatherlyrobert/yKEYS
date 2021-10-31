@@ -8,6 +8,15 @@
 #define     NSEC        1000000000
 
 
+static float     s_pct    = 0.0;
+
+static long long s_total_time =    0;
+static long long s_draw_time  =    0;
+static long long s_keys_time  =    0;
+static long long s_miss_time  =    0;
+
+
+
 
 /*===[[ UPDATES ]]============================================================*/
 const tUPDATE g_updates [MAX_UPDATE] = {
@@ -33,8 +42,8 @@ const tUPDATE g_updates [MAX_UPDATE] = {
 };
 char    g_nupdate  =   0;          /* number of update options                */
 char    g_cupdate  =   0;          /* current update option                   */
-float   g_bupdate  = 0.0;          /* pre-blitz updates per second            */
 char    g_supdate  [LEN_LABEL] = "every";
+float   g_bupdate  = 0.0;          /* pre-blitz updates per second            */
 
 
 /*===[[ DELAYS ]]=============================================================*/
@@ -64,8 +73,9 @@ const tDELAY g_delays [MAX_DELAY] = {
 };
 char    g_ndelay   =  0;           /* number of delay options                 */
 char    g_cdelay   =  0;           /* current delay option                    */
-float   g_bdelay   = 0.0;          /* pre-blitz delay seconds between loops   */
 char    g_sdelay   [LEN_LABEL] = "keys";
+float   g_bdelay   = 0.0;          /* pre-blitz delay seconds between loops   */
+char    g_bskip    =   0;          /* pre-blitz delay skips                   */
 
 
 
@@ -73,6 +83,38 @@ char    g_sdelay   [LEN_LABEL] = "keys";
 /*===----                       program level                          ----===*/
 /*====================------------------------------------====================*/
 static void      o___PROGRAM_________________o (void) {;}
+
+char
+ykeys_loop_clear        (void)
+{
+   /*---(overall)------------------------*/
+   myKEYS.loops       = 0;
+   myKEYS.done        = '-';
+   /*---(timing)-------------------------*/
+   myKEYS.l_exp       = 0;
+   myKEYS.l_act       = 0;
+   myKEYS.l_slept     = 0;
+   myKEYS.l_used      = 0;
+   myKEYS.l_sleep     = 0;
+   myKEYS.l_beg       = 0;
+   myKEYS.l_end       = 0;
+   myKEYS.l_prev      = 0;
+   myKEYS.l_avg_all   = 0;
+   myKEYS.l_avg_miss  = 0;
+   /*---(stats)--------------------------*/
+   myKEYS.l_draw      = 0;
+   myKEYS.l_avg_draw  = 0;
+   myKEYS.l_keys      = 0;
+   myKEYS.l_avg_keys  = 0;
+   myKEYS.l_idle      = 0;
+   /*---(totals)-------------------------*/
+   s_total_time       = 0.0;
+   s_draw_time        = 0.0;
+   s_keys_time        = 0.0;
+   s_miss_time        = 0.0;
+   /*---(complete)-----------------------*/
+   return 0;
+}
 
 char
 ykeys_loop_init         (void)
@@ -87,6 +129,8 @@ ykeys_loop_init         (void)
    myKEYS.l_nsec      = 0;
    myKEYS.l_loops     = 1;
    myKEYS.l_blocking  = '-';
+   /*---(clear other)--------------------*/
+   ykeys_loop_clear ();
    /*---(count updates)------------------*/
    g_cupdate = 4;
    g_nupdate = 0;
@@ -103,6 +147,13 @@ ykeys_loop_init         (void)
    }
    /*---(initial setting)----------------*/
    yKEYS_loop_set ("10ms" , "100ms");
+   /*---(saves)--------------------------*/
+   /*> strcpy (g_sdelay , "keys" );                                                   <*/
+   /*> strcpy (g_supdate, "every");                                                   <*/
+   /*---(blitzing)-----------------------*/
+   g_bdelay  = 0.0;
+   g_bskip   =   0;
+   g_bupdate = 0.0;
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -219,6 +270,13 @@ yvikeys_loop_getch      (void)
     *> return x_ch;                                                                        <*/
 }
 
+
+
+/*====================------------------------------------====================*/
+/*===----                      setting values                          ----===*/
+/*====================------------------------------------====================*/
+static void      o___SETTING_________________o (void) {;}
+
 char
 ykeys__loop_shared      (char a_type, char *a_string)
 {
@@ -324,114 +382,6 @@ ykeys__loop_shared      (char a_type, char *a_string)
 char ykeys_loop_update       (char *a_update)  { return ykeys__loop_shared ('u', a_update); }
 char ykeys_loop_delay        (char *a_delay)   { return ykeys__loop_shared ('d', a_delay);  }
 
-/*> char                                                                                          <* 
- *> yvikeys_loop_delay      (char *a_delay)                                                       <* 
- *> {                                                                                             <* 
- *>    /+> /+---(locals)-----------+-----+-----+-+/                                       <*      <* 
- *>     *> char        rc          =    0;                                                <*      <* 
- *>     *> char        x_prefix    =  ' ';                                                <*      <* 
- *>     *> int         i           =    0;                                                <*      <* 
- *>     *> char        x_index     =   -1;                                                <*      <* 
- *>     *> char        x_max       =   -1;                                                <*      <* 
- *>     *> /+---(header)-------------------------+/                                       <*      <* 
- *>     *> DEBUG_LOOP   yLOG_senter  (__FUNCTION__);                                      <*      <* 
- *>     *> /+---(assign prefix)------------------+/                                       <*      <* 
- *>     *> DEBUG_LOOP   yLOG_snote   (a_delay);                                           <*      <* 
- *>     *> if (a_delay  == NULL)   x_prefix = 0;                                          <*      <* 
- *>     *> else                    x_prefix = a_delay [0];                                <*      <* 
- *>     *> DEBUG_LOOP   yLOG_sint    (x_prefix);                                          <*      <* 
- *>     *> /+---(determine max)------------------+/                                       <*      <* 
- *>     *> for (i = 0; i < MAX_DELAY; ++i) {                                              <*      <* 
- *>     *>    if (strcmp (g_delays [i].terse, "---"  ) == 0)  break;                  <*          <* 
- *>     *>    ++x_max;                                                                    <*      <* 
- *>     *> }                                                                              <*      <* 
- *>     *> /+---(find entry in table)------------+/                                       <*      <* 
- *>     *> DEBUG_LOOP   yLOG_sint    (g_cdelay);                                           <*     <* 
- *>     *> switch (x_prefix) {                                                            <*      <* 
- *>     *> case  0  :                                                                     <*      <* 
- *>     *>    x_index = g_cdelay;                                                          <*     <* 
- *>     *>    rc = -1;                                                                    <*      <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> case '0' :                                                                     <*      <* 
- *>     *>    x_index = 0;                                                                <*      <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> case '=' :                                                                     <*      <* 
- *>     *>    x_index = g_cdelay;                                                          <*     <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> case '>' :                                                                     <*      <* 
- *>     *>    if (g_cdelay  <  x_max)  x_index = ++g_cdelay;                                <*    <* 
- *>     *>    else {                                                                      <*      <* 
- *>     *>       x_index = x_max;                                                         <*      <* 
- *>     *>       rc = -3;                                                                 <*      <* 
- *>     *>    }                                                                           <*      <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> case '<' :                                                                     <*      <* 
- *>     *>    if (g_cdelay  >  1    )  x_index = --g_cdelay;                                <*    <* 
- *>     *>    else {                                                                      <*      <* 
- *>     *>       x_index = 1;                                                             <*      <* 
- *>     *>       rc = -4;                                                                 <*      <* 
- *>     *>    }                                                                           <*      <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> default  :                                                                     <*      <* 
- *>     *>    for (i = 0; i < x_max; ++i) {                                               <*      <* 
- *>     *>       if (strcmp (g_delays [i].terse, a_delay) != 0)  continue;            <*          <* 
- *>     *>       x_index = i;                                                             <*      <* 
- *>     *>       break;                                                                   <*      <* 
- *>     *>    }                                                                           <*      <* 
- *>     *>    if (x_index == -1) {                                                        <*      <* 
- *>     *>       x_index = g_cdelay;                                                       <*     <* 
- *>     *>       rc = -2;                                                                 <*      <* 
- *>     *>    }                                                                           <*      <* 
- *>     *>    break;                                                                      <*      <* 
- *>     *> }                                                                              <*      <* 
- *>     *> /+---(set key values)-----------------+/                                       <*      <* 
- *>     *> DEBUG_LOOP   yLOG_sint    (x_index);                                           <*      <* 
- *>     *> g_cdelay         = x_index;                                                     <*     <* 
- *>     *> myKEYS.l_delay  = g_delays [x_index].delay;                                <*          <* 
- *>     *> DEBUG_LOOP   yLOG_sdouble (myKEYS.l_delay);                                    <*      <* 
- *>     *> DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);                                      <*      <* 
- *>     *> /+---(update looping)-----------------+/                                       <*      <* 
- *>     *> yvikeys__loop_calc   ();                                                       <*      <* 
- *>     *> /+---(complete)-----------------------+/                                       <*      <* 
- *>     *> return rc;                                                                     <+/     <* 
- *> }                                                                                             <*/
-
-char
-ykeys_loop_blitz        (void)
-{
-   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
-   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
-   if (myKEYS.l_delay <  0.00001) {
-      DEBUG_LOOP   yLOG_note    ("already in blitz, nothing to do");
-      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
-      return 0;
-   }
-   g_bdelay        = myKEYS.l_delay;
-   myKEYS.l_delay  =   0.000001;
-   g_bupdate  = myKEYS.l_update;
-   myKEYS.l_update =   100.000000;
-   ykeys__loop_calc ();
-   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
-char
-ykeys_loop_unblitz      (void)
-{
-   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
-   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
-   if (myKEYS.l_delay >= 0.00001) {
-      DEBUG_LOOP   yLOG_note    ("not in blitz, nothing to do");
-      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
-      return 0;
-   }
-   myKEYS.l_delay  = g_bdelay;
-   myKEYS.l_update = g_bupdate;
-   ykeys__loop_calc ();
-   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
-   return 0;
-}
-
 char
 yKEYS_loop_set          (char *a_delay, char *a_update)
 {
@@ -441,40 +391,28 @@ yKEYS_loop_set          (char *a_delay, char *a_update)
    char        rc2         =    0;
    /*---(set values)---------------------*/
    rc1 = ykeys_loop_delay   (a_delay);
-   if (rc1 >= 0)  strlcpy (g_sdelay , a_delay , LEN_LABEL);
+   if (rc1 >= 0)  strlcpy (g_sdelay , g_delays  [g_cdelay ].terse, LEN_LABEL);
    else           rc = rc1;
    rc2 = ykeys_loop_update  (a_update);
-   if (rc2 >= 0)  strlcpy (g_supdate, a_update, LEN_LABEL);
+   if (rc2 >= 0)  strlcpy (g_supdate, g_updates [g_cupdate].terse, LEN_LABEL);
    else           rc = rc2;
    /*---(complete)-----------------------*/
    return rc;
 }
 
-char
-yKEYS_loop_normal       (void)
-{
-   /*---(locals)-----------+-----+-----+-*/
-   char        rc          =    0;
-   /*---(return to normal)---------------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_schar   (yMACRO_exe_mode ());
-   DEBUG_LOOP   yLOG_snote   (g_sdelay);
-   rc = ykeys_loop_delay   (g_sdelay);
-   myKEYS.l_skip = 0;
-   DEBUG_LOOP   yLOG_sint    (myKEYS.l_skip);
-   DEBUG_LOOP   yLOG_snote   (g_supdate);
-   rc = ykeys_loop_update  (g_supdate);
-   /*---(complete)-----------------------*/
-   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
-   return rc;
-}
+
+
+/*====================------------------------------------====================*/
+/*===----                       macro support                          ----===*/
+/*====================------------------------------------====================*/
+static void      o___MACROS__________________o (void) {;}
 
 char
 yKEYS_loop_macro        (char a_delay, char a_update)
 {
    /*---(no change for playback)---------*/
    IF_MACRO_PLAYBACK {
-      yKEYS_loop_normal ();
+      yKEYS_loop_return ();
       return 0;
    }
    /*---(change to macro speed)----------*/
@@ -513,167 +451,169 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    return 0;
 }
 
-static long long s_loop_targ   = 0;
-static long long s_loop_used   = 0;
-static long long s_loop_rem    = 0;
-
-static long long s_loop_slept  = 0;
-static long long s_loop_miss   = 0;
-
-static long long s_loop_prev   = 0;
-static long long s_loop_beg    = 0;
-static long long s_loop_end    = 0;
-static long long s_loop_dur    = 0;
-
-
-static long long x_used   = 0;
-static float     x_pct    = 0.0;
-
-static long      s_avg    = 0.0;
-static long      s_draw   = 0.0;
-static long      s_keys   = 0.0;
-static long      s_idle   = 0.0;
-
 char
-yvikeys_loop_beg        (void)
+yKEYS_loop_return       (void)
 {
-   /*> /+---(locals)-----------+-----+-----+-+/                                       <* 
-    *> tTSPEC      x_dur;                                                             <* 
-    *> /+---(get beginning time)-------------+/                                       <* 
-    *> clock_gettime  (CLOCK_MONOTONIC_RAW, &x_dur);                                  <* 
-    *> s_loop_beg   = x_dur.tv_sec * NSEC;                                            <* 
-    *> s_loop_beg  += x_dur.tv_nsec;                                                  <* 
-    *> /+---(complete)-----------------------+/                                       <* 
-    *> return 0;                                                                      <*/
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   /*---(return to normal)---------------*/
+   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
+   DEBUG_LOOP   yLOG_schar   (yMACRO_exe_mode ());
+   DEBUG_LOOP   yLOG_snote   (g_sdelay);
+   rc = ykeys_loop_delay   (g_sdelay);
+   myKEYS.l_skip = 0;
+   DEBUG_LOOP   yLOG_sint    (myKEYS.l_skip);
+   DEBUG_LOOP   yLOG_snote   (g_supdate);
+   rc = ykeys_loop_update  (g_supdate);
+   /*---(complete)-----------------------*/
+   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
+   return rc;
 }
 
 char
-yvikeys_loop_prog       (void)
+yKEYS_loop_blitz        (void)
 {
-   /*> if (myKEYS.p_play == 'y') {                                                    <* 
-    *>    myKEYS.p_cur += myKEYS.p_adv;                                               <* 
-    *> }                                                                              <* 
-    *> if (myKEYS.p_cur <  myKEYS.p_beg) {                                            <* 
-    *>    if (myKEYS.p_repeat == 'y' && myKEYS.p_play == 'y') {                       <* 
-    *>       myKEYS.p_cur  = myKEYS.p_end;                                            <* 
-    *>       myKEYS.p_play = 'y';                                                     <* 
-    *>    } else {                                                                    <* 
-    *>       myKEYS.p_cur  = myKEYS.p_beg;                                            <* 
-    *>       myKEYS.p_play = '-';                                                     <* 
-    *>    }                                                                           <* 
-    *> }                                                                              <* 
-    *> if (myKEYS.p_cur >  myKEYS.p_end) {                                            <* 
-    *>    if (myKEYS.p_repeat == 'y' && myKEYS.p_play == 'y') {                       <* 
-    *>       myKEYS.p_cur  = myKEYS.p_beg;                                            <* 
-    *>       myKEYS.p_play = 'y';                                                     <* 
-    *>    } else {                                                                    <* 
-    *>       myKEYS.p_cur  = myKEYS.p_end;                                            <* 
-    *>       myKEYS.p_play = '-';                                                     <* 
-    *>    }                                                                           <* 
-    *> }                                                                              <* 
-    *> return 0;                                                                      <*/
+   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
+   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
+   if (myKEYS.l_delay <  0.00001) {
+      DEBUG_LOOP   yLOG_note    ("already in blitz, nothing to do");
+      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   g_bdelay        = myKEYS.l_delay;
+   myKEYS.l_delay  =   0.000001;
+   g_bskip         = myKEYS.l_skip;
+   myKEYS.l_skip   =   0;
+   g_bupdate       = myKEYS.l_update;
+   myKEYS.l_update =   100.000000;
+   ykeys__loop_calc ();
+   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   return 0;
 }
 
 char
-yvikeys_loop_sleep      (uchar a_key, char a_draw)
+yKEYS_loop_unblitz      (void)
 {
-   /*> /+---(locals)-----------+-----+-----+-+/                                                                                                                                                                 <* 
-    *> static long x_secs      =    0;                                                                                                                                                                          <* 
-    *> static long x_nsec      =    0;                                                                                                                                                                          <* 
-    *> tTSPEC      x_dur;                                                                                                                                                                                       <* 
-    *> static int  x_loops     =    0;                                                                                                                                                                          <* 
-    *> static int  x_draws     =    0;                                                                                                                                                                          <* 
-    *> static int  x_keys      =    0;                                                                                                                                                                          <* 
-    *> static int  x_idles     =    0;                                                                                                                                                                          <* 
-    *> static long long x_total =    0;                                                                                                                                                                         <* 
-    *> static long long x_draw  =    0;                                                                                                                                                                         <* 
-    *> static long long x_key   =    0;                                                                                                                                                                         <* 
-    *> static long long x_idle  =    0;                                                                                                                                                                         <* 
-    *> char        x_type       =  '-';                                                                                                                                                                         <* 
-    *> /+---(header)-------------------------+/                                                                                                                                                                 <* 
-    *> DEBUG_LOOP   yLOG_enter   (__FUNCTION__);                                                                                                                                                                <* 
-    *> /+---(get ending time)----------------+/                                                                                                                                                                 <* 
-    *> DEBUG_LOOP   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, chrvisible (a_key), a_draw, myKEYS.l_blocking);                                                                              <* 
-    *> clock_gettime  (CLOCK_MONOTONIC_RAW, &x_dur);                                                                                                                                                            <* 
-    *> s_loop_end   = x_dur.tv_sec * NSEC;                                                                                                                                                                      <* 
-    *> s_loop_end  += x_dur.tv_nsec;                                                                                                                                                                            <* 
-    *> /+---(classify)-----------------------+/                                                                                                                                                                 <* 
-    *> if      (a_draw == 'y')  x_type = 'g';                                                                                                                                                                   <* 
-    *> else if (a_key  !=  0 )  x_type = 'k';                                                                                                                                                                   <* 
-    *> else                     x_type = '-';                                                                                                                                                                   <* 
-    *> /+---(calc sleep diffs)---------------+/                                                                                                                                                                 <* 
-    *> /+> s_loop_slept = s_loop_beg - s_loop_prev;                                       <+/                                                                                                                   <* 
-    *> /+> s_loop_miss  = s_loop_beg - s_loop_prev;                                       <+/                                                                                                                   <* 
-    *> /+---(calc run diffs)-----------------+/                                                                                                                                                                 <* 
-    *> s_loop_targ  = (myKEYS.l_secs * NSEC) + myKEYS.l_nsec;                                                                                                                                                   <* 
-    *> s_loop_used  = s_loop_end  - s_loop_beg;                                                                                                                                                                 <* 
-    *> s_loop_rem   = s_loop_targ - s_loop_used;                                                                                                                                                                <* 
-    *> if (myKEYS.l_blocking == 'y')  s_loop_rem = 0;                                                                                                                                                           <* 
-    *> /+> s_loop_prev  = s_loop_end;                                                     <+/                                                                                                                   <* 
-    *> /+---(for timer)----------------------+/                                                                                                                                                                 <* 
-    *> x_pct    = (s_loop_used / (float) s_loop_targ) * 100.0;                                                                                                                                                  <* 
-    *> DEBUG_LOOP   yLOG_complex ("timing"    , "%10ds, %10dn, %10db, %10dt, %10de, %10du, %10dr, %8.6f", myKEYS.l_secs, myKEYS.l_nsec, s_loop_beg, s_loop_targ, s_loop_end, s_loop_used, s_loop_rem, x_pct);   <* 
-    *> /+---(statistics)---------------------+/                                                                                                                                                                 <* 
-    *> ++x_loops;                                                                                                                                                                                               <* 
-    *> x_total += s_loop_used;                                                                                                                                                                                  <* 
-    *> s_avg    = x_total / (float) x_loops;                                                                                                                                                                    <* 
-    *> switch (x_type) {                                                                                                                                                                                        <* 
-    *> case 'g' :                                                                                                                                                                                               <* 
-    *>    ++x_draws;                                                                                                                                                                                            <* 
-    *>    x_draw += s_loop_used;                                                                                                                                                                                <* 
-    *>    s_draw  = x_draw / (float) x_draws;                                                                                                                                                                   <* 
-    *>    break;                                                                                                                                                                                                <* 
-    *> case 'k' :                                                                                                                                                                                               <* 
-    *>    ++x_keys;                                                                                                                                                                                             <* 
-    *>    x_key  += s_loop_used;                                                                                                                                                                                <* 
-    *>    s_keys  = x_key  / (float) x_keys;                                                                                                                                                                    <* 
-    *>    break;                                                                                                                                                                                                <* 
-    *> default  :                                                                                                                                                                                               <* 
-    *>    ++x_idles;                                                                                                                                                                                            <* 
-    *>    x_idle += s_loop_used;                                                                                                                                                                                <* 
-    *>    s_idle  = x_idle / (float) x_idles;                                                                                                                                                                   <* 
-    *>    break;                                                                                                                                                                                                <* 
-    *> }                                                                                                                                                                                                        <* 
-    *> /+> s_avg     = x_total / x_loops;                                                 <+/                                                                                                                   <* 
-    *> DEBUG_LOOP   yLOG_complex ("counts"    , "%c, %6dd, %6dk, %6di", x_type, x_draws, x_keys, x_idles);                                                                                                      <* 
-    *> /+---(sleeping)-----------------------+/                                                                                                                                                                 <* 
-    *> if (myKEYS.l_blocking != 'y') {                                                                                                                                                                          <* 
-    *>    x_dur.tv_sec  = s_loop_rem / NSEC;                                                                                                                                                                    <* 
-    *>    x_dur.tv_nsec = s_loop_rem % NSEC;                                                                                                                                                                    <* 
-    *>    DEBUG_LOOP   yLOG_note    ("nano-sleeping");                                                                                                                                                          <* 
-    *>    nanosleep      (&x_dur, NULL);                                                                                                                                                                        <* 
-    *> }                                                                                                                                                                                                        <* 
-    *> /+---(complete)-----------------------+/                                                                                                                                                                 <* 
-    *> DEBUG_LOOP   yLOG_exit    (__FUNCTION__);                                                                                                                                                                <* 
-    *> return 0;                                                                                                                                                                                                <*/
+   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
+   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
+   if (myKEYS.l_delay >= 0.00001) {
+      DEBUG_LOOP   yLOG_note    ("not in blitz, nothing to do");
+      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   myKEYS.l_delay  = g_bdelay;
+   myKEYS.l_skip   = g_bskip;
+   myKEYS.l_update = g_bupdate;
+   g_bdelay        = 0.0;
+   g_bskip         =   0;
+   g_bupdate       = 0.0;
+   ykeys__loop_calc ();
+   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   return 0;
 }
 
-char       /*----: give current looping info ---------------------------------*/
-yvikeys_prog_status     (char *a_list)
+
+char
+yKEYS_loop_beg          (void)
 {
-   /*> /+---(locals)-----------+-----------+-+/                                                            <* 
-    *> char        rce         = -10;                                                                      <* 
-    *> /+---(defenses)-----------------------+/                                                            <* 
-    *> --rce;  if (a_list  == NULL)  return rce;                                                           <* 
-    *> /+---(write status)-------------------+/                                                            <* 
-    *> sprintf (a_list, "progress, play=%c, %8.6fa, %8.6fi", myKEYS.p_play, myKEYS.p_adv, myKEYS.p_inc);   <* 
-    *> /+---(complete)-----------------------+/                                                            <* 
-    *> return 0;                                                                                           <*/
+   /*---(locals)-----------+-----+-----+-*/
+   tTSPEC      x_dur;
+   /*---(reset timing);------------------*/
+   myKEYS.l_beg   = 0;
+   myKEYS.l_graf  = 0;
+   myKEYS.l_end   = 0;
+   /*---(get beginning time)-------------*/
+   clock_gettime  (CLOCK_MONOTONIC_RAW, &x_dur);
+   myKEYS.l_beg   = x_dur.tv_sec * NSEC;
+   myKEYS.l_beg  += x_dur.tv_nsec;
+   /*---(complete)-----------------------*/
+   return 0;
 }
 
-char       /*----: give current looping info ---------------------------------*/
-yvikeys_delay_status    (char *a_list)
+char
+yKEYS_loop_graf         (void)
 {
-   /*> /+---(locals)-----------+-----------+-+/                                                                     <* 
-    *> char        rce         = -10;                                                                               <* 
-    *> /+---(defenses)-----------------------+/                                                                     <* 
-    *> --rce;  if (a_list  == NULL)  return rce;                                                                    <* 
-    *> /+---(write status)-------------------+/                                                                     <* 
-    *> sprintf (a_list, "delay, %-5s = %8.6f, %1ds, %10dns, update %-5s = %5.3fs, %4d loop(s), %c",                 <* 
-    *>       g_delays [g_cdelay].terse, g_delays [g_cdelay].delay, myKEYS.l_secs, myKEYS.l_nsec,              <* 
-    *>       g_updates [g_cupdate].terse, g_updates [g_cupdate].update, myKEYS.l_loops, myKEYS.l_blocking);   <* 
-    *> /+---(complete)-----------------------+/                                                                     <* 
-    *> return 0;                                                                                                    <*/
+   /*---(locals)-----------+-----+-----+-*/
+   tTSPEC      x_dur;
+   /*---(get beginning time)-------------*/
+   clock_gettime  (CLOCK_MONOTONIC_RAW, &x_dur);
+   myKEYS.l_graf  = x_dur.tv_sec * NSEC;
+   myKEYS.l_graf += x_dur.tv_nsec;
+   /*---(complete)-----------------------*/
+   return 0;
+}
+char
+yKEYS_loop_end          (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   tTSPEC      x_dur;
+   /*---(get beginning time)-------------*/
+   clock_gettime  (CLOCK_MONOTONIC_RAW, &x_dur);
+   myKEYS.l_end   = x_dur.tv_sec * NSEC;
+   myKEYS.l_end  += x_dur.tv_nsec;
+   if (myKEYS.l_graf == 0)  myKEYS.l_graf = myKEYS.l_end;
+   /*---(calc diffs)---------------------*/
+   myKEYS.l_exp   = (myKEYS.l_secs * NSEC) + myKEYS.l_nsec;
+   myKEYS.l_act   = myKEYS.l_end - myKEYS.l_prev;
+   s_miss_time   += myKEYS.l_exp - myKEYS.l_act;
+   myKEYS.l_slept = myKEYS.l_beg - myKEYS.l_prev;
+   myKEYS.l_used  = myKEYS.l_end - myKEYS.l_beg;
+   myKEYS.l_sleep = myKEYS.l_exp - myKEYS.l_used;
+   /*---(calc run diffs)-----------------*/
+   if (myKEYS.l_blocking == 'y')  myKEYS.l_sleep = 0;
+   myKEYS.l_prev  = myKEYS.l_end;
+   /*---(for timer)----------------------*/
+   s_pct        = (myKEYS.l_used / (float) myKEYS.l_exp) * 100.0;
+   DEBUG_LOOP   yLOG_complex ("timing"    , "%10ds, %10dn, %10db, %10dt, %10de, %10du, %10dr, %8.6f", myKEYS.l_secs, myKEYS.l_nsec, myKEYS.l_beg, myKEYS.l_exp, myKEYS.l_end, myKEYS.l_used, myKEYS.l_sleep, s_pct);
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char
+ykeys_loop_sleep        (uchar a_key, char a_draw)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   static long x_secs      =    0;
+   static long x_nsec      =    0;
+   tTSPEC      x_dur;
+   static int  x_draws     =    0;
+   static int  x_idles     =    0;
+   char        x_flag      =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
+   DEBUG_LOOP   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, chrvisible (a_key), a_draw, myKEYS.l_blocking);
+   /*---(get ending time)----------------*/
+   yKEYS_loop_end ();
+   /*---(statistics)---------------------*/
+   s_total_time     += myKEYS.l_end  - myKEYS.l_beg;
+   myKEYS.l_avg_all  = s_total_time / (float) myKEYS.loops;
+   myKEYS.l_avg_miss = s_miss_time  / (float) myKEYS.loops;
+   if (a_key  != 0) {
+      ++(myKEYS.l_keys);
+      s_keys_time      += myKEYS.l_graf - myKEYS.l_beg;
+      myKEYS.l_avg_keys = s_keys_time  / (float) myKEYS.l_keys;
+      x_flag = 'y';
+   }
+   if (a_draw == 'y') {
+      ++(myKEYS.l_draw);
+      s_draw_time      += myKEYS.l_end  - myKEYS.l_graf;
+      myKEYS.l_avg_draw = s_draw_time / (float) myKEYS.l_draw;
+      x_flag = 'y';
+   }
+   if (x_flag != 'y') {
+      ++(myKEYS.l_idle);
+   }
+   DEBUG_LOOP   yLOG_complex ("counts"    , "%6dd, %6dk, %6di", x_draws, myKEYS.l_keys, x_idles);
+   /*---(sleeping)-----------------------*/
+   if (myKEYS.l_blocking != 'y') {
+      x_dur.tv_sec  = myKEYS.l_sleep / NSEC;
+      x_dur.tv_nsec = myKEYS.l_sleep % NSEC;
+      DEBUG_LOOP   yLOG_note    ("nano-sleeping");
+      nanosleep      (&x_dur, NULL);
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   return 0;
 }
 
 char       /*----: give current looping info ---------------------------------*/
@@ -685,7 +625,7 @@ yvikeys_main_status     (char *a_list)
     *> --rce;  if (a_list  == NULL)  return rce;                                      <* 
     *> /+---(write status)-------------------+/                                       <* 
     *> sprintf (a_list, "main, %8lldt, %8lldr, %8lldu, %6ldt, %6ldd, %6ldk, %6ldi",   <* 
-    *>       s_loop_targ, s_loop_rem, s_loop_used, s_avg, s_draw, s_keys, s_idle);    <* 
+    *>       myKEYS.l_exp, myKEYS.l_sleep, myKEYS.l_used, s_avg, myKEYS.l_draw, myKEYS.a_keys, myKEYS.l_idle);    <* 
     *> /+---(complete)-----------------------+/                                       <* 
     *> return 0;                                                                      <*/
 }

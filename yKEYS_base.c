@@ -7,7 +7,11 @@
 tMY         myKEYS;
 
 
-char  g_last      [LEN_LABEL] = "";
+static char    s_env          = 'c';
+static char    (*s_draw)      (float  a_zoom);
+static char    (*s_input)     (int   *a_key);
+static char    (*s_altinput)  (void);
+static int     s_max_loop     =   0;
 
 
 
@@ -325,24 +329,91 @@ yKEYS_string            (uchar *a_keys)
    return x_error;
 }
 
-char         /*-> handle main loop for ncurses -------[ ------ [gn.842.232.99]*/ /*-[01.0000.000.!]-*/ /*-[--.---.---.--]-*/
-yKEYS_main              (char *a_delay, char *a_update, char *a_altinput ())
+char
+ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env, char *a_draw (), char *a_input (), char *a_altinput ())
 {
    /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
    char        rc          =    0;
-   int         x_loop      =    0;
+   /*---(header)-------------------------*/
+   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
+   /*---(defaults)-----------------------*/
+   s_env      = '-';
+   s_max_loop = 0;
+   s_draw     = NULL;
+   s_input    = NULL;
+   s_altinput = NULL;
+   /*---(timing)-------------------------*/
+   rc = yKEYS_loop_set     (a_delay, a_update);
+   DEBUG_GRAF   yLOG_value   ("loop_set"  , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(loops)--------------------------*/
+   DEBUG_GRAF   yLOG_value   ("a_loops"   , a_loops);
+   if (a_loops > 0)  s_max_loop = a_loops;
+   /*---(environment)--------------------*/
+   DEBUG_GRAF   yLOG_char    ("a_env"     , a_env);
+   --rce;  if (a_env == 0 || strchr ("gc", a_env) == NULL) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   s_env      = a_env;
+   /*---(draw)---------------------------*/
+   DEBUG_GRAF   yLOG_point   ("a_draw"    , a_draw);
+   --rce;  if (a_draw == NULL) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   s_draw     = a_draw;
+   /*---(input)--------------------------*/
+   DEBUG_GRAF   yLOG_point   ("a_input"   , a_input);
+   --rce;  if (a_input == NULL) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   s_input    = a_input;
+   /*---(alt-input)----------------------*/
+   DEBUG_GRAF   yLOG_point   ("a_altinput", a_altinput);
+   s_altinput = a_altinput;
+   /*---(run drawer)---------------------*/
+   rc = s_draw (0.0);
+   DEBUG_GRAF   yLOG_value   ("drawing"   , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
+char yKEYS_quit        (void) { myKEYS.done = 'y'; }
+char ykeys_quitting    (void) { if (myKEYS.done    == 'y') return 1; return 0; }
+
+char         /*-> handle main loop for ncurses -------[ ------ [gn.842.232.99]*/ /*-[01.0000.000.!]-*/ /*-[--.---.---.--]-*/
+yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env, char *a_draw (), char *a_input (), char *a_altinput ())
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
    int         x_ch        =  ' ';
    uchar       x_key       =  ' ';
    char        x_draw      =  '-';
-   char        x_group     =  '-';
    char        t           [LEN_DESC]  = "";
-   /*---(prepare)------------------------*/
+   /*---(header)-------------------------*/
    DEBUG_TOPS   yLOG_note    ("entering main processing loop");
    DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
    DEBUG_GRAF   yLOG_point   ("a_altinput", a_altinput);
    DEBUG_TOPS   yLOG_break   ();
-   /*> yvikeys_loop_set     (a_delay, a_update);                                      <*/
-   /*> yVIKEYS_view_all (0.0);                                                        <*/
+   /*---(prepare)------------------------*/
+   rc = ykeys__prepare (a_delay, a_update, a_loops, a_env, a_draw, a_input, a_altinput);
+   DEBUG_GRAF   yLOG_value   ("loop_set"  , rc);
+   --rce;  if (rc < 0) {
+      DEBUG_LOOP   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
    /*---(CLA for script)-----------------*/
    /*> DEBUG_TOPS   yLOG_info    ("script"    , myVIKEYS.m_script);                   <*/
    /*> if (strcmp (myVIKEYS.m_script, "") != 0) {                                     <* 
@@ -354,50 +425,58 @@ yKEYS_main              (char *a_delay, char *a_update, char *a_altinput ())
     *> }                                                                              <*/
    /*---(main-loop)----------------------*/
    while (1) {
+      DEBUG_GRAF  yLOG_value   ("LOOP"      , myKEYS.loops);
+      /*---(start loop)------------------*/
+      yKEYS_loop_beg   ();
       /*---(alternate input)-------------*/
-      /*> DEBUG_GRAF  yLOG_point   ("a_altinput", a_altinput);                        <*/
-      /*> if (a_altinput != NULL)   a_altinput ();                                    <*/
+      if (s_altinput != NULL) {
+         rc = a_altinput ();
+         DEBUG_GRAF  yLOG_value   ("altinput"  , rc);
+      }
       /*---(get input)-------------------*/
-      /*> x_ch = yvikeys_loop_getch ();                                               <* 
-       *> DEBUG_GRAF  yLOG_value   ("x_ch"      , x_ch);                              <* 
-       *> yvikeys_loop_beg   ();                                                      <*/
+      rc = s_input (&x_ch);
+      DEBUG_GRAF  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_ch, x_ch);
       /*---(specialty actions)-----------*/
       /*> if (x_ch == KEY_RESIZE)  yVIKEYS_resize (0, 0, 0);                          <* 
-       *> if (x_ch == -102)        yVIKEYS_resize (0, 0, 0);                          <* 
-       *> if (x_ch < 0)  x_key = 0;                                                   <* 
-       *> else           x_key = x_ch;                                                <*/
-      x_key = x_ch;
+       *> if (x_ch == -102)        yVIKEYS_resize (0, 0, 0);                          <*/
       /*---(keyboard input)--------------*/
-      DEBUG_GRAF  yLOG_value   ("x_key"     , x_key);
-      /*> x_key = yVIKEYS_main_input  (RUN_USER, x_key);                              <*/
-      /*> x_key = yKEYS_input (myVIKEYS.env, x_key);                                  <*/
-      if (x_key == G_KEY_SKIP)  continue;   /* for macros to skip spaces, etc  */
-      /*---(handling)--------------------*/
-      /*> yVIKEYS_main_handle (x_key);                                                <*/
-      /*> rc = yMODE_handle (x_key);                                                  <*/
-      /*> if (yVIKEYS_quit ())  break;                                                <*/
-      /*---(repeating)-------------------*/
-      /*> if (x_key == ')' && yvikeys_macro_emode () == MACRO_STOP) {                           <* 
-       *>    DEBUG_GRAF  yLOG_note    ("kick into grouping (non-macro) fast execution mode");   <* 
-       *>    yvikeys_macro_set2blitz ();                                                        <* 
-       *>    x_group = 'y';                                                                     <* 
-       *>    continue;                                                                          <* 
-       *> }                                                                                     <* 
-       *> if (!yvikeys_keys_repeating () && x_group == 'y') {                                   <* 
-       *>    DEBUG_GRAF  yLOG_note    ("end grouping (non-macro) fast execution mode");         <* 
-       *>    yvikeys_macro_set2run ();                                                          <* 
-       *>    x_group = '-';                                                                     <* 
-       *> }                                                                                     <*/
+      if      (x_ch <  0  || x_ch > 255)  x_key = 0;
+      else                                x_key = x_ch;
+      rc = ykeys__input (s_env, &x_key, NULL, NULL);
+      DEBUG_GRAF  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_key, x_key);
+      /*---(handle keystroke)------------*/
+      if (!yKEYS_is_locked () && x_key != G_KEY_NOOP && x_key != G_KEY_SKIP) {
+         rc = yMODE_handle (x_key);
+         if (rc >= 0) {
+            DEBUG_LOOP   yLOG_complex ("normal"    , "%3d, %c, %4d", x_key, chrvisible (x_key), rc);
+         } else {
+            DEBUG_LOOP   yLOG_complex ("error"     , "%3d, %c, %4d", x_key, chrvisible (x_key), rc);
+         }
+      } else {
+         DEBUG_LOOP   yLOG_complex ("skipped"   , "%3d, %c", x_key, chrvisible (x_key));
+      }
+      /*---(exiting)---------------------*/
+      ++myKEYS.loops;
+      if (ykeys_quitting ()) {
+         DEBUG_GRAF   yLOG_note    ("user requested quitting");
+         break;
+      }
+      if (s_max_loop > 0 && myKEYS.loops >= s_max_loop) {
+         DEBUG_GRAF   yLOG_note    ("hit max loops, stopping");
+         break;
+      }
+      /*---(next)------------------------*/
+      IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
       /*---(showing)---------------------*/
-      ++x_loop;
       x_draw = '-';
-      /*> if ((x_loop % myVIKEYS.loops) == 0) {                                       <* 
-       *>    x_draw = 'y';                                                            <* 
-       *>    yvikeys_loop_prog ();                                                    <* 
-       *>    yVIKEYS_view_all (0.0);                                                  <* 
-       *> }                                                                           <*/
+      if ((myKEYS.loops % myKEYS.l_loops) == 0) {
+         x_draw = 'y';
+         yKEYS_loop_graf  ();
+         rc = s_draw (0.0);
+         DEBUG_GRAF   yLOG_value   ("drawing"   , rc);
+      }
       /*---(sleeping)--------------------*/
-      /*> yvikeys_loop_sleep (x_key, x_draw);                                         <*/
+      ykeys_loop_sleep (x_key, x_draw);
       /*---(done)------------------------*/
    }
    DEBUG_TOPS  yLOG_break   ();
@@ -450,6 +529,50 @@ ykeys__unit_end         (void)
    yKEYS_wrap ();
    DEBUG_KEYS  yLOG_exit    (__FUNCTION__);
    yLOGS_end    ();
+   return 0;
+}
+
+static   int  s_draws      = 0;
+static   int  s_inputs     = 0;
+static   int  s_alts       = 0;
+static   int  s_pos        = 0;
+static   char s_keys       [LEN_RECD] = "";
+static   int  s_len        = 0;
+
+char
+ykeys__unit_prep        (char *a_keys)
+{
+   s_draws  = 0;
+   s_inputs = 0;
+   s_alts   = 0;
+   s_pos    = 0;
+   if (a_keys != NULL)  strlcpy (s_keys, a_keys, LEN_RECD);
+   else                 strlcpy (s_keys, ""    , LEN_RECD);
+   s_len = strlen (s_keys);
+   return 0;
+}
+
+char
+ykeys__unit_input       (int *a_key)
+{
+   ++s_inputs;
+   if (a_key == NULL)  return -1;
+   if (s_pos >= s_len)  *a_key = 0;
+   *a_key = s_keys [s_pos++];
+   return 0;
+}
+
+char
+ykeys__unit_draw        (float a_zoom)
+{
+   ++s_draws;
+   return 0;
+}
+
+char
+ykeys__unit_altinput    (void)
+{
+   ++s_alts;
    return 0;
 }
 
@@ -534,15 +657,29 @@ yKEYS__unit             (char *a_question, char a_index)
       snprintf (unit_answer, LEN_FULL, "KEYS groups      : %1d %s", myKEYS.r_level, x_list);
    }
    else if (strcmp (a_question, "loop"        )   == 0) {
-      yKEYS_loop_status ('m', 70, t);
+      yKEYS_loop_status ('l', 70, t);
       snprintf (unit_answer, LEN_RECD, "KEYS loop        : %s", t + 8);
    }
-   /*> else if (strcmp (a_question, "update"      )   == 0) {                                                                                                                  <* 
-    *>    snprintf (unit_answer, LEN_RECD, "LOOP update      : %-5s = %5.3f, %6d loop(s)", s_update_info [s_update].terse, s_update_info [s_update].update, myVIKEYS.loops);   <* 
-    *> }                                                                                                                                                                       <*/
-   /*> else if (strcmp (a_question, "saved"       )   == 0) {                                                            <* 
-    *>    snprintf (unit_answer, LEN_RECD, "LOOP saved       : delay %-5s, update %-5s", s_save_delay, s_save_update);   <* 
-    *> }                                                                                                                 <*/
+   else if (strcmp (a_question, "runs"         )  == 0) {
+      snprintf (unit_answer, LEN_FULL, "KEYS runs        : A %4d %c, D %-10.10p %-4d, I %-10.10p %-4d, A %-10.10p %d",
+            s_max_loop, s_env,
+            s_draw, s_draws,
+            s_input, s_inputs,
+            s_altinput, s_alts);
+   }
+   else if (strcmp (a_question, "timing"       )  == 0) {
+      snprintf (unit_answer, LEN_FULL, "KEYS timing      : A %4ld %8lld, D %4ld %8lld, K %4ld %8lld, I %4ld, M %8lld",
+            myKEYS.loops,  myKEYS.l_avg_all,
+            myKEYS.l_draw, myKEYS.l_avg_draw,
+            myKEYS.l_keys, myKEYS.l_avg_keys,
+            myKEYS.l_idle,
+            myKEYS.l_avg_miss);
+   }
+   /*> sprintf (a_list, "main, %8lldt, %8lldr, %8lldu, %6ldt, %6ldd, %6ldk, %6ldi",   <* 
+    *>       s_loop_targ, s_loop_rem, s_loop_used, s_avg, s_draw, s_keys, s_idle);    <*/
    /*---(complete)-----------------------*/
    return unit_answer;
 }
+
+
+

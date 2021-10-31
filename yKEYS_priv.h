@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
-#define     P_VERNUM    "2.1b"
-#define     P_VERTXT    "cleaned and unit tested delay and update setting (no calcs)"
+#define     P_VERNUM    "2.1c"
+#define     P_VERTXT    "main loop is working and unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -52,6 +52,7 @@
 #include    <stdlib.h>            /* clibc  standard general purpose          */
 #include    <string.h>            /* clibc  standard string handling          */
 #include    <math.h>              /* clibc  standard math library             */
+#include    <time.h>              /* clibc  time related functions            */
 /*---(custom)----------------------------*/
 #include    <yURG.h>              /* heatherly urgent processing              */
 #include    <yLOG.h>              /* heatherly program logging                */
@@ -61,13 +62,14 @@
 #include    <yVIKEYS_solo.h>      /* heatherly yVIKEYS constants              */
 
 
+typedef     struct timespec   tTSPEC;
 
 typedef    struct    cMY    tMY;
 struct cMY {
    /*---(global flags)---------*/
+   long        loops;                       /* number of loops in main        */
    char        done;                        /* flag indicating ready to quit  */
    char        redraw;                      /* force redraw based on changes  */
-   char        repeating;                   /* note for repeating actions     */
    char        log_keys;                    /* allows keys to be hidden       */
    /*---(history every)--------*/
    char        h_every     [LEN_HUGE];      /* every key  (hidden or not)     */
@@ -108,6 +110,24 @@ struct cMY {
    long        l_nsec;                      /* loop sleep nanosec part        */
    int         l_loops;                     /* loops before screen update     */
    char        l_blocking;                  /* keyboard input blocks          */
+   /*---(loop timing)----------*/
+   long long   l_exp;                       /* expected loop duration         */
+   long long   l_act;                       /* actual loop duration           */
+   long long   l_slept;                     /* actual dur of last sleep       */
+   long long   l_used;                      /* actual dur of processing       */
+   long long   l_sleep;                     /* expected dur of next sleep     */
+   long long   l_beg;                       /* nsec of current start          */
+   long long   l_graf;                      /* nsec of graphics/drawing start */
+   long long   l_end;                       /* nsec of current end            */
+   long long   l_prev;                      /* nsec of previous end           */
+   long long   l_avg_all;                   /* average processing time        */
+   long long   l_avg_miss;                  /* total variance of exp to act   */
+   /*---(loop stats)-----------*/
+   long        l_draw;                      /* count of drawing loops         */
+   long long   l_avg_draw;                  /* average drawing time           */
+   long        l_keys;                      /* count of key handling loops    */
+   long long   l_avg_keys;                  /* average key processing time    */
+   long        l_idle;                      /* count of idle/noop loops       */
    /*---(repeat main)----------*/
    int         r_asked;                     /* originally requested repeats   */
    int         r_count;                     /* remaining repeats              */
@@ -132,8 +152,9 @@ struct cDELAY {
 extern const tDELAY g_delays [MAX_DELAY];
 extern char    g_cdelay;
 extern char    g_ndelay;
-extern float   g_bdelay;
 extern char    g_sdelay   [LEN_LABEL];
+extern float   g_bdelay;
+extern char    g_bskip;
 
 #define     MAX_UPDATE  15
 typedef  struct cUPDATE tUPDATE;
@@ -145,8 +166,8 @@ struct cUPDATE {
 extern const tUPDATE g_updates [MAX_UPDATE];
 extern char    g_nupdate;
 extern char    g_cupdate;
-extern float   g_bupdate;
 extern char    g_supdate  [LEN_LABEL];
+extern float   g_bupdate;
 
 
 
@@ -156,10 +177,16 @@ extern char    g_supdate  [LEN_LABEL];
 uchar       ykeys__input_fix        (char a_env, uchar a_key);
 char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        ykeys__input_force      (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys_quitting          (void);
+char        ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env, char *a_draw (), char *a_input (), char *a_altinput ());
 /*---(unittest)-------------*/
 char        ykeys__unit_quiet       (void);
 char        ykeys__unit_loud        (void);
 char        ykeys__unit_end         (void);
+char        ykeys__unit_prep        (char *a_keys);
+char        ykeys__unit_draw        (float a_zoom);
+char        ykeys__unit_input       (int *a_key);
+char        ykeys__unit_altinput    (void);
 char*       yKEYS__unit             (char *a_question, char a_index);
 
 
@@ -227,6 +254,7 @@ char        ykeys_group_check_end   (void);
 
 /*===[[ yKEYS_loop.c ]]=======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        ykeys_loop_clear        (void);
 char        ykeys_loop_init         (void);
 char        ykeys__loop_calc        (void);
 char        ykeys_loop_update       (char *a_update);

@@ -18,8 +18,9 @@ typedef  unsigned char        uchar;
 char*       yKEYS_version           (void);
 char        yKEYS_init              (void);
 char        yKEYS_wrap              (void);
-char        ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n);
+char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        yKEYS_string            (uchar *a_keys);
+char        yKEYS_quit              (void);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
 char        yKEYS_unique            (void);
@@ -90,13 +91,22 @@ char        yKEYS_is_vert_scroll    (uchar a_minor);
 char        yKEYS_is_vert_ends      (uchar a_minor);
 
 
+/*---(reporting)------------*/
 char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 char        yKEYS_logger_status     (char a_size, short a_wide, char *a_list);
 char        yKEYS_loop_status       (char a_size, short a_wide, char *a_list);
 
+
+/*---(normal)---------------*/
 char        yKEYS_loop_set          (char *a_delay, char *a_update);
-char        yKEYS_loop_normal       (void);
+/*---(macro)----------------*/
 char        yKEYS_loop_macro        (char a_delay, char a_update);
+char        yKEYS_loop_return       (void);
+char        yKEYS_loop_blitz        (void);
+char        yKEYS_loop_unblitz      (void);
+char        yKEYS_loop_beg          (void);
+char        yKEYS_loop_graf         (void);
+char        yKEYS_loop_end          (void);
 
 
 #endif
