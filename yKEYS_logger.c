@@ -139,19 +139,19 @@ yKEYS_logger            (uchar a_key)
    uchar       x_mode      =    0;
    char        x_multi     =  '-';
    /*---(header)-------------------------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_sint    (a_key);
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_sint    (a_key);
    /*---(null key)-----------------------*/
    --rce;  if (a_key == 0) {
-      DEBUG_LOOP   yLOG_snote   ("null/noop, zero recording");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_snote   ("null/noop, zero recording");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    /*---(prepare)------------------------*/
    x_key  = chrvisible (a_key);
-   DEBUG_LOOP   yLOG_schar   (x_key);
+   DEBUG_KEYS   yLOG_schar   (x_key);
    x_mode = yMODE_curr ();
-   DEBUG_LOOP   yLOG_schar   (x_mode);
+   DEBUG_KEYS   yLOG_schar   (x_mode);
    /*---(every)--------------------------*/
    DEBUG_KEYS   yLOG_snote   ("every logged");
    myKEYS.h_every [myKEYS.h_grand    ] = x_key;
@@ -159,33 +159,33 @@ yKEYS_logger            (uchar a_key)
    myKEYS.h_emode [myKEYS.h_grand    ] = x_mode;
    myKEYS.h_emode [myKEYS.h_grand + 1] = 0;
    ++(myKEYS.h_grand);
-   DEBUG_LOOP   yLOG_svalue  ("grand"     , myKEYS.h_grand);
+   DEBUG_KEYS   yLOG_svalue  ("grand"     , myKEYS.h_grand);
    /*---(TAIL -- check roll)-------------*/
    if (myKEYS.h_grand >= LEN_HUGE - 2)  ykeys__roll_every ();
    /*---(check logging)------------------*/
    DEBUG_KEYS   yLOG_schar   (myKEYS.h_logkeys);
    --rce;  if (myKEYS.h_logkeys != 'y') {
       DEBUG_KEYS   yLOG_snote   ("NO recording");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_KEYS   yLOG_schar   (myKEYS.h_total);
    DEBUG_KEYS   yLOG_schar   (myKEYS.h_curr);
    --rce;  if (myKEYS.h_curr < myKEYS.h_total) {
       DEBUG_KEYS   yLOG_snote   ("key already processed");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_KEYS   yLOG_schar   (yMACRO_exe_mode ());
    --rce;  IF_MACRO_PLAYING  {
       DEBUG_KEYS   yLOG_snote   ("do not record running macros");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    DEBUG_KEYS   yLOG_schar   (myKEYS.h_used);
    /*> if (myKEYS.h_used == 'y') {                                                    <* 
     *>    DEBUG_KEYS   yLOG_snote   ("key already processed");                        <* 
-    *>    DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);                                   <* 
+    *>    DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);                                   <* 
     *>    return 0;                                                                   <* 
     *> }                                                                              <*/
    DEBUG_KEYS   yLOG_snote   ("record");
@@ -194,11 +194,11 @@ yKEYS_logger            (uchar a_key)
    myKEYS.h_mode  [myKEYS.h_total]     = x_mode;
    myKEYS.h_mode  [myKEYS.h_total + 1] = 0;
    /*---(key)----------------------------*/
-   DEBUG_LOOP   yLOG_schar   (x_key);
+   DEBUG_KEYS   yLOG_schar   (x_key);
    myKEYS.h_log   [myKEYS.h_total]     = x_key;
    myKEYS.h_log   [myKEYS.h_total + 1] = 0;
    /*---(error)--------------------------*/
-   DEBUG_LOOP   yLOG_schar   ('-');
+   DEBUG_KEYS   yLOG_schar   ('-');
    myKEYS.h_errs [myKEYS.h_total]     = '-';
    myKEYS.h_errs [myKEYS.h_total + 1] = 0;
    /*---(multi)--------------------------*/
@@ -222,10 +222,10 @@ yKEYS_logger            (uchar a_key)
    ++(myKEYS.h_all);
    myKEYS.h_curr = myKEYS.h_total;
    ++(myKEYS.h_total);
-   DEBUG_LOOP   yLOG_svalue  ("all"       , myKEYS.h_all);
-   DEBUG_LOOP   yLOG_svalue  ("total"     , myKEYS.h_total);
-   DEBUG_LOOP   yLOG_svalue  ("curr"      , myKEYS.h_curr );
-   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_svalue  ("all"       , myKEYS.h_all);
+   DEBUG_KEYS   yLOG_svalue  ("total"     , myKEYS.h_total);
+   DEBUG_KEYS   yLOG_svalue  ("curr"      , myKEYS.h_curr );
+   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    /*---(TAIL -- check roll)-------------*/
    if (myKEYS.h_total >= LEN_FULL - 2)  ykeys__roll ();
    /*---(TAIL -- check recording)--------*/
@@ -281,12 +281,12 @@ yKEYS_unique            (void)
    uchar       m1, m2, m3, m4;
    uchar       c1, c2, c3, c4;
    /*---(header)-------------------------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_sint    (myKEYS.h_total);
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_sint    (myKEYS.h_total);
    /*---(basic defense)------------------*/
    if (myKEYS.h_total < 2) {
-      DEBUG_LOOP   yLOG_snote   ("too few keys, unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("too few keys, unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
    /*---(prepare)------------------------*/
@@ -295,38 +295,38 @@ yKEYS_unique            (void)
    c4 = myKEYS.h_log   [myKEYS.h_total - 1];
    m4 = myKEYS.h_multi [myKEYS.h_total - 1];
    /*---(filter)-------------------------*/
-   DEBUG_LOOP   yLOG_sint    (m3);
+   DEBUG_KEYS   yLOG_sint    (m3);
    if (strchr ("ps-", m3) == NULL) {
-      DEBUG_LOOP   yLOG_snote   ("m3 is weird, unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("m3 is weird, unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
-   DEBUG_LOOP   yLOG_sint    (m4);
+   DEBUG_KEYS   yLOG_sint    (m4);
    if (strchr ("ps-", m4) == NULL) {
-      DEBUG_LOOP   yLOG_snote   ("m4 is weird, unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("m4 is weird, unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
    if (m3 == 's' && m4 == '-') {
-      DEBUG_LOOP   yLOG_snote   ("coming off combo, obviously unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("coming off combo, obviously unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
    if (m4 == 'p') {
-      DEBUG_LOOP   yLOG_snote   ("starting combo, obviously unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("starting combo, obviously unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
-   DEBUG_LOOP   yLOG_sint    (c3);
+   DEBUG_KEYS   yLOG_sint    (c3);
    if (c3 == G_CHAR_SPACE) {
-      DEBUG_LOOP   yLOG_snote   ("c3 is space, so unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("c3 is space, so unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
-   DEBUG_LOOP   yLOG_sint    (c4);
+   DEBUG_KEYS   yLOG_sint    (c4);
    if (c4 == G_CHAR_SPACE) {
-      DEBUG_LOOP   yLOG_snote   ("c4 is space, so unique");
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+      DEBUG_KEYS   yLOG_snote   ("c4 is space, so unique");
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
       return 1;
    }
    /*---(single)-------------------------*/
@@ -346,7 +346,7 @@ yKEYS_unique            (void)
    /*---(double)-------------------------*/
    if (c4 == c2 && c3 == c1)                     return 0;
    /*---(complete)-----------------------*/
-   DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, 1);
+   DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, 1);
    return 1;
 }
 
@@ -485,15 +485,15 @@ yKEYS_check_unlock      (uchar *a_key)
    x_lock = yKEYS_is_locked ();
    DEBUG_KEYS   yLOG_value   ("x_lock"    , x_lock);
    if (!x_lock) {
-      DEBUG_LOOP   yLOG_note    ("key handling not locked");
+      DEBUG_KEYS   yLOG_snote   ("key handling not locked");
       DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
       return 0;
    }
    *a_key = 1;
    /*---(enough keys)--------------------*/
-   DEBUG_LOOP   yLOG_svalue  ("total"     , myKEYS.h_total);
+   DEBUG_KEYS   yLOG_svalue  ("total"     , myKEYS.h_total);
    --rce;  if (myKEYS.h_total < 2) {
-      DEBUG_LOOP   yLOG_note    ("not ready to unlock, skipping");
+      DEBUG_KEYS   yLOG_snote   ("not ready to unlock, skipping");
       DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -501,7 +501,7 @@ yKEYS_check_unlock      (uchar *a_key)
    x_ch = myKEYS.h_log [myKEYS.h_total - 1];
    DEBUG_KEYS   yLOG_schar   (x_ch);
    --rce;  if (x_ch != G_CHAR_ESCAPE) {
-      DEBUG_LOOP   yLOG_note    ("current key not е, skipping");
+      DEBUG_KEYS   yLOG_snote   ("current key not е, skipping");
       DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -509,7 +509,7 @@ yKEYS_check_unlock      (uchar *a_key)
    x_ch = myKEYS.h_log [myKEYS.h_total - 2];
    DEBUG_KEYS   yLOG_schar   (x_ch);
    --rce;  if (x_ch != G_CHAR_ESCAPE) {
-      DEBUG_LOOP   yLOG_note    ("previous key not е, skipping");
+      DEBUG_KEYS   yLOG_snote   ("previous key not е, skipping");
       DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
@@ -517,20 +517,29 @@ yKEYS_check_unlock      (uchar *a_key)
    x_ch = myKEYS.h_errs [myKEYS.h_total - 2];
    DEBUG_KEYS   yLOG_schar   (x_ch);
    --rce;  if (x_ch != G_CHAR_SPACE) {
-      DEBUG_LOOP   yLOG_note    ("previous key not during lock-down, skipping");
+      DEBUG_KEYS   yLOG_snote   ("previous key not during lock-down, skipping");
       DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
    /*---(unlock)-------------------------*/
    myKEYS.h_errs [myKEYS.h_total - 1] = '╧';
    yKEYS_unlock ();
-   DEBUG_LOOP   yLOG_note    ("received ее, unlocking");
+   DEBUG_KEYS   yLOG_snote   ("received ее, unlocking");
    /*---(complete)-----------------------*/
    DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    return 1;
 }
 
-char yKEYS_lock              (void)      { myKEYS.h_locked = 'y'; }
+char
+yKEYS_lock              (void)
+{
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_schar   (myKEYS.h_locked);
+   myKEYS.h_locked = 'y';
+   DEBUG_KEYS   yLOG_schar   (myKEYS.h_locked);
+   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
+}
+
 char yKEYS_unlock            (void)      { myKEYS.h_locked = '-'; }
 
 char

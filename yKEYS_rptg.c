@@ -6,7 +6,8 @@
 char*
 yKEYS_last              (void)
 {
-   sprintf (myKEYS.h_last, "(%c) %c", myKEYS.h_mode [myKEYS.h_total - 1], myKEYS.h_log [myKEYS.h_total - 1]);
+   if  (myKEYS.h_total > 0)  sprintf (myKEYS.h_last, "(%c) %c", myKEYS.h_mode [myKEYS.h_total - 1], myKEYS.h_log [myKEYS.h_total - 1]);
+   else                      sprintf (myKEYS.h_last, "(%c) %c", '·', '·');
    return myKEYS.h_last;
 }
 
@@ -47,7 +48,7 @@ yKEYS_logger_status     (char a_size, short a_wide, char *a_list)
    uchar       x_open      [LEN_TERSE] = "";
    uchar       x_close     [LEN_TERSE] = "";
    /*---(header)-------------------------*/
-   DEBUG_SCRP   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
    /*---(get size)-----------------------*/
    if (a_size == '-') { /* no adapt option */
       if      (a_wide <  20)  a_size = 'u';
@@ -81,20 +82,20 @@ yKEYS_logger_status     (char a_size, short a_wide, char *a_list)
       sprintf (a_list, "log %4sg %3st %c %c ´", x_grand, x_total, myKEYS.h_logkeys, myKEYS.h_locked);
       break;
    case 's' :
-      sprintf (a_list, "logger  %4sg %4sa %3st %c %3sc %c %2se %c´",
+      sprintf (a_list, " logger  %4sg %4sa %3st %c %3sc %c %2se %c´",
             x_grand, x_all, x_total, myKEYS.h_logkeys,
             x_curr , myKEYS.h_used,
             x_error, myKEYS.h_locked);
       break;
    case 'm' :
-      sprintf (a_list, "logger  %4sg %4sa %3st %c %3sc %c %2se %2sw %2ss %c %3sa %3ss %3sz %3sp  ´",
+      sprintf (a_list, " logger  %4sg %4sa %3st %c %3sc %c %2se %2sw %2ss %c %3sa %3ss %3sz %3sp  ´",
             x_grand, x_all, x_total, myKEYS.h_logkeys,
             x_curr , myKEYS.h_used,
             x_error, x_warn, x_skip, myKEYS.h_locked,
             x_ack, x_space, x_noop, x_combo);
       break;
    default  :
-      sprintf (a_list, "logger  %4sg %4sa %3st %c § %3sc %c § %2se %2sw %2ss %c § %3sa %3ss %3sz %3sp § %2so %2sc %c ´",
+      sprintf (a_list, " logger  %4sg %4sa %3st %c § %3sc %c § %2se %2sw %2ss %c § %3sa %3ss %3sz %3sp § %2so %2sc %c ´",
             x_grand, x_all, x_total, myKEYS.h_logkeys,
             x_curr , myKEYS.h_used,
             x_error, x_warn, x_skip, myKEYS.h_locked,
@@ -103,6 +104,7 @@ yKEYS_logger_status     (char a_size, short a_wide, char *a_list)
       break;
    }
    /*---(complete)-----------------------*/
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -122,7 +124,7 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
    short       x_max       =    0;
    int         i           =    0;
    /*---(header)-------------------------*/
-   DEBUG_SCRP   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
    /*---(get size)-----------------------*/
    if (a_size == '-') { /* no adapt option */
       if      (a_wide <  20)  a_size = 'u';
@@ -147,9 +149,9 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
    ykeys_num2str (myKEYS.h_grand, 4, x_grand);
    ykeys_num2str (myKEYS.h_total, 3, x_total);
    if (myKEYS.h_total > 0) {
-      x_mode = myKEYS.h_mode [myKEYS.h_curr];
-      x_err  = myKEYS.h_errs [myKEYS.h_curr];
-      x_ch   = myKEYS.h_log  [myKEYS.h_curr];
+      x_mode = chrvisible (myKEYS.h_mode [myKEYS.h_curr]);
+      x_err  = chrvisible (myKEYS.h_errs [myKEYS.h_curr]);
+      x_ch   = chrvisible (myKEYS.h_log  [myKEYS.h_curr]);
    }
    /*---(log part)-----------------------*/
    strlcpy (x_log, YSTR_PLUS, h + 1);
@@ -168,10 +170,11 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
       sprintf (a_list, "key %3st %c %c %c %c %c ´", x_total, myKEYS.h_logkeys, myKEYS.h_locked, x_mode, x_ch, x_err);
       break;
    default  :
-      sprintf (a_list, "keylog  %4sg %3st %c %c  %c %c %c %c%s ´", x_grand, x_total, myKEYS.h_logkeys, myKEYS.h_locked, x_mode, x_ch, x_err, x_cont, x_log);
+      sprintf (a_list, " keylog  %4sg %3st %c %c  %c %c %c %c%s ´", x_grand, x_total, myKEYS.h_logkeys, myKEYS.h_locked, x_mode, x_ch, x_err, x_cont, x_log);
       break;
    }
    /*---(complete)-----------------------*/
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -218,19 +221,19 @@ yKEYS_loop_status       (char a_size, short a_wide, char *a_list)
             myKEYS.l_blocking);
       break;
    case 's' :
-      sprintf (a_list, "loop    D %-5.5s %-2.2s, U %-5.5s, L %-4.4s %c  ´",
+      sprintf (a_list, " loop    D %-5.5s %-2.2s, U %-5.5s, L %-4.4s %c ´",
             g_delays  [g_cdelay ].terse, x_skip,
             g_updates [g_cupdate].terse,
             x_loops, myKEYS.l_blocking);
       break;
    case 'm' :
-      sprintf (a_list, "loop    D %-5.5s %-8.8s %-2.2s, U %-5.5s %-8.8s, %1ds %-9.9sns %-4.4s %c ´",
+      sprintf (a_list, " loop    D %-5.5s %-8.8s %-2.2s, U %-5.5s %-8.8s, %1ds %-9.9sns %-4.4s %c ´",
             g_delays  [g_cdelay ].terse, x_delay, x_skip,
             g_updates [g_cupdate].terse, x_update,
             myKEYS.l_secs, x_nsec, x_loops, myKEYS.l_blocking);
       break;
    case 'l' :
-      sprintf (a_list, "loop    D %-5.5s %-8.8s %-2.2s, U %-5.5s %-8.8s, L %1ds %-9.9sns %-4.4s %c, S %-5.5s %-5.5s, B %-8.8s %-2.2s %-8.8s´",
+      sprintf (a_list, " loop    D %-5.5s %-8.8s %-2.2s, U %-5.5s %-8.8s, L %1ds %-9.9sns %-4.4s %c, S %-5.5s %-5.5s, B %-8.8s %-2.2s %-7.7s ´",
             g_delays  [g_cdelay ].terse, x_delay, x_skip,
             g_updates [g_cupdate].terse, x_update,
             myKEYS.l_secs, x_nsec, x_loops, myKEYS.l_blocking,

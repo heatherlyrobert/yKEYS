@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
-#define     P_VERNUM    "2.1c"
-#define     P_VERTXT    "main loop is working and unit tested"
+#define     P_VERNUM    "2.1d"
+#define     P_VERTXT    "updates and tweaks for gyges testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -178,14 +178,14 @@ uchar       ykeys__input_fix        (char a_env, uchar a_key);
 char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        ykeys__input_force      (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        ykeys_quitting          (void);
-char        ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env, char *a_draw (), char *a_input (), char *a_altinput ());
+char        ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput);
 /*---(unittest)-------------*/
 char        ykeys__unit_quiet       (void);
 char        ykeys__unit_loud        (void);
 char        ykeys__unit_end         (void);
 char        ykeys__unit_prep        (char *a_keys);
 char        ykeys__unit_draw        (float a_zoom);
-char        ykeys__unit_input       (int *a_key);
+char        ykeys__unit_input       (char a_blocking, char *a_key);
 char        ykeys__unit_altinput    (void);
 char*       yKEYS__unit             (char *a_question, char a_index);
 

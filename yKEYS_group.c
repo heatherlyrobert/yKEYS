@@ -19,6 +19,12 @@ ykeys_group_reset       (void)
 }
 
 char
+ykeys_group_analyze     (void)
+{
+}
+
+
+char
 yKEYS_group_beg         (void)
 {
    /*---(locals)-----------+-----+-----+-*/

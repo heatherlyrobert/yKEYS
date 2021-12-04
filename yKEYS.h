@@ -21,6 +21,9 @@ char        yKEYS_wrap              (void);
 char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        yKEYS_string            (uchar *a_keys);
 char        yKEYS_quit              (void);
+char        yKEYS_writequit         (void);
+char        yKEYS_writequitall      (void);
+char        yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
 char        yKEYS_unique            (void);
@@ -67,6 +70,7 @@ char*       yKEYS__unit             (char *a_question, char a_index);
 
 
 
+/*===[[ yKEYS_check.c ]]======================================================*/
 /*---(overall)--------------*/
 char        yKEYS_is_repeater       (uchar a_minor);
 char        yKEYS_is_macro          (uchar a_minor);
@@ -89,6 +93,14 @@ char        yKEYS_is_vert_simple    (uchar a_minor);
 char        yKEYS_is_vert_goto      (uchar a_minor);
 char        yKEYS_is_vert_scroll    (uchar a_minor);
 char        yKEYS_is_vert_ends      (uchar a_minor);
+/*---(depth)----------------*/
+char        yKEYS_is_deep_simple    (uchar a_minor);
+char        yKEYS_is_deep_goto      (uchar a_minor);
+char        yKEYS_is_deep_scroll    (uchar a_minor);
+char        yKEYS_is_deep_ends      (uchar a_minor);
+/*---(done)-----------------*/
+
+
 
 
 /*---(reporting)------------*/

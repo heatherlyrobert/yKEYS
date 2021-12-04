@@ -290,9 +290,9 @@ ykeys__loop_shared      (char a_type, char *a_string)
    char        x_curr      =   -1;
    char        x_save      =   -1;
    /*---(header)-------------------------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
    /*---(determine max)------------------*/
-   DEBUG_LOOP   yLOG_schar   (a_type);
+   DEBUG_KEYS   yLOG_schar   (a_type);
    --rce;  switch (a_type) {
    case 'u' :
       x_curr = g_cupdate;
@@ -303,21 +303,21 @@ ykeys__loop_shared      (char a_type, char *a_string)
       x_max  = g_ndelay - 1;
       break;
    default  :
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_LOOP   yLOG_sint    (x_max);
+   DEBUG_KEYS   yLOG_sint    (x_max);
    /*---(assign prefix)------------------*/
-   DEBUG_LOOP   yLOG_spoint  (a_string);
+   DEBUG_KEYS   yLOG_spoint  (a_string);
    --rce;  if (a_string == NULL) {
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_LOOP   yLOG_snote   (a_string);
+   DEBUG_KEYS   yLOG_snote   (a_string);
    x_prefix = a_string [0];
-   DEBUG_LOOP   yLOG_sint    (x_prefix);
+   DEBUG_KEYS   yLOG_sint    (x_prefix);
    /*---(find entry in table)------------*/
-   DEBUG_LOOP   yLOG_sint    (x_curr);
+   DEBUG_KEYS   yLOG_sint    (x_curr);
    switch (x_prefix) {
    case '[' :
       x_new  = 0;
@@ -355,24 +355,24 @@ ykeys__loop_shared      (char a_type, char *a_string)
       }
       break;
    }
-   DEBUG_LOOP   yLOG_sint    (x_new);
+   DEBUG_KEYS   yLOG_sint    (x_new);
    /*---(set key values)-----------------*/
    --rce;  switch (a_type) {
    case 'u' :
       g_cupdate       = x_new;
       myKEYS.l_update = g_updates [x_new].update;
-      DEBUG_LOOP   yLOG_sdouble (myKEYS.l_update);
+      DEBUG_KEYS   yLOG_sdouble (myKEYS.l_update);
       break;
    case 'd' :
       g_cdelay        = x_new;
       myKEYS.l_delay  = g_delays  [x_new].delay;
-      DEBUG_LOOP   yLOG_sdouble (myKEYS.l_delay);
+      DEBUG_KEYS   yLOG_sdouble (myKEYS.l_delay);
       break;
    default  :
-      DEBUG_LOOP   yLOG_sexitr  (__FUNCTION__, rce);
+      DEBUG_KEYS   yLOG_sexitr  (__FUNCTION__, rce);
       return rce;
    }
-   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    /*---(update looping)-----------------*/
    ykeys__loop_calc   ();
    /*---(complete)-----------------------*/
@@ -416,10 +416,10 @@ yKEYS_loop_macro        (char a_delay, char a_update)
       return 0;
    }
    /*---(change to macro speed)----------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_schar   (yMACRO_exe_mode ());
-   DEBUG_LOOP   yLOG_sint    (a_delay);
-   DEBUG_LOOP   yLOG_schar   (a_delay);
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_schar   (yMACRO_exe_mode ());
+   DEBUG_KEYS   yLOG_sint    (a_delay);
+   DEBUG_KEYS   yLOG_schar   (a_delay);
    /*---(run mode)-----------------------*/
    /*> IF_MACRO_RUN   a_delay = '0';                                                  <*/
    /*---(delay mode)---------------------*/
@@ -435,10 +435,10 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    case MACRO_DOUBLE :  ykeys_loop_delay ("100ms");   myKEYS.l_skip = 19;   break;
    case MACRO_TRIPLE :  ykeys_loop_delay ("100ms");   myKEYS.l_skip = 29;   break;
    }
-   DEBUG_LOOP   yLOG_sint    (myKEYS.l_skip);
+   DEBUG_KEYS   yLOG_sint    (myKEYS.l_skip);
    /*---(change update basis)------------*/
-   DEBUG_LOOP   yLOG_sint    (a_update);
-   DEBUG_LOOP   yLOG_schar   (a_update);
+   DEBUG_KEYS   yLOG_sint    (a_update);
+   DEBUG_KEYS   yLOG_schar   (a_update);
    switch (a_update) {
    case MACRO_NORMAL :  ykeys_loop_update ("100ms");  break;
    case MACRO_SLOWER :  ykeys_loop_update ("500ms");  break;
@@ -447,7 +447,7 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    case MACRO_BLIND  :  ykeys_loop_update ("100s");   break;
    }
    /*---(complete)-----------------------*/
-   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    return 0;
 }
 
@@ -457,27 +457,27 @@ yKEYS_loop_return       (void)
    /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
    /*---(return to normal)---------------*/
-   DEBUG_LOOP   yLOG_senter  (__FUNCTION__);
-   DEBUG_LOOP   yLOG_schar   (yMACRO_exe_mode ());
-   DEBUG_LOOP   yLOG_snote   (g_sdelay);
+   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   DEBUG_KEYS   yLOG_schar   (yMACRO_exe_mode ());
+   DEBUG_KEYS   yLOG_snote   (g_sdelay);
    rc = ykeys_loop_delay   (g_sdelay);
    myKEYS.l_skip = 0;
-   DEBUG_LOOP   yLOG_sint    (myKEYS.l_skip);
-   DEBUG_LOOP   yLOG_snote   (g_supdate);
+   DEBUG_KEYS   yLOG_sint    (myKEYS.l_skip);
+   DEBUG_KEYS   yLOG_snote   (g_supdate);
    rc = ykeys_loop_update  (g_supdate);
    /*---(complete)-----------------------*/
-   DEBUG_LOOP   yLOG_sexit   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
    return rc;
 }
 
 char
 yKEYS_loop_blitz        (void)
 {
-   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
-   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_double  ("delay"     , myKEYS.l_delay);
    if (myKEYS.l_delay <  0.00001) {
-      DEBUG_LOOP   yLOG_note    ("already in blitz, nothing to do");
-      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+      DEBUG_KEYS   yLOG_note    ("already in blitz, nothing to do");
+      DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
    g_bdelay        = myKEYS.l_delay;
@@ -487,18 +487,18 @@ yKEYS_loop_blitz        (void)
    g_bupdate       = myKEYS.l_update;
    myKEYS.l_update =   100.000000;
    ykeys__loop_calc ();
-   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
 char
 yKEYS_loop_unblitz      (void)
 {
-   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
-   DEBUG_LOOP   yLOG_double  ("delay"     , myKEYS.l_delay);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_double  ("delay"     , myKEYS.l_delay);
    if (myKEYS.l_delay >= 0.00001) {
-      DEBUG_LOOP   yLOG_note    ("not in blitz, nothing to do");
-      DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+      DEBUG_KEYS   yLOG_note    ("not in blitz, nothing to do");
+      DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
    myKEYS.l_delay  = g_bdelay;
@@ -508,7 +508,7 @@ yKEYS_loop_unblitz      (void)
    g_bskip         =   0;
    g_bupdate       = 0.0;
    ykeys__loop_calc ();
-   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -564,7 +564,7 @@ yKEYS_loop_end          (void)
    myKEYS.l_prev  = myKEYS.l_end;
    /*---(for timer)----------------------*/
    s_pct        = (myKEYS.l_used / (float) myKEYS.l_exp) * 100.0;
-   DEBUG_LOOP   yLOG_complex ("timing"    , "%10ds, %10dn, %10db, %10dt, %10de, %10du, %10dr, %8.6f", myKEYS.l_secs, myKEYS.l_nsec, myKEYS.l_beg, myKEYS.l_exp, myKEYS.l_end, myKEYS.l_used, myKEYS.l_sleep, s_pct);
+   DEBUG_KEYS   yLOG_complex ("timing"    , "%10ds, %10dn, %10db, %10dt, %10de, %10du, %10dr, %8.6f", myKEYS.l_secs, myKEYS.l_nsec, myKEYS.l_beg, myKEYS.l_exp, myKEYS.l_end, myKEYS.l_used, myKEYS.l_sleep, s_pct);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -580,8 +580,8 @@ ykeys_loop_sleep        (uchar a_key, char a_draw)
    static int  x_idles     =    0;
    char        x_flag      =  '-';
    /*---(header)-------------------------*/
-   DEBUG_LOOP   yLOG_enter   (__FUNCTION__);
-   DEBUG_LOOP   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, chrvisible (a_key), a_draw, myKEYS.l_blocking);
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_KEYS   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, chrvisible (a_key), a_draw, myKEYS.l_blocking);
    /*---(get ending time)----------------*/
    yKEYS_loop_end ();
    /*---(statistics)---------------------*/
@@ -603,16 +603,16 @@ ykeys_loop_sleep        (uchar a_key, char a_draw)
    if (x_flag != 'y') {
       ++(myKEYS.l_idle);
    }
-   DEBUG_LOOP   yLOG_complex ("counts"    , "%6dd, %6dk, %6di", x_draws, myKEYS.l_keys, x_idles);
+   DEBUG_KEYS   yLOG_complex ("counts"    , "%6dd, %6dk, %6di", x_draws, myKEYS.l_keys, x_idles);
    /*---(sleeping)-----------------------*/
    if (myKEYS.l_blocking != 'y') {
       x_dur.tv_sec  = myKEYS.l_sleep / NSEC;
       x_dur.tv_nsec = myKEYS.l_sleep % NSEC;
-      DEBUG_LOOP   yLOG_note    ("nano-sleeping");
+      DEBUG_KEYS   yLOG_note    ("nano-sleeping");
       nanosleep      (&x_dur, NULL);
    }
    /*---(complete)-----------------------*/
-   DEBUG_LOOP   yLOG_exit    (__FUNCTION__);
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
