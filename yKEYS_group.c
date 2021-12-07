@@ -66,18 +66,22 @@ yKEYS_group_end         (void)
    /*---(defense)------------------------*/
    if (myKEYS.r_level <= 0)  return 0;
    /*---(header)-------------------------*/
-   DEBUG_KEYS   yLOG_senter  (__FUNCTION__);
+   /*> DEBUG_KEYS   yLOG_senter  (__FUNCTION__);                                      <*/
+   DEBUG_KEYS   yLOG_enter   (__FUNCTION__);
    n = myKEYS.r_level;
-   DEBUG_KEYS   yLOG_sint    (n);
+   /*> DEBUG_KEYS   yLOG_sint    (n);                                                 <*/
+   DEBUG_KEYS   yLOG_value   ("r_level"   , myKEYS.r_level);
    /*---(check for done)-----------------*/
    if (myKEYS.r_reps [n] == 0) {
-      DEBUG_KEYS   yLOG_snote   ("pass thru");
+      /*> DEBUG_KEYS   yLOG_snote   ("pass thru");                                    <*/
+      DEBUG_KEYS   yLOG_note    ("pass thru");
       myKEYS.r_reps  [n] = -1;
       myKEYS.r_macro [n] = '-';
       myKEYS.r_beg   [n] = -1;
       myKEYS.r_end   [n] = -1;
       n = --(myKEYS.r_level);
-      DEBUG_KEYS   yLOG_sint    (n);
+      /*> DEBUG_KEYS   yLOG_sint    (n);                                              <*/
+      DEBUG_KEYS   yLOG_value   ("n"       , n);
       rc = 0;
    }
    /*---(return to beginning)------------*/
@@ -85,23 +89,29 @@ yKEYS_group_end         (void)
       /*---(mark end)--------------------*/
       if (myKEYS.r_end [n] < 0) {
          IF_MACRO_PLAYING {
-            DEBUG_KEYS   yLOG_snote   ("mark end macro");
+            /*> DEBUG_KEYS   yLOG_snote   ("mark end macro");                         <*/
+            DEBUG_KEYS   yLOG_note    ("mark end macro");
+            DEBUG_KEYS   yLOG_value   ("r_end"   , myKEYS.r_end [n]);
+            DEBUG_KEYS   yLOG_point   ("r_end"   , &(myKEYS.r_end [n]));
             yMACRO_exe_pos (NULL, &(myKEYS.r_end [n]));
          } else {
-            DEBUG_KEYS   yLOG_snote   ("mark end normal");
+            /*> DEBUG_KEYS   yLOG_snote   ("mark end normal");                        <*/
+            DEBUG_KEYS   yLOG_note    ("mark end normal");
             myKEYS.r_end   [n] = yKEYS_position ();
          }
-         DEBUG_KEYS   yLOG_sint    (myKEYS.r_end [n]);
+         /*> DEBUG_KEYS   yLOG_sint    (myKEYS.r_end [n]);                            <*/
+         DEBUG_KEYS   yLOG_value   ("r_end"     , myKEYS.r_end [n]);
       }
       /*---(update)----------------------*/
-      DEBUG_KEYS   yLOG_snote   ("next");
+      /*> DEBUG_KEYS   yLOG_snote   ("next");                                         <*/
+      DEBUG_KEYS   yLOG_note    ("next");
       if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos       (myKEYS.r_beg  [n]);
       else                                    yMACRO_exe_repos  (myKEYS.r_beg  [n]);
       --(myKEYS.r_reps [n]);
-      DEBUG_KEYS   yLOG_sint    (myKEYS.r_reps  [n]);
-      DEBUG_KEYS   yLOG_schar   (myKEYS.r_macro [n]);
-      DEBUG_KEYS   yLOG_sint    (myKEYS.r_beg   [n]);
-      DEBUG_KEYS   yLOG_sint    (myKEYS.r_end   [n]);
+      /*> DEBUG_KEYS   yLOG_sint    (myKEYS.r_reps  [n]);                             <*/
+      /*> DEBUG_KEYS   yLOG_schar   (myKEYS.r_macro [n]);                             <*/
+      /*> DEBUG_KEYS   yLOG_sint    (myKEYS.r_beg   [n]);                             <*/
+      /*> DEBUG_KEYS   yLOG_sint    (myKEYS.r_end   [n]);                             <*/
       rc = 1;
       /*---(done)------------------------*/
    }
@@ -115,7 +125,8 @@ yKEYS_group_end         (void)
     *>    DEBUG_KEYS   yLOG_sint    (n);                                              <* 
     *> }                                                                              <*/
    /*---(complete)-----------------------*/
-   DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);
+   /*> DEBUG_KEYS   yLOG_sexit   (__FUNCTION__);                                      <*/
+   DEBUG_KEYS   yLOG_exit    (__FUNCTION__);
    return rc;
 }
 

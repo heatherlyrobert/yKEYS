@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
-#define     P_VERNUM    "2.1d"
-#define     P_VERTXT    "updates and tweaks for gyges testing"
+#define     P_VERNUM    "2.1e"
+#define     P_VERTXT    "updated with gyges testing and changes to other libraries"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

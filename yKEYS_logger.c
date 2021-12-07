@@ -199,7 +199,8 @@ yKEYS_logger            (uchar a_key)
    myKEYS.h_log   [myKEYS.h_total + 1] = 0;
    /*---(error)--------------------------*/
    DEBUG_KEYS   yLOG_schar   ('-');
-   myKEYS.h_errs [myKEYS.h_total]     = '-';
+   if (myKEYS.h_locked != 'y')  myKEYS.h_errs [myKEYS.h_total]     = '-';
+   else                         myKEYS.h_errs [myKEYS.h_total]     = '·';
    myKEYS.h_errs [myKEYS.h_total + 1] = 0;
    /*---(multi)--------------------------*/
    x_multi = ykeys__multi (myKEYS.h_total);
@@ -465,7 +466,7 @@ yKEYS_set_warning       (void)
 char
 yKEYS_set_skip          (void)
 {  /* set if not already set */
-   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == '-') {
+   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == G_CHAR_SPACE) {
       myKEYS.h_errs [myKEYS.h_total - 1] = G_CHAR_SPACE;
       ++(myKEYS.h_skips);
    }

@@ -228,7 +228,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
    }
    /*---(get normal key)-----------------*/
    DEBUG_KEYS   yLOG_complex ("pos"       , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
-   --rce;  IF_MACRO_NOT_PLAYING {
+   --rce;  IF_MACRO_OFF {
       if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
          DEBUG_KEYS   yLOG_note    ("taking in new key from string");
          x_len = strlen (a_str);
@@ -253,17 +253,43 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
          x_source = 1;
       }
    }
-   /*---(get macro key)------------------*/
+   /*---(get macro playback)-------------*/
+   else IF_MACRO_PLAYBACK {
+      DEBUG_KEYS   yLOG_note    ("macro playback, get key, then call yMACRO");
+      if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
+         DEBUG_KEYS   yLOG_note    ("taking in playback key from string");
+         x_len = strlen (a_str);
+         DEBUG_KEYS   yLOG_complex ("pos"       , "%3dn, %3d len", *n, x_len);
+         if (*n < 0 || *n >= x_len) {
+            *a_key = 0;
+            DEBUG_KEYS   yLOG_exitr   (__FUNCTION__, rce);
+            return rce;
+         }
+         x_key = chrworking (a_str [*n]);
+         x_key = ykeys__input_fix (a_env, x_key);
+         DEBUG_KEYS   yLOG_value   ("x_key"     , x_key);
+         ++(*n);
+         x_source = 3;
+      } else {
+         DEBUG_KEYS   yLOG_note    ("no new playback keys, just wait");
+         *a_key = 0;
+         DEBUG_KEYS   yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      x_key = yMACRO_exec  (x_key);
+      x_source = 4;
+   }
+   /*---(get macro execution)------------*/
    else {
       DEBUG_KEYS   yLOG_note    ("macro execution, call yMACRO");
       x_key = yMACRO_exec  (*a_key);
-      x_source = 3;
+      x_source = 5;
    }
    /*---(double cleanse controls)--------*/
    if (x_key > 0 && x_key < 32) {
       if      (x_key == G_KEY_ESCAPE)  ;
       else if (x_key == G_KEY_RETURN)  ;
-      else  x_key = 0;
+      else     x_key = 0;
    }
    /*---(logger)-------------------------*/
    rc = yKEYS_logger (x_key);
@@ -286,15 +312,36 @@ ykeys__input_force      (char a_env, uchar *a_key, uchar *a_str, int *n)
    return ykeys__input (a_env, a_key, a_str, n);
 }
 
+char
+ykeys__handle     (uchar a_key, int *a_error)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   /*---(handle keystroke)---------------*/
+   if (!yKEYS_is_locked () && a_key != G_KEY_NOOP && a_key != G_KEY_SKIP) {
+      rc = yMODE_handle (a_key);
+      if (rc >= 0) {
+         DEBUG_KEYS   yLOG_complex ("normal"    , "%3d, %c, %4d", a_key, chrvisible (a_key), rc);
+      } else {
+         DEBUG_KEYS   yLOG_complex ("error"     , "%3d, %c, %4d", a_key, chrvisible (a_key), rc);
+         if (a_error != NULL)  *a_error += 1;
+      }
+   } else {
+      DEBUG_KEYS   yLOG_complex ("skipped"   , "%3d, %c", a_key, chrvisible (a_key));
+   }
+   /*---(complete)-----------------------*/
+   return rc;
+}
+
 char         /*-> process input string in main loop --[ ------ [ge.C74.153.42]*/ /*-[02.0000.00#.D]-*/ /*-[--.---.---.--]-*/
 yKEYS_string            (uchar *a_keys)
 {
    /*---(locals)-----------+-----------+-*/
    char        rc          =    0;
    int         x_len       =    0;
-   uchar       x_ch        =  ' ';     /* current keystroke                   */
+   uchar       x_key       =  ' ';     /* current keystroke                   */
    char        x_keys      [LEN_RECD];
-   char        x_error     =    0;          /* count of badly handled keys    */
+   int         x_error     =    0;          /* count of badly handled keys    */
    int         x_end       =    0;
    int         n           =    0;
    /*---(header)-------------------------*/
@@ -309,21 +356,13 @@ yKEYS_string            (uchar *a_keys)
    /*---(walk characters)----------------*/
    while (n < x_end) {
       /*---(get next char)---------------*/
-      rc = ykeys__input ('-', &x_ch, x_keys, &n);
+      rc = ykeys__input ('-', &x_key, x_keys, &n);
       DEBUG_KEYS   yLOG_value   ("input"     , rc);
       if (rc < 0)  break;
       /*---(handle keystroke)------------*/
-      if (!yKEYS_is_locked () && x_ch != G_KEY_SKIP) {
-         rc = yMODE_handle (x_ch);
-         if (rc >= 0) {
-            DEBUG_KEYS   yLOG_complex ("normal"    , "%3d, %c, %4d", x_ch, chrvisible (x_ch), rc);
-         } else {
-            DEBUG_KEYS   yLOG_complex ("error"     , "%3d, %c, %4d", x_ch, chrvisible (x_ch), rc);
-            ++x_error;
-         }
-      } else {
-         DEBUG_KEYS   yLOG_complex ("skipped"   , "%3d, %c", x_ch, chrvisible (x_ch));
-      }
+      rc = ykeys__handle (x_key, &x_error);
+      DEBUG_KEYS   yLOG_value   ("handle"    , rc);
+      if (rc < 0)  ++x_error;
       /*---(next)------------------------*/
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
       /*---(done)------------------------*/
@@ -447,16 +486,8 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       rc = ykeys__input (s_env, &x_key, NULL, NULL);
       DEBUG_KEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, x_key, chrvisible (x_key));
       /*---(handle keystroke)------------*/
-      if (!yKEYS_is_locked () && x_key != G_KEY_NOOP && x_key != G_KEY_SKIP) {
-         rc = yMODE_handle (x_key);
-         if (rc >= 0) {
-            DEBUG_KEYS   yLOG_complex ("normal"    , "%3d, %c, %4d", x_key, chrvisible (x_key), rc);
-         } else {
-            DEBUG_KEYS   yLOG_complex ("error"     , "%3d, %c, %4d", x_key, chrvisible (x_key), rc);
-         }
-      } else {
-         DEBUG_KEYS   yLOG_complex ("skipped"   , "%3d, %c", x_key, chrvisible (x_key));
-      }
+      rc = ykeys__handle (x_key, NULL);
+      DEBUG_KEYS   yLOG_value   ("handle"    , rc);
       /*---(exiting)---------------------*/
       ++myKEYS.loops;
       if (ykeys_quitting ()) {
@@ -502,7 +533,8 @@ ykeys__unit_quiet       (void)
    int         x_narg       = 1;
    char       *x_args [20]  = {"yKEYS_unit" };
    char        rc           =    0;
-   rc = yKEYS_init ();
+   rc = yKEYS_init  ();
+   rc = yMACRO_global_init  ();
    return rc;
 }
 
@@ -519,7 +551,8 @@ ykeys__unit_loud        (void)
    yURG_name  ("mode"         , YURG_ON);
    yURG_name  ("keys"         , YURG_ON);
    DEBUG_KEYS  yLOG_info     ("yKEYS"     , yKEYS_version   ());
-   rc = yKEYS_init ();
+   rc = yKEYS_init  ();
+   rc = yMACRO_global_init  ();
    return rc;
 }
 
