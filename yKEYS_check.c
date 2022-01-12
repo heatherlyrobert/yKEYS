@@ -16,7 +16,7 @@ static  uchar   s_hsimple   [LEN_DESC ]   = "0 Hh lL $                 ©  ";
 static  uchar   s_hgoto     [LEN_DESC ]   = "SH shcle LE   azud AZUD .   g";
 static  uchar   s_hscroll   [LEN_DESC ]   = "   shcle      azud      .    ";
 static  uchar   s_hpage     [LEN_DESC ]   = "   sh le      azud AZUD      ";
-static  uchar   s_hends     [LEN_DESC ]   = "S  shcle  E C azud      . x  ";
+static  uchar   s_hends     [LEN_DESC ]   = "S  shcle  E C azud      . x!*";
 static  uchar   s_hword     [LEN_LABEL]   = "wbe WBE";
 static  uchar   s_hchar     [LEN_LABEL]   = "#fFnN";
 
@@ -25,9 +25,10 @@ static  uchar   s_dgoto     [LEN_DESC ]   = "                             ";
 static  uchar   s_dscroll   [LEN_DESC ]   = "                             ";
 static  uchar   s_dends     [LEN_DESC ]   = "                             ";
 
+
 static  uchar   s_multimap  [LEN_DESC ]   = "cgz e pdx ai  DA             ";
 static  uchar   s_multivisu [LEN_DESC ]   = "cgz e pd  ai  DA             ";
-static  uchar   s_multiwdr  [LEN_DESC ]   = "cg  e                        ";
+static  uchar   s_multiwdr  [LEN_DESC ]   = " gz e                        ";
 
 static  uchar   s_multisrc  [LEN_DESC ]   = "cgz   pdx     Ff             ";
 static  uchar   s_multiselc [LEN_DESC ]   = "cgz   p       Ff             ";
@@ -61,6 +62,8 @@ char yKEYS_is_deep_simple    (uchar a_minor) { if (strchr (s_dsimple  , a_minor)
 char yKEYS_is_deep_goto      (uchar a_minor) { if (strchr (s_dgoto    , a_minor) != NULL)  return 1; return 0; }
 char yKEYS_is_deep_ends      (uchar a_minor) { if (strchr (s_dends    , a_minor) != NULL)  return 1; return 0; }
 char yKEYS_is_deep_scroll    (uchar a_minor) { if (strchr (s_dscroll  , a_minor) != NULL)  return 1; return 0; }
+
+
 
 char yKEYS_is_macro          (uchar a_minor) { if (strchr (s_macro    , a_minor) != NULL)  return 1; return 0; }
 char yKEYS_is_search         (uchar a_minor) { if (strchr (s_search   , a_minor) != NULL)  return 1; return 0; }

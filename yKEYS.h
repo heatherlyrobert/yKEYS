@@ -31,8 +31,11 @@ char        yKEYS_unique            (void);
 int         yKEYS_count             (void);
 int         yKEYS_position          (void);
 uchar       yKEYS_current           (void);
+char        yKEYS_is_menu           (void);
 char        yKEYS_oldkeys           (void);
 /*---(action)---------------*/
+char        yKEYS_logging_on        (void);
+char        yKEYS_logging_off       (void);
 char        yKEYS_repos             (int a_pos);
 char        yKEYS_nextpos           (void);
 char        yKEYS_toend             (void);
@@ -55,6 +58,8 @@ char        yKEYS_normal            (void);
 char        yKEYS_repeating         (void);
 int         yKEYS_repeats           (void);
 int         yKEYS_repeat_orig       (void);
+int         yKEYS_repeat_set_multi  (void);
+int         yKEYS_repeat_use_multi  (void);
 /*---(action)---------------*/
 char        yKEYS_repeat_dec        (void);
 int         yKEYS_repeat_useall     (void);
@@ -120,6 +125,11 @@ char        yKEYS_loop_beg          (void);
 char        yKEYS_loop_graf         (void);
 char        yKEYS_loop_end          (void);
 
+
+char        yKEYS_edelay_info       (char n, char *a_terse, char *a_desc, float *a_delay);
+char        yKEYS_eupdate_info      (char n, char *a_terse, char *a_desc, float *a_update);
+char        yKEYS_ddelay_info       (char a_abbr, char *a_terse, char *a_skip, char *a_desc);
+char        yKEYS_dupdate_info      (char a_abbr, char *a_terse, char *a_desc);
 
 #endif
 /*============================----end-of-source---============================*/

@@ -37,9 +37,9 @@
 #define     P_CREATED   ""
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
-#define     P_VERMINOR  "2.1-, complete and tie yVIKEYS back into it"
-#define     P_VERNUM    "2.1e"
-#define     P_VERTXT    "updated with gyges testing and changes to other libraries"
+#define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
+#define     P_VERNUM    "2.2a"
+#define     P_VERTXT    "cleaned up and fully unit tested"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -58,7 +58,9 @@
 #include    <yLOG.h>              /* heatherly program logging                */
 #include    <ySTR.h>              /* heatherly string processing              */
 #include    <yMODE.h>             /* heatherly yVIKEYS mode tracking          */
+#include    <yMAP.h>              /* heatherly vi-keys location management    */
 #include    <yMACRO.h>            /* heatherly yVIKEYS macro processing       */
+#include    <yFILE.h>             /* heatherly vi-keys content file handling  */
 #include    <yVIKEYS_solo.h>      /* heatherly yVIKEYS constants              */
 
 
@@ -71,6 +73,12 @@ struct cMY {
    char        done;                        /* flag indicating ready to quit  */
    char        redraw;                      /* force redraw based on changes  */
    char        log_keys;                    /* allows keys to be hidden       */
+   /*---(config)---------------*/
+   char        c_env;
+   char      (*c_draw)     (float);
+   char      (*c_input)    (char, char*);
+   char      (*c_altinput) (void);
+   int         c_max_loop;
    /*---(history every)--------*/
    char        h_every     [LEN_HUGE];      /* every key  (hidden or not)     */
    char        h_emode     [LEN_HUGE];      /* every mode (hidden or not)     */
@@ -101,10 +109,20 @@ struct cMY {
    short       h_open;                      /* count of open parens           */
    short       h_close;                     /* count of close parens          */
    char        h_balanced;                  /* parens are balanced (y/-)      */
-   /*---(loop speed)-----------*/
+   /*---(delay)----------------*/
+   char        l_ndelay;                    /* number of delay options        */
+   char        l_cdelay;                    /* current delay index            */
+   char        l_sdelay   [LEN_LABEL];      /* current delay terse            */
    float       l_delay;                     /* requested loop sleep timing    */
-   float       l_update;                    /* requested screen update timing */
    int         l_skip;                      /* diff between playback and exec */
+   float       l_bdelay;                    /* pre-blitz delay between loops  */
+   char        l_bskip;                     /* pre-blitz delay skips          */
+   /*---(update)---------------*/
+   char        l_nupdate;                   /* number of update options       */
+   char        l_cupdate;                   /* current update option          */
+   char        l_supdate  [LEN_LABEL];      /* current update terse           */
+   float       l_update;                    /* requested screen update timing */
+   float       l_bupdate;                   /* pre-blitz updates per second   */
    /*---(loop tracking)--------*/
    int         l_secs;                      /* loop sleep second part         */
    long        l_nsec;                      /* loop sleep nanosec part        */
@@ -131,6 +149,7 @@ struct cMY {
    /*---(repeat main)----------*/
    int         r_asked;                     /* originally requested repeats   */
    int         r_count;                     /* remaining repeats              */
+   int         r_multi;                     /* count for multi-keys           */
    char        r_repeating;                 /* repeat status (y/-)            */
    /*---(repeat groups)--------*/
    char        r_level;                     /* repeat/grouping level          */
@@ -150,11 +169,6 @@ struct cDELAY {
    float       delay;
 };
 extern const tDELAY g_delays [MAX_DELAY];
-extern char    g_cdelay;
-extern char    g_ndelay;
-extern char    g_sdelay   [LEN_LABEL];
-extern float   g_bdelay;
-extern char    g_bskip;
 
 #define     MAX_UPDATE  15
 typedef  struct cUPDATE tUPDATE;
@@ -164,10 +178,6 @@ struct cUPDATE {
    float       update;
 };
 extern const tUPDATE g_updates [MAX_UPDATE];
-extern char    g_nupdate;
-extern char    g_cupdate;
-extern char    g_supdate  [LEN_LABEL];
-extern float   g_bupdate;
 
 
 
@@ -245,6 +255,7 @@ char        yKEYS_repeat_umode      (uchar a_major, uchar a_minor);
 /*===[[ yKEYS_rptg.c ]]=======================================================*/
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
 char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
+char        ykeys_dump              (FILE *f);
 
 
 char        ykeys_group_reset       (void);
