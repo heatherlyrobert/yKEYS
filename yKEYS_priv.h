@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2a"
-#define     P_VERTXT    "cleaned up and fully unit tested"
+#define     P_VERNUM    "2.2b"
+#define     P_VERTXT    "integrated multi-key repeating into yMODE and ySRC"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -61,6 +61,7 @@
 #include    <yMAP.h>              /* heatherly vi-keys location management    */
 #include    <yMACRO.h>            /* heatherly yVIKEYS macro processing       */
 #include    <yFILE.h>             /* heatherly vi-keys content file handling  */
+#include    <ySRC.h>              /* heatherly vi-keys source editing         */
 #include    <yVIKEYS_solo.h>      /* heatherly yVIKEYS constants              */
 
 
@@ -149,7 +150,6 @@ struct cMY {
    /*---(repeat main)----------*/
    int         r_asked;                     /* originally requested repeats   */
    int         r_count;                     /* remaining repeats              */
-   int         r_multi;                     /* count for multi-keys           */
    char        r_repeating;                 /* repeat status (y/-)            */
    /*---(repeat groups)--------*/
    char        r_level;                     /* repeat/grouping level          */

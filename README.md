@@ -1,2 +1,2 @@
 # yKEYS
-yVIKEYS sub-library for key handling and recording
+yvi-keys library for key handling and recording

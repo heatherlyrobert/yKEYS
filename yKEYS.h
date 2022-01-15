@@ -58,8 +58,12 @@ char        yKEYS_normal            (void);
 char        yKEYS_repeating         (void);
 int         yKEYS_repeats           (void);
 int         yKEYS_repeat_orig       (void);
-int         yKEYS_repeat_set_multi  (void);
-int         yKEYS_repeat_use_multi  (void);
+/*> int         yKEYS_repeat_set_multi  (void);                                       <*/
+/*> char        yKEYS_repeat_dec_multi  (void);                                       <*/
+/*> int         yKEYS_repeat_use_multi  (void);                                       <*/
+char        yKEYS_repeat_beg        (void);
+char        yKEYS_repeat_end        (void);
+char        yKEYS_check_repeat      (void);
 /*---(action)---------------*/
 char        yKEYS_repeat_dec        (void);
 int         yKEYS_repeat_useall     (void);
@@ -70,6 +74,7 @@ char        yKEYS_group_end         (void);
 char        yKEYS_group_hmode       (uchar a_major, uchar a_minor);
 /*---(mode)-----------------*/
 char        yKEYS_repeat_umode      (uchar a_major, uchar a_minor);
+char        yKEYS_repeat_check      (uchar a_major, uchar a_minor, char a_prev, char a_curr, char a_rc);
 /*---(done)-----------------*/
 char*       yKEYS__unit             (char *a_question, char a_index);
 
@@ -103,6 +108,8 @@ char        yKEYS_is_deep_simple    (uchar a_minor);
 char        yKEYS_is_deep_goto      (uchar a_minor);
 char        yKEYS_is_deep_scroll    (uchar a_minor);
 char        yKEYS_is_deep_ends      (uchar a_minor);
+/*---(complex)--------------*/
+char        yKEYS_check_multi       (uchar a_major, uchar a_minor);
 /*---(done)-----------------*/
 
 

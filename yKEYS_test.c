@@ -107,6 +107,8 @@ yKEYS__unit             (char *a_question, char a_index)
    char        x_open      =  'å';
    int         i           =    0;
    char        x_list      [LEN_RECD]  = "";
+   char        c           =  '·';
+   char        d           =  '·';
    /*---(preprare)-----------------------*/
    strlcpy  (unit_answer, "KEYS unit        : question not understood", LEN_FULL);
    /*---(dependency list)----------------*/
@@ -163,7 +165,9 @@ yKEYS__unit             (char *a_question, char a_index)
       snprintf (unit_answer, LEN_FULL, "KEYS counts      : %3dg § %3da %3dt %c %3dc %c § %3da %3ds %3dz %3dp § %3de %3dw %3ds %c § %2do %2dc %c", myKEYS.h_grand, myKEYS.h_all, myKEYS.h_total, myKEYS.h_logkeys, myKEYS.h_curr, chrvisible (myKEYS.h_log [myKEYS.h_curr]), myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_combos, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_skips, myKEYS.h_locked, myKEYS.h_open, myKEYS.h_close, myKEYS.h_balanced);
    }
    else if (strcmp (a_question, "repeats"      )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS repeats     : %c  %4da  %4dc  %4dm", myKEYS.r_repeating, myKEYS.r_asked, myKEYS.r_count, myKEYS.r_multi);
+      if (yKEYS_repeat_beg ())   c = 'y';
+      if (yKEYS_repeat_end ())   d = 'y';
+      snprintf (unit_answer, LEN_FULL, "KEYS repeats     : %c  %4da  %4dc   %c   %c", myKEYS.r_repeating, myKEYS.r_asked, myKEYS.r_count, c, d);
    }
    else if (strcmp (a_question, "groups"       )  == 0) {
       for (i = 1; i <= 5; ++i) {

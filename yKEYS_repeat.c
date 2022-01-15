@@ -42,14 +42,14 @@ ykeys_repeat_init       (void)
 /*====================------------------------------------====================*/
 static void  o___STATUS__________o () { return; }
 
-char ykeys_check_repeat (void) { if (myKEYS.r_count <= 0) yKEYS_repeat_reset (); }
-char yKEYS_repeating    (void) { ykeys_check_repeat ();  if (myKEYS.r_repeating == 'y')  return 1; return 0; }
-char yKEYS_normal       (void) { ykeys_check_repeat ();  if (myKEYS.r_repeating == '-')  return 1; return 0; }
-int  yKEYS_repeats      (void) { ykeys_check_repeat ();  return myKEYS.r_count; }
+char yKEYS_check_repeat (void) { if (myKEYS.r_count <= 0) yKEYS_repeat_reset (); }
+char yKEYS_repeating    (void) { if (myKEYS.r_repeating == 'y')  return 1; return 0; }
+char yKEYS_normal       (void) { if (myKEYS.r_repeating == '-')  return 1; return 0; }
+int  yKEYS_repeats      (void) { return myKEYS.r_count; }
 int  yKEYS_repeat_orig  (void) { return myKEYS.r_asked;}
 
-int  yKEYS_repeat_set_multi (void) { myKEYS.r_multi = myKEYS.r_count; return yKEYS_repeat_reset (); }
-int  yKEYS_repeat_use_multi (void) { int a = myKEYS.r_multi;  myKEYS.r_multi = 0; return a;  }
+char yKEYS_repeat_beg   (void) { if (myKEYS.r_asked == myKEYS.r_count) return 1;  return 0; }
+char yKEYS_repeat_end   (void) { if (myKEYS.r_count == 0) return 1;  return 0; }
 
 
 
@@ -58,8 +58,8 @@ int  yKEYS_repeat_use_multi (void) { int a = myKEYS.r_multi;  myKEYS.r_multi = 0
 /*====================------------------------------------====================*/
 static void  o___ACTION__________o () { return; }
 
-char yKEYS_repeat_dec   (void) { if (myKEYS.r_count > 0)  --myKEYS.r_count; ykeys_check_repeat ();  return 0;}
-int  yKEYS_repeat_useall(void) { ykeys_check_repeat (); int a = myKEYS.r_count; yKEYS_repeat_reset ();  return a; }
+char yKEYS_repeat_dec   (void) { if (myKEYS.r_count > 0)  --myKEYS.r_count; return 0;}
+int  yKEYS_repeat_useall(void) { int a = myKEYS.r_count; yKEYS_repeat_reset ();  return a; }
 
 char
 yKEYS_repeat_reset      (void)
@@ -74,9 +74,8 @@ char
 ykeys_repeat_set        (int a_repeat)
 {
    myKEYS.r_asked     = myKEYS.r_count = a_repeat;
-   myKEYS.r_multi     = 0;
    myKEYS.r_repeating = 'y';
-   ykeys_check_repeat ();
+   yKEYS_check_repeat ();
    return 0;
 }
 
@@ -149,6 +148,57 @@ yKEYS_repeat_umode      (uchar a_major, uchar a_minor)
    yMODE_exit  ();
    DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return a_minor;
+}
+
+char
+yKEYS_repeat_check      (uchar a_major, uchar a_minor, char a_prev, char a_curr, char a_rc)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   int         x_repeat    =    0;
+   char        rc          =    0;
+   /*---(header)----------------------*/
+   DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
+   /*---(capture repeats)-------------*/
+   x_repeat = yKEYS_repeats ();
+   DEBUG_YKEYS   yLOG_sint    (x_repeat);
+   if (x_repeat <= 0) {
+      DEBUG_YKEYS   yLOG_snote   ("no repeats requested");
+      DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(check mode change)-----------*/
+   x_repeat = yKEYS_repeats ();
+   if (a_prev != a_curr) {
+      DEBUG_YKEYS   yLOG_snote   ("no repeats across mode changes");
+      yKEYS_repeat_reset ();
+      DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(multi-key repeats)-----------*/
+   rc = yKEYS_check_multi (a_major, a_minor);
+   DEBUG_YKEYS   yLOG_sint    (rc);
+   if (rc == 1) {
+      DEBUG_YKEYS   yLOG_snote   ("multi-key, so defer repeating");
+      DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(loop repeats)----------------*/
+   if (a_rc >= 0 && x_repeat > 0 && a_curr != PMOD_REPEAT) {
+      DEBUG_YKEYS   yLOG_note    ("repeating");
+      yKEYS_repeat_dec ();
+      DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+      return 1;
+   }
+   /*---(loop repeats)----------------*/
+   if (a_rc < 0 && a_curr != PMOD_REPEAT) {
+      DEBUG_YKEYS   yLOG_note    ("complete repeat");
+      yKEYS_repeat_reset ();
+      DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+      return 0;
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+   return 0;
 }
 
 
