@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2b"
-#define     P_VERTXT    "integrated multi-key repeating into yMODE and ySRC"
+#define     P_VERNUM    "2.2c"
+#define     P_VERTXT    "minor changes to support yMACRO and gyges system testing"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -83,6 +83,7 @@ struct cMY {
    /*---(history every)--------*/
    char        h_every     [LEN_HUGE];      /* every key  (hidden or not)     */
    char        h_emode     [LEN_HUGE];      /* every mode (hidden or not)     */
+   char        h_estat     [LEN_HUGE];      /* note normal vs hidden          */
    short       h_grand;                     /* total of every key             */
    /*---(history normal)-------*/
    char        h_logkeys;                   /* log current keys (y/-)         */

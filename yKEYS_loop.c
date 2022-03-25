@@ -572,16 +572,16 @@ yKEYS_loop_return       (void)
    /*---(locals)-----------+-----+-----+-*/
    char        rc          =    0;
    /*---(return to normal)---------------*/
-   DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
-   DEBUG_YKEYS   yLOG_schar   (yMACRO_exe_mode ());
-   DEBUG_YKEYS   yLOG_snote   (myKEYS.l_sdelay);
+   DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YKEYS   yLOG_char    ("emode"     , yMACRO_exe_mode ());
+   DEBUG_YKEYS   yLOG_info    ("sdelay"    , myKEYS.l_sdelay);
    rc = ykeys_loop_delay   (myKEYS.l_sdelay);
    myKEYS.l_skip = 0;
-   DEBUG_YKEYS   yLOG_sint    (myKEYS.l_skip);
-   DEBUG_YKEYS   yLOG_snote   (myKEYS.l_supdate);
+   DEBUG_YKEYS   yLOG_value   ("skip"      , myKEYS.l_skip);
+   DEBUG_YKEYS   yLOG_info    ("supdate"   , myKEYS.l_supdate);
    rc = ykeys_loop_update  (myKEYS.l_supdate);
    /*---(complete)-----------------------*/
-   DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return rc;
 }
 

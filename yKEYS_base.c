@@ -242,12 +242,15 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   --rce;  if (a_str != NULL) {
+      x_len = strlen (a_str);
+      DEBUG_YKEYS   yLOG_complex ("a_str"     , "%2då%sæ", strlen (a_str), a_str);
+   }
    /*---(get normal key)-----------------*/
    DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
    --rce;  IF_MACRO_OFF {
       if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
          DEBUG_YKEYS   yLOG_note    ("taking in new key from string");
-         x_len = strlen (a_str);
          DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dn, %3d len", *n, x_len);
          if (*n < 0 || *n >= x_len) {
             *a_key = 0;
@@ -256,7 +259,6 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
          }
          x_key = chrworking (a_str [*n]);
          x_key = ykeys__input_fix (a_env, x_key);
-         DEBUG_YKEYS   yLOG_value   ("x_key"     , x_key);
          ++(*n);
          x_source = 2;
       } else if (myKEYS.h_curr >= myKEYS.h_total) {
@@ -274,7 +276,6 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       DEBUG_YKEYS   yLOG_note    ("macro playback, get key, then call yMACRO");
       if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
          DEBUG_YKEYS   yLOG_note    ("taking in playback key from string");
-         x_len = strlen (a_str);
          DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dn, %3d len", *n, x_len);
          if (*n < 0 || *n >= x_len) {
             *a_key = 0;
@@ -283,7 +284,6 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
          }
          x_key = chrworking (a_str [*n]);
          x_key = ykeys__input_fix (a_env, x_key);
-         DEBUG_YKEYS   yLOG_value   ("x_key"     , x_key);
          ++(*n);
          x_source = 3;
       } else {
@@ -302,6 +302,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       x_source = 5;
    }
    /*---(double cleanse controls)--------*/
+   DEBUG_YKEYS   yLOG_complex ("x_key"     , "%ds, %3d, %c", x_source, x_key, chrvisible (x_key));
    if (x_key > 0 && x_key < 32) {
       if      (x_key == G_KEY_ESCAPE)  ;
       else if (x_key == G_KEY_RETURN)  ;
@@ -370,7 +371,8 @@ yKEYS_string            (uchar *a_keys)
       return rc;
    }
    /*---(walk characters)----------------*/
-   while (n < x_end) {
+   DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3de", n, x_end);
+   while (n < x_end || yMACRO_exe_mode () != MACRO_STOP) {
       /*---(get next char)---------------*/
       rc = ykeys__input ('-', &x_key, x_keys, &n);
       DEBUG_YKEYS   yLOG_value   ("input"     , rc);
@@ -384,6 +386,10 @@ yKEYS_string            (uchar *a_keys)
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
       /*---(next)------------------------*/
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
+      /*> else {                                                                      <* 
+       *>    if (n == x_end)   --n;                                                   <* 
+       *> }                                                                           <*/
+      DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3de", n, x_end);
       /*---(done)------------------------*/
    }
    DEBUG_YKEYS   yLOG_note    ("main loop done");

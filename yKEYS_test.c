@@ -158,6 +158,16 @@ yKEYS__unit             (char *a_question, char a_index)
       sprintf (t, "%s", myKEYS.h_emode + x_beg);
       snprintf (unit_answer, LEN_FULL, "KEYS emode       : %c%-.70sæ", x_open, t);
    }
+   else if (strcmp (a_question, "estat"          )   == 0) {
+      x_beg  = 0;
+      x_open = 'å';
+      if (myKEYS.h_grand > 70) {
+         x_beg  = myKEYS.h_grand - 70;
+         x_open = '<';
+      }
+      sprintf (t, "%s", myKEYS.h_estat + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS estat       : %c%-.70sæ", x_open, t);
+   }
    else if (strcmp (a_question, "pos"          )  == 0) {
       snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr);
    }

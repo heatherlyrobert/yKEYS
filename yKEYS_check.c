@@ -30,8 +30,8 @@ static  uchar   s_multimap  [LEN_DESC ]   = "cgz e pdx ai  DA             ";
 static  uchar   s_multivisu [LEN_DESC ]   = "cgz e pd  ai  DA             ";
 static  uchar   s_multiwdr  [LEN_DESC ]   = " gz e                        ";
 
-static  uchar   s_multisrc  [LEN_DESC ]   = "cgz   pdx     Ff             ";
-static  uchar   s_multiselc [LEN_DESC ]   = "cgz   p       Ff             ";
+static  uchar   s_multisrc  [LEN_DESC ]   = "cgzy  pdx     Ff             ";
+static  uchar   s_multiselc [LEN_DESC ]   = " gz   p       Ff             ";
 
 static  uchar   s_search    [LEN_LABEL]   = "[<>]";
 
