@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2c"
-#define     P_VERTXT    "minor changes to support yMACRO and gyges system testing"
+#define     P_VERNUM    "2.2d"
+#define     P_VERTXT    "quick update to avoid drawing for NOOP, SKIP, ... (flickering)"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

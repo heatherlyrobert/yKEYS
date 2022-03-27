@@ -477,6 +477,7 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
    int         x_ch        =  ' ';
    uchar       x_key       =  ' ';
    char        x_draw      =  '-';
+   char        x_update    =  '-';
    char        t           [LEN_DESC]  = "";
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_break   ();
@@ -534,11 +535,13 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
       /*---(showing)---------------------*/
       x_draw = '-';
+      if (x_key >= 10)  x_update = 'y';
       if ((myKEYS.loops % myKEYS.l_loops) == 0) {
          x_draw = 'y';
          yKEYS_loop_graf  ();
-         rc = myKEYS.c_draw (0.0);
+         if (x_update == 'y')  rc = myKEYS.c_draw (0.0);
          DEBUG_YKEYS   yLOG_value   ("drawing"   , rc);
+         x_update = '-';
       }
       /*---(sleeping)--------------------*/
       ykeys_loop_sleep (x_key, x_draw);
