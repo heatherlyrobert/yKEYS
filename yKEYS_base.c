@@ -57,7 +57,7 @@ yvikeys_keys_dump       (FILE *a_file)
    fprintf (a_file, "keys      %s¦", myKEYS.h_log);
    fprintf (a_file, "mode      %s¦", myKEYS.h_mode);
    fprintf (a_file, "multi     %s¦", myKEYS.h_multi);
-   fprintf (a_file, "error     %s¦", myKEYS.h_errs);
+   fprintf (a_file, "error     %s¦", myKEYS.h_error);
    fprintf (a_file, "type----  ");
    for (i = 0; i < (myKEYS.h_total / 10) + 1; ++i)  fprintf (a_file, "-123456789");
    fprintf (a_file, "\n");
@@ -477,7 +477,6 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
    int         x_ch        =  ' ';
    uchar       x_key       =  ' ';
    char        x_draw      =  '-';
-   char        x_update    =  '-';
    char        t           [LEN_DESC]  = "";
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_break   ();
@@ -518,6 +517,10 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       /*---(handle keystroke)------------*/
       rc = ykeys__handle (x_key, NULL);
       DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
+      /*> if (x_key < 10)  {                                                                <* 
+       *>    DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");   <* 
+       *>    continue;                                                                      <* 
+       *> }                                                                                 <*/
       /*---(refresh maps)----------------*/
       rc = yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
@@ -535,13 +538,11 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
       /*---(showing)---------------------*/
       x_draw = '-';
-      if (x_key >= 10)  x_update = 'y';
       if ((myKEYS.loops % myKEYS.l_loops) == 0) {
          x_draw = 'y';
          yKEYS_loop_graf  ();
-         if (x_update == 'y')  rc = myKEYS.c_draw (0.0);
+         rc = myKEYS.c_draw (0.0);
          DEBUG_YKEYS   yLOG_value   ("drawing"   , rc);
-         x_update = '-';
       }
       /*---(sleeping)--------------------*/
       ykeys_loop_sleep (x_key, x_draw);

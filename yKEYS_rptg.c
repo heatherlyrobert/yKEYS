@@ -62,7 +62,7 @@ yKEYS_logger_status     (char a_size, short a_wide, char *a_list)
       else                    a_size = 'g';
    }
    /*---(prepare)------------------------*/
-   ykeys_num2str (myKEYS.h_grand   , 4, x_grand);
+   ykeys_num2str (myKEYS.e_total   , 4, x_grand);
    ykeys_num2str (myKEYS.h_all     , 4, x_all);
    ykeys_num2str (myKEYS.h_total   , 3, x_total);
    ykeys_num2str (myKEYS.h_curr    , 3, x_curr);
@@ -148,11 +148,11 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
    case  'g' :  h = 187;  break;
    }
    /*---(prepare)------------------------*/
-   ykeys_num2str (myKEYS.h_grand, 4, x_grand);
+   ykeys_num2str (myKEYS.e_total, 4, x_grand);
    ykeys_num2str (myKEYS.h_total, 3, x_total);
    if (myKEYS.h_total > 0) {
       x_mode = chrvisible (myKEYS.h_mode [myKEYS.h_curr]);
-      x_err  = chrvisible (myKEYS.h_errs [myKEYS.h_curr]);
+      x_err  = chrvisible (myKEYS.h_error [myKEYS.h_curr]);
       x_ch   = chrvisible (myKEYS.h_log  [myKEYS.h_curr]);
    }
    /*---(log part)-----------------------*/
@@ -254,16 +254,16 @@ ykeys_dump              (FILE *f)
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
    /*---(clear)--------------------------*/
    fprintf (f, "all keys ever entered\n");
-   fprintf (f, "count  %d\n", myKEYS.h_grand);
-   fprintf (f, "emode  å%sæ\n", myKEYS.h_emode);
-   fprintf (f, "every  å%sæ\n", myKEYS.h_every);
+   fprintf (f, "count  %d¦", myKEYS.e_total);
+   fprintf (f, "emode  å%sæ¦", myKEYS.e_mode );
+   fprintf (f, "every  å%sæ\n", myKEYS.e_log);
    fprintf (f, "\n");
    fprintf (f, "most recent keys entered\n");
    fprintf (f, "count  %d\n", myKEYS.h_total);
    fprintf (f, "mode   å%sæ\n", myKEYS.h_mode);
    fprintf (f, "log    å%sæ\n", myKEYS.h_log);
    fprintf (f, "multi  å%sæ\n", myKEYS.h_multi);
-   fprintf (f, "errs   å%sæ\n", myKEYS.h_errs);
+   fprintf (f, "errs   å%sæ¦", myKEYS.h_error);
    fprintf (f, "\n");
    fprintf (f, "general flags\n");
    fprintf (f, "locked %c\n", myKEYS.h_locked);

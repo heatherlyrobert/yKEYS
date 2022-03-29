@@ -34,6 +34,7 @@ uchar       yKEYS_current           (void);
 uchar       yKEYS_multi             (void);
 char        yKEYS_is_menu           (void);
 char        yKEYS_oldkeys           (void);
+char        yKEYS_every_current     (uchar *a_mode, uchar *a_curr, uchar *a_multi, uchar *a_menu, uchar *a_error, uchar *a_status);
 /*---(action)---------------*/
 char        yKEYS_logging_on        (void);
 char        yKEYS_logging_off       (void);

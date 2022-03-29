@@ -116,63 +116,87 @@ yKEYS__unit             (char *a_question, char a_index)
       x_beg  = myKEYS.h_total - 40;
       x_open = '<';
    }
-   if      (strcmp (a_question, "log"            )   == 0) {
-      sprintf (t, "%s", myKEYS.h_log   + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS log         : %c%-.40sæ", x_open, t);
-   }
-   else if (strcmp (a_question, "mode"           )   == 0) {
+   /*---(normal log)---------------------*/
+   if      (strcmp (a_question, "mode"           )   == 0) {
       sprintf (t, "%s", myKEYS.h_mode  + x_beg);
       snprintf (unit_answer, LEN_FULL, "KEYS mode        : %c%-.40sæ", x_open, t);
+   }
+   else if (strcmp (a_question, "log"            )   == 0) {
+      sprintf (t, "%s", myKEYS.h_log   + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS log         : %c%-.40sæ", x_open, t);
    }
    else if (strcmp (a_question, "multi"          )   == 0) {
       sprintf (t, "%s", myKEYS.h_multi + x_beg);
       snprintf (unit_answer, LEN_FULL, "KEYS multi       : %c%-.40sæ", x_open, t);
    }
    else if (strcmp (a_question, "error"          )   == 0) {
-      sprintf (t, "%s", myKEYS.h_errs  + x_beg);
+      sprintf (t, "%s", myKEYS.h_error  + x_beg);
       snprintf (unit_answer, LEN_FULL, "KEYS error       : %c%-.40sæ", x_open, t);
    }
+   /*---(every log ugly)-----------------*/
    else if (strcmp (a_question, "ugly_every"     )   == 0) {
-      snprintf (unit_answer, LEN_RECD, "KEYS ugly every  : å%sæ", myKEYS.h_every);
+      snprintf (unit_answer, LEN_RECD, "KEYS ugly every  : å%sæ", myKEYS.e_log);
    }
    else if (strcmp (a_question, "ugly_emode"     )   == 0) {
-      snprintf (unit_answer, LEN_RECD, "KEYS ugly emode  : å%sæ", myKEYS.h_emode);
+      snprintf (unit_answer, LEN_RECD, "KEYS ugly emode  : å%sæ", myKEYS.e_mode );
    }
-   else if (strcmp (a_question, "every"          )   == 0) {
+   /*---(every log)----------------------*/
+   else if (strcmp (a_question, "e_mode"         )   == 0) {
       x_beg  = 0;
       x_open = 'å';
-      if (myKEYS.h_grand > 70) {
-         x_beg  = myKEYS.h_grand - 70;
+      if (myKEYS.e_total > 70) {
+         x_beg  = myKEYS.e_total - 70;
          x_open = '<';
       }
-      sprintf (t, "%s", myKEYS.h_every + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS every       : %c%-.70sæ", x_open, t);
+      sprintf (t, "%s", myKEYS.e_mode + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS e_mode      : %c%-.70sæ", x_open, t);
    }
-   else if (strcmp (a_question, "emode"          )   == 0) {
+   else if (strcmp (a_question, "e_log"          )   == 0) {
       x_beg  = 0;
       x_open = 'å';
-      if (myKEYS.h_grand > 70) {
-         x_beg  = myKEYS.h_grand - 70;
+      if (myKEYS.e_total > 70) {
+         x_beg  = myKEYS.e_total - 70;
          x_open = '<';
       }
-      sprintf (t, "%s", myKEYS.h_emode + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS emode       : %c%-.70sæ", x_open, t);
+      sprintf (t, "%s", myKEYS.e_log + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS e_log       : %c%-.70sæ", x_open, t);
    }
-   else if (strcmp (a_question, "estat"          )   == 0) {
+   else if (strcmp (a_question, "e_multi"        )   == 0) {
       x_beg  = 0;
       x_open = 'å';
-      if (myKEYS.h_grand > 70) {
-         x_beg  = myKEYS.h_grand - 70;
+      if (myKEYS.e_total > 70) {
+         x_beg  = myKEYS.e_total - 70;
          x_open = '<';
       }
-      sprintf (t, "%s", myKEYS.h_estat + x_beg);
-      snprintf (unit_answer, LEN_FULL, "KEYS estat       : %c%-.70sæ", x_open, t);
+      sprintf (t, "%s", myKEYS.e_multi + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS e_multi     : %c%-.70sæ", x_open, t);
    }
+   else if (strcmp (a_question, "e_error"        )   == 0) {
+      x_beg  = 0;
+      x_open = 'å';
+      if (myKEYS.e_total > 70) {
+         x_beg  = myKEYS.e_total - 70;
+         x_open = '<';
+      }
+      sprintf (t, "%s", myKEYS.e_error + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS e_error     : %c%-.70sæ", x_open, t);
+   }
+   else if (strcmp (a_question, "e_status"       )   == 0) {
+      x_beg  = 0;
+      x_open = 'å';
+      if (myKEYS.e_total > 70) {
+         x_beg  = myKEYS.e_total - 70;
+         x_open = '<';
+      }
+      sprintf (t, "%s", myKEYS.e_status + x_beg);
+      snprintf (unit_answer, LEN_FULL, "KEYS e_status    : %c%-.70sæ", x_open, t);
+   }
+   /*---(positioning)--------------------*/
    else if (strcmp (a_question, "pos"          )  == 0) {
       snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr);
    }
    else if (strcmp (a_question, "counts"       )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS counts      : %3dg § %3da %3dt %c %3dc %c § %3da %3ds %3dz %3dp § %3de %3dw %3ds %c § %2do %2dc %c", myKEYS.h_grand, myKEYS.h_all, myKEYS.h_total, myKEYS.h_logkeys, myKEYS.h_curr, chrvisible (myKEYS.h_log [myKEYS.h_curr]), myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_combos, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_skips, myKEYS.h_locked, myKEYS.h_open, myKEYS.h_close, myKEYS.h_balanced);
+      snprintf (unit_answer, LEN_FULL, "KEYS counts      : %3dg § %3da %3dt %c %3dc %c § %3da %3ds %3dz %3dp § %3de %3dw %3ds %c § %2do %2dc %c", myKEYS.e_total, myKEYS.h_all, myKEYS.h_total, myKEYS.h_logkeys, myKEYS.h_curr, chrvisible (myKEYS.h_log [myKEYS.h_curr]), myKEYS.h_acks, myKEYS.h_spaces, myKEYS.h_noops, myKEYS.h_combos, myKEYS.h_errors, myKEYS.h_warnings, myKEYS.h_skips, myKEYS.h_locked, myKEYS.h_open, myKEYS.h_close, myKEYS.h_balanced);
    }
    else if (strcmp (a_question, "repeats"      )  == 0) {
       if (yKEYS_repeat_beg ())   c = 'y';

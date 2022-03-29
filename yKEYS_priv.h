@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2d"
-#define     P_VERTXT    "quick update to avoid drawing for NOOP, SKIP, ... (flickering)"
+#define     P_VERNUM    "2.2e"
+#define     P_VERTXT    "break out every and normal logging, improve overall logging"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -81,16 +81,19 @@ struct cMY {
    char      (*c_altinput) (void);
    int         c_max_loop;
    /*---(history every)--------*/
-   char        h_every     [LEN_HUGE];      /* every key  (hidden or not)     */
-   char        h_emode     [LEN_HUGE];      /* every mode (hidden or not)     */
-   char        h_estat     [LEN_HUGE];      /* note normal vs hidden          */
-   short       h_grand;                     /* total of every key             */
+   char        e_log       [LEN_HUGE];      /* every key  (hidden or not)     */
+   char        e_mode      [LEN_HUGE];      /* every mode (hidden or not)     */
+   char        e_multi     [LEN_HUGE];      /* every mode (hidden or not)     */
+   char        e_error     [LEN_HUGE];      /* every mode (hidden or not)     */
+   char        e_status    [LEN_HUGE];      /* note normal vs hidden          */
+   short       e_all;                       /* all keys counted, from init    */
+   short       e_total;                     /* entries in arrays              */
    /*---(history normal)-------*/
    char        h_logkeys;                   /* log current keys (y/-)         */
    uchar       h_mode      [LEN_FULL];      /* mode when key logged           */
    uchar       h_log       [LEN_FULL];      /* key logged                     */
    uchar       h_multi     [LEN_FULL];      /* prefix for multi key           */
-   uchar       h_errs      [LEN_FULL];      /* key handling error/warns       */
+   uchar       h_error     [LEN_FULL];      /* key handling error/warns       */
    char        h_locked;                    /* key handling locked due to err */
    /*---(history positions)----*/
    short       h_all;                       /* all keys counted, from init    */
@@ -208,6 +211,8 @@ char        ykeys_logger_init       (void);
 /*---(history)--------------*/
 char        ykeys__roll             (void);
 char        ykeys__multi            (int a_pos);
+char        ykeys__every            (uchar a_key, uchar a_mode);
+char        ykeys__normal           (uchar a_key, uchar a_mode);
 char        yKEYS_logger            (uchar a_key);
 char        ykeys_logger_force      (uchar a_key);
 char        ykeys_logstr            (char a_mode, uchar *a_keys);

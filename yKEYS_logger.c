@@ -14,16 +14,19 @@ char
 ykeys_logger_init       (void)
 {
    /*---(every)--------------------------*/
-   strlcpy (myKEYS.h_every, "", LEN_HUGE);
-   strlcpy (myKEYS.h_emode, "", LEN_HUGE);
-   strlcpy (myKEYS.h_estat, "", LEN_HUGE);
-   myKEYS.h_grand    = 0;
+   strlcpy (myKEYS.e_log  , "", LEN_HUGE);
+   strlcpy (myKEYS.e_mode , "", LEN_HUGE);
+   strlcpy (myKEYS.e_multi, "", LEN_HUGE);
+   strlcpy (myKEYS.e_error, "", LEN_HUGE);
+   strlcpy (myKEYS.e_status, "", LEN_HUGE);
+   myKEYS.e_all      = 0;
+   myKEYS.e_total    = 0;
    /*---(logs)---------------------------*/
    myKEYS.h_logkeys  = 'y';
    strlcpy (myKEYS.h_log  , "", LEN_FULL);
    strlcpy (myKEYS.h_mode , "", LEN_FULL);
    strlcpy (myKEYS.h_multi, "", LEN_FULL);
-   strlcpy (myKEYS.h_errs , "", LEN_FULL);
+   strlcpy (myKEYS.h_error , "", LEN_FULL);
    myKEYS.h_locked   = '-';
    /*---(positions)----------------------*/
    myKEYS.h_all      = 0;
@@ -61,16 +64,22 @@ ykeys__roll_every       (void)
    char        x_off       = LEN_HUGE / 2;
    char        t           [LEN_HUGE];
    /*---(log)----------------------------*/
-   strlcpy (t, myKEYS.h_every + x_off, LEN_HUGE);
-   strlcpy (myKEYS.h_every, t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_log   + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_log  , t        , LEN_HUGE);
    /*---(mode)---------------------------*/
-   strlcpy (t, myKEYS.h_emode + x_off, LEN_HUGE);
-   strlcpy (myKEYS.h_emode, t        , LEN_HUGE);
-   /*---(mode)---------------------------*/
-   strlcpy (t, myKEYS.h_estat + x_off, LEN_HUGE);
-   strlcpy (myKEYS.h_estat, t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_mode  + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_mode , t        , LEN_HUGE);
+   /*---(error)--------------------------*/
+   strlcpy (t, myKEYS.e_error + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_error, t        , LEN_HUGE);
+   /*---(multi)--------------------------*/
+   strlcpy (t, myKEYS.e_multi + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_multi, t        , LEN_HUGE);
+   /*---(status)-------------------------*/
+   strlcpy (t, myKEYS.e_status + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_status, t        , LEN_HUGE);
    /*---(position)-----------------------*/
-   myKEYS.h_grand -= x_off;
+   myKEYS.e_total -= x_off;
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -93,8 +102,8 @@ ykeys__roll             (void)
    strlcpy (myKEYS.h_mode , t        , LEN_FULL);
    /*---(error)--------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("error");
-   strlcpy (t, myKEYS.h_errs  + x_off, LEN_FULL);
-   strlcpy (myKEYS.h_errs, t         , LEN_FULL);
+   strlcpy (t, myKEYS.h_error  + x_off, LEN_FULL);
+   strlcpy (myKEYS.h_error, t         , LEN_FULL);
    /*---(multi)--------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("multi");
    strlcpy (t, myKEYS.h_multi + x_off, LEN_FULL);
@@ -108,11 +117,38 @@ ykeys__roll             (void)
 }
 
 char         /*-> tbd --------------------------------[ ------ [gz.420.121.11]*/ /*-[01.0000.102.!]-*/ /*-[--.---.---.--]-*/
+ykeys__multi_every      (int a_pos)
+{
+   char        x_mode      =  ' ';
+   /*---(defense)------------------------*/
+   if (a_pos < 0 || a_pos >  myKEYS.e_total)                       return 0;
+   if (myKEYS.e_log [a_pos] == G_KEY_NULL )                        return 0;
+   if (myKEYS.e_log [a_pos] == G_KEY_SPACE)                        return 0;
+   if (myKEYS.e_log [a_pos] == G_CHAR_SPACE)                       return 0;
+   /*---(key for mode)-------------------*/
+   x_mode = myKEYS.e_mode [a_pos];
+   if (a_pos > 0 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.e_mode [a_pos - 1];
+   if (a_pos > 1 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.e_mode [a_pos - 2];
+   if (a_pos > 2 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.e_mode [a_pos - 3];
+   if (a_pos > 3 && x_mode == PMOD_REPEAT)  x_mode = myKEYS.e_mode [a_pos - 4];
+   switch (x_mode) {
+   case MODE_SOURCE  : case MODE_COMMAND : case MODE_SEARCH  : case SMOD_HINT  :
+      if (yKEYS_is_multi_src (myKEYS.e_log [a_pos]))  return 1;
+      break;
+   case MODE_MAP     :
+      if (yKEYS_is_multi_map (myKEYS.e_log [a_pos]))  return 1;
+      break;
+   }
+   /*---(complete)-----------------------*/
+   return 0;
+}
+
+char         /*-> tbd --------------------------------[ ------ [gz.420.121.11]*/ /*-[01.0000.102.!]-*/ /*-[--.---.---.--]-*/
 ykeys__multi            (int a_pos)
 {
    char        x_mode      =  ' ';
    /*---(defense)------------------------*/
-   if (a_pos < 0 || a_pos >  myKEYS.h_total)                             return 0;
+   if (a_pos < 0 || a_pos >  myKEYS.h_total)                       return 0;
    if (myKEYS.h_log [a_pos] == G_KEY_NULL )                        return 0;
    if (myKEYS.h_log [a_pos] == G_KEY_SPACE)                        return 0;
    if (myKEYS.h_log [a_pos] == G_CHAR_SPACE)                       return 0;
@@ -134,82 +170,115 @@ ykeys__multi            (int a_pos)
    return 0;
 }
 
-char         /*-> tbd --------------------------------[ ------ [gz.420.121.11]*/ /*-[01.0000.102.!]-*/ /*-[--.---.---.--]-*/
-yKEYS_logger            (uchar a_key)
+char
+ykeys__every            (uchar a_mode, uchar a_key)
 {
    /*---(locals)-----------+-----+-----+-*/
    char        rce         =  -10;
-   uchar       x_key       =    0;
-   uchar       x_mode      =    0;
-   char        x_multi     =  '-';
+   char        x_final     =    1;
+   uchar       x_key       =  '-';
+   uchar       x_multi     =  '-';
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
-   DEBUG_YKEYS   yLOG_sint    (a_key);
-   /*---(null key)-----------------------*/
-   --rce;  if (a_key == 0) {
-      DEBUG_YKEYS   yLOG_snote   ("null/noop, zero recording");
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
-   }
    /*---(prepare)------------------------*/
    x_key  = chrvisible (a_key);
+   /*---(mode)---------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("mode");
+   DEBUG_YKEYS   yLOG_schar   (a_mode);
+   myKEYS.e_mode  [myKEYS.e_total    ] = a_mode;
+   myKEYS.e_mode  [myKEYS.e_total + 1] = 0;
+   /*---(log)----------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("log");
    DEBUG_YKEYS   yLOG_schar   (x_key);
-   x_mode = yMODE_curr ();
-   DEBUG_YKEYS   yLOG_schar   (x_mode);
-   /*---(every)--------------------------*/
-   DEBUG_YKEYS   yLOG_snote   ("every logged");
-   myKEYS.h_every [myKEYS.h_grand    ] = x_key;
-   myKEYS.h_every [myKEYS.h_grand + 1] = 0;
-   myKEYS.h_emode [myKEYS.h_grand    ] = x_mode;
-   myKEYS.h_emode [myKEYS.h_grand + 1] = 0;
-   ++(myKEYS.h_grand);
-   DEBUG_YKEYS   yLOG_svalue  ("grand"     , myKEYS.h_grand);
-   /*---(TAIL -- check roll)-------------*/
-   if (myKEYS.h_grand >= LEN_HUGE - 2)  ykeys__roll_every ();
-   /*---(check logging)------------------*/
+   myKEYS.e_log   [myKEYS.e_total    ] = x_key;
+   myKEYS.e_log   [myKEYS.e_total + 1] = 0;
+   /*---(multi)--------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("multi");
+   x_multi = ykeys__multi_every (myKEYS.e_total);
+   switch (myKEYS.e_multi [myKEYS.e_total - 1]) {
+   case 'p' :
+      myKEYS.e_multi [myKEYS.e_total] = 's';
+      break;
+   case 's' : case '-' : default  :
+      if (x_multi)   myKEYS.e_multi [myKEYS.e_total] = 'p';
+      else           myKEYS.e_multi [myKEYS.e_total] = '-';
+      break;
+   }
+   DEBUG_YKEYS   yLOG_schar   (myKEYS.e_multi [myKEYS.e_total]);
+   myKEYS.e_multi [myKEYS.e_total + 1] = 0;
+   /*---(errors)-------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("error");
+   if (myKEYS.h_locked != 'y')  myKEYS.e_error [myKEYS.e_total]     = '-';
+   else                         myKEYS.e_error [myKEYS.e_total]     = '·';
+   myKEYS.e_error [myKEYS.e_total + 1] = 0;
+   DEBUG_YKEYS   yLOG_schar   (myKEYS.e_error [myKEYS.e_total]);
+   /*---(status)-------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("status");
    DEBUG_YKEYS   yLOG_schar   (myKEYS.h_logkeys);
    --rce;  if (myKEYS.h_logkeys != 'y') {
-      DEBUG_YKEYS   yLOG_snote   ("NO recording");
-      myKEYS.h_estat [myKEYS.h_grand - 1] = '·';
-      myKEYS.h_estat [myKEYS.h_grand    ] = 0;
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
+      DEBUG_YKEYS   yLOG_snote   ("NO REC");
+      myKEYS.e_status [myKEYS.e_total    ] = '·';
+      myKEYS.e_status [myKEYS.e_total + 1] = 0;
+      x_final = 0;
    }
    DEBUG_YKEYS   yLOG_schar   (myKEYS.h_total);
    DEBUG_YKEYS   yLOG_schar   (myKEYS.h_curr);
    --rce;  if (myKEYS.h_curr < myKEYS.h_total) {
-      DEBUG_YKEYS   yLOG_snote   ("key already processed");
-      myKEYS.h_estat [myKEYS.h_grand - 1] = '>';
-      myKEYS.h_estat [myKEYS.h_grand    ] = 0;
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
+      DEBUG_YKEYS   yLOG_snote   ("OLD KEY");
+      myKEYS.e_status [myKEYS.e_total    ] = '>';
+      myKEYS.e_status [myKEYS.e_total + 1] = 0;
+      x_final = 0;
    }
    DEBUG_YKEYS   yLOG_schar   (yMACRO_exe_mode ());
    --rce;  IF_MACRO_PLAYING  {
-      DEBUG_YKEYS   yLOG_snote   ("do not record running macros");
-      myKEYS.h_estat [myKEYS.h_grand - 1] = '>';
-      myKEYS.h_estat [myKEYS.h_grand    ] = 0;
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
+      DEBUG_YKEYS   yLOG_snote   ("MACRO PLAYING");
+      myKEYS.e_status [myKEYS.e_total    ] = '>';
+      myKEYS.e_status [myKEYS.e_total + 1] = 0;
+      x_final = 0;
    }
-   DEBUG_YKEYS   yLOG_schar   (myKEYS.h_used);
-   DEBUG_YKEYS   yLOG_snote   ("record");
-   myKEYS.h_estat [myKEYS.h_grand - 1] = '-';
-   myKEYS.h_estat [myKEYS.h_grand    ] = 0;
+   if (x_final == 1) {
+      DEBUG_YKEYS   yLOG_snote   ("normal");
+      myKEYS.e_status [myKEYS.e_total    ] = '-';
+      myKEYS.e_status [myKEYS.e_total + 1] = 0;
+   }
+   /*---(update count)-------------------*/
+   ++(myKEYS.e_all);
+   DEBUG_YKEYS   yLOG_sint    (myKEYS.e_all);
+   ++(myKEYS.e_total);
+   DEBUG_YKEYS   yLOG_sint    (myKEYS.e_total);
+   /*---(TAIL -- check roll)-------------*/
+   if (myKEYS.e_total >= LEN_HUGE - 2) {
+      DEBUG_YKEYS   yLOG_snote   ("ROLL KEYS");
+      ykeys__roll_every ();
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+   return x_final;
+}
+
+char
+ykeys__normal           (uchar a_mode, uchar a_key)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   uchar       x_key       =  '-';
+   uchar       x_multi     =  '-';
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
+   /*---(prepare)------------------------*/
+   x_key  = chrvisible (a_key);
    /*---(mode)---------------------------*/
-   DEBUG_YKEYS   yLOG_schar   (x_mode);
-   myKEYS.h_mode  [myKEYS.h_total]     = x_mode;
+   DEBUG_YKEYS   yLOG_snote   ("mode");
+   DEBUG_YKEYS   yLOG_schar   (a_mode);
+   myKEYS.h_mode  [myKEYS.h_total]     = a_mode;
    myKEYS.h_mode  [myKEYS.h_total + 1] = 0;
-   /*---(key)----------------------------*/
+   /*---(log)----------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("log");
    DEBUG_YKEYS   yLOG_schar   (x_key);
    myKEYS.h_log   [myKEYS.h_total]     = x_key;
    myKEYS.h_log   [myKEYS.h_total + 1] = 0;
-   /*---(error)--------------------------*/
-   DEBUG_YKEYS   yLOG_schar   ('-');
-   if (myKEYS.h_locked != 'y')  myKEYS.h_errs [myKEYS.h_total]     = '-';
-   else                         myKEYS.h_errs [myKEYS.h_total]     = '·';
-   myKEYS.h_errs [myKEYS.h_total + 1] = 0;
    /*---(multi)--------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("multi");
    x_multi = ykeys__multi (myKEYS.h_total);
    switch (myKEYS.h_multi [myKEYS.h_total - 1]) {
    case 'p' :
@@ -224,23 +293,66 @@ yKEYS_logger            (uchar a_key)
    }
    DEBUG_YKEYS   yLOG_schar   (myKEYS.h_multi [myKEYS.h_total]);
    myKEYS.h_multi [myKEYS.h_total + 1] = 0;
-   /*---(mark unused)--------------------*/
-   myKEYS.h_used = '-';
+   /*---(errors)-------------------------*/
+   DEBUG_YKEYS   yLOG_snote   ("error");
+   if (myKEYS.h_locked != 'y')  myKEYS.h_error [myKEYS.h_total]     = '-';
+   else                         myKEYS.h_error [myKEYS.h_total]     = '·';
+   myKEYS.h_error [myKEYS.h_total + 1] = 0;
+   DEBUG_YKEYS   yLOG_schar   (myKEYS.h_error [myKEYS.h_total]);
    /*---(update count)-------------------*/
    ++(myKEYS.h_all);
+   DEBUG_YKEYS   yLOG_svalue  ("all"       , myKEYS.h_all);
    myKEYS.h_curr = myKEYS.h_total;
    ++(myKEYS.h_total);
-   DEBUG_YKEYS   yLOG_svalue  ("all"       , myKEYS.h_all);
    DEBUG_YKEYS   yLOG_svalue  ("total"     , myKEYS.h_total);
    DEBUG_YKEYS   yLOG_svalue  ("curr"      , myKEYS.h_curr );
-   DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
    /*---(TAIL -- check roll)-------------*/
-   if (myKEYS.h_total >= LEN_FULL - 2)  ykeys__roll ();
-   /*---(TAIL -- check recording)--------*/
+   if (myKEYS.h_total >= LEN_FULL - 2) {
+      DEBUG_YKEYS   yLOG_snote   ("ROLL KEYS");
+      ykeys__roll ();
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
+   return 0;
+}
+
+char         /*-> tbd --------------------------------[ ------ [gz.420.121.11]*/ /*-[01.0000.102.!]-*/ /*-[--.---.---.--]-*/
+yKEYS_logger            (uchar a_key)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   uchar       x_mode      =    0;
+   uchar       x_key       =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
+   DEBUG_YKEYS   yLOG_value   ("a_key"     , a_key);
+   /*---(null key)-----------------------*/
+   --rce;  if (a_key == 0) {
+      DEBUG_YKEYS   yLOG_note    ("null/noop, zero recording");
+      DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   /*---(prepare)------------------------*/
+   x_mode = yMODE_curr ();
+   x_key  = chrvisible (a_key);
+   /*---(every)--------------------------*/
+   rc = ykeys__every  (x_mode, x_key);
+   DEBUG_YKEYS   yLOG_value   ("hidden"    , rc);
+   if (rc == 0) {
+      DEBUG_YKEYS   yLOG_note    ("keys are not for normal log or macro recording");
+      DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
+      return 0;
+   }
+   ykeys__normal (x_mode, x_key);
+   /*---(mark unused)--------------------*/
+   myKEYS.h_used = '-';
+   /*---(check recording)----------------*/
    IF_MACRO_RECORDING {
       yMACRO_rec_key (x_key, x_mode);
    }
    /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
 
@@ -265,7 +377,7 @@ ykeys_logstr            (char a_mode, uchar *a_keys)
          a = myKEYS.h_curr - 1;
          myKEYS.h_mode  [myKEYS.h_curr] = YSTR_RULER [a];
          myKEYS.h_multi [myKEYS.h_curr] = YSTR_RULER [a];
-         myKEYS.h_errs  [myKEYS.h_curr] = YSTR_RULER [a];
+         myKEYS.h_error  [myKEYS.h_curr] = YSTR_RULER [a];
       }
    }
    return 0;
@@ -378,16 +490,16 @@ yKEYS_current           (void)
 uchar
 yKEYS_multi             (void)
 {
-   if (myKEYS.h_curr < 1 || myKEYS.h_curr >= myKEYS.h_total)   return 0;
-   if (myKEYS.h_multi [myKEYS.h_curr] != 's')  return 0;
+   if (myKEYS.e_total <= 0)                         return 0;
+   if (myKEYS.e_multi [myKEYS.h_total - 1] != 's')  return 0;
    return myKEYS.h_log [myKEYS.h_curr - 1];
 }
 
 char
 yKEYS_is_menu           (void)
 {
-   if (myKEYS.h_curr < 0) return 0;
-   if (myKEYS.h_mode [myKEYS.h_total - 1] == SMOD_MENUS) return 1;
+   if (myKEYS.e_total <= 0)       return 0;
+   if (myKEYS.e_mode [myKEYS.e_total - 1] == SMOD_MENUS) return 1;
    return 0;
 }
 
@@ -396,6 +508,26 @@ yKEYS_oldkeys           (void)
 {
    if (myKEYS.h_curr < myKEYS.h_total - 1)  return 1;
    if (myKEYS.h_curr < myKEYS.h_total)      return 2;
+   return 0;
+}
+
+char
+yKEYS_every_current     (uchar *a_mode, uchar *a_curr, uchar *a_multi, uchar *a_menu, uchar *a_error, uchar *a_status)
+{
+   char        rce         =  -10;
+   if (a_mode   != NULL)  *a_mode   = '-';
+   if (a_curr   != NULL)  *a_curr   = '-';
+   if (a_multi  != NULL)  *a_multi  = '-';
+   if (a_menu   != NULL)  *a_menu   =   0;
+   if (a_error  != NULL)  *a_error  = '-';
+   if (a_status != NULL)  *a_status = '-';
+   --rce;  if (myKEYS.e_total <= 0)  return rce;
+   if (a_mode   != NULL)  *a_mode   = myKEYS.e_mode   [myKEYS.e_total - 1];
+   if (a_curr   != NULL)  *a_curr   = myKEYS.e_log    [myKEYS.e_total - 1];
+   if (a_multi  != NULL)  *a_multi  = myKEYS.e_multi  [myKEYS.e_total - 1];
+   if (a_menu   != NULL) { if (myKEYS.e_mode   [myKEYS.e_total - 1] == SMOD_MENUS)  *a_menu   = 1; }
+   if (a_error  != NULL)  *a_error  = myKEYS.e_error  [myKEYS.e_total - 1];
+   if (a_status != NULL)  *a_status = myKEYS.e_status [myKEYS.e_total - 1];
    return 0;
 }
 
@@ -462,43 +594,67 @@ static void  o___ERRORS__________o () { return; }
 char
 yKEYS_set_error         (void)
 {
+   /*---(every)--------------------------*/
+   if (myKEYS.e_total > 0) {
+      myKEYS.e_error [myKEYS.e_total - 1] = 'E';
+   }
+   /*---(normal)-------------------------*/
    if (myKEYS.h_total > 0) {
-      myKEYS.h_errs [myKEYS.h_total - 1] = 'E';
+      myKEYS.h_error  [myKEYS.h_total - 1] = 'E';
       yKEYS_repeat_reset ();
       ++(myKEYS.h_errors);
    }
+   /*---(complete)-----------------------*/
    return 0;
 }
 
 char
 yKEYS_set_lock          (void)
 {
+   /*---(every)--------------------------*/
+   if (myKEYS.e_total > 0) {
+      myKEYS.e_error [myKEYS.e_total - 1] = 'Ï';
+   }
+   /*---(normal)-------------------------*/
    if (myKEYS.h_total > 0) { 
-      myKEYS.h_errs [myKEYS.h_total - 1] = 'Ï';
+      myKEYS.h_error  [myKEYS.h_total - 1] = 'Ï';
       yKEYS_lock ();
       yKEYS_repeat_reset ();
       ++(myKEYS.h_errors);
    }
+   /*---(complete)-----------------------*/
    return 0;
 }
 
 char
 yKEYS_set_warning       (void)
 {  /* set if not already set */
-   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == '-') {
-      myKEYS.h_errs [myKEYS.h_total - 1] = 'w';
+   /*---(every)--------------------------*/
+   if (myKEYS.e_total > 0 && myKEYS.e_error [myKEYS.e_total - 1] == '-') {
+      myKEYS.e_error [myKEYS.e_total - 1] = 'w';
+   }
+   /*---(normal)-------------------------*/
+   if (myKEYS.h_total > 0 && myKEYS.h_error  [myKEYS.h_total - 1] == '-') {
+      myKEYS.h_error  [myKEYS.h_total - 1] = 'w';
       ++(myKEYS.h_warnings);
    }
+   /*---(complete)-----------------------*/
    return 0;
 }
 
 char
 yKEYS_set_skip          (void)
 {  /* set if not already set */
-   if (myKEYS.h_total > 0 && myKEYS.h_errs [myKEYS.h_total - 1] == G_CHAR_SPACE) {
-      myKEYS.h_errs [myKEYS.h_total - 1] = G_CHAR_SPACE;
+   /*---(every)--------------------------*/
+   if (myKEYS.e_total > 0 && myKEYS.e_error [myKEYS.e_total - 1] == G_CHAR_SPACE) {
+      myKEYS.e_error [myKEYS.e_total - 1] = G_CHAR_SPACE;
+   }
+   /*---(normal)-------------------------*/
+   if (myKEYS.h_total > 0 && myKEYS.h_error  [myKEYS.h_total - 1] == G_CHAR_SPACE) {
+      myKEYS.h_error  [myKEYS.h_total - 1] = G_CHAR_SPACE;
       ++(myKEYS.h_skips);
    }
+   /*---(complete)-----------------------*/
    return 0;
 }
 
@@ -544,7 +700,7 @@ yKEYS_check_unlock      (uchar *a_key)
       return rce;
    }
    /*---(during lock-down)---------------*/
-   x_ch = myKEYS.h_errs [myKEYS.h_total - 2];
+   x_ch = myKEYS.h_error [myKEYS.h_total - 2];
    DEBUG_YKEYS   yLOG_schar   (x_ch);
    --rce;  if (x_ch != G_CHAR_SPACE) {
       DEBUG_YKEYS   yLOG_snote   ("previous key not during lock-down, skipping");
@@ -552,7 +708,7 @@ yKEYS_check_unlock      (uchar *a_key)
       return rce;
    }
    /*---(unlock)-------------------------*/
-   myKEYS.h_errs [myKEYS.h_total - 1] = 'Ï';
+   myKEYS.h_error [myKEYS.h_total - 1] = 'Ï';
    yKEYS_unlock ();
    DEBUG_YKEYS   yLOG_snote   ("received ¥¥, unlocking");
    /*---(exit menu)----------------------*/
@@ -581,8 +737,8 @@ char
 yKEYS_is_error          (void)
 {
    if (myKEYS.h_total > 0) {
-      if (myKEYS.h_errs [myKEYS.h_total - 1] == 'E') return 1;
-      if (myKEYS.h_locked == 'y')             return 1;
+      if (myKEYS.h_error [myKEYS.h_total - 1] == 'E') return 1;
+      if (myKEYS.h_locked == 'y')                    return 1;
    }
    return 0;
 }
