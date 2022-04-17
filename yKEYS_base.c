@@ -174,7 +174,7 @@ ykeys__input_fix        (char a_env, uchar a_key)
    }
    /*---(cleanse controls)---------------*/
    if      (x_key == G_KEY_SKIP) ;
-   else if (x_key > 0 && x_key <= 32)  x_key = 0;
+   else if (x_key > 0 && x_key <  32)  x_key = 0;
    /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
    return x_key;
@@ -303,11 +303,11 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
    }
    /*---(double cleanse controls)--------*/
    DEBUG_YKEYS   yLOG_complex ("x_key"     , "%ds, %3d, %c", x_source, x_key, chrvisible (x_key));
-   if (x_key > 0 && x_key < 32) {
-      if      (x_key == G_KEY_ESCAPE)  ;
-      else if (x_key == G_KEY_RETURN)  ;
-      else     x_key = 0;
-   }
+   /*> if (x_key > 0 && x_key < 32) {                                                 <* 
+    *>    if      (x_key == G_KEY_ESCAPE)  ;                                          <* 
+    *>    else if (x_key == G_KEY_RETURN)  ;                                          <* 
+    *>    else     x_key = 0;                                                         <* 
+    *> }                                                                              <*/
    /*---(logger)-------------------------*/
    rc = yKEYS_logger (x_key);
    DEBUG_YKEYS   yLOG_value   ("logger"    , rc);
@@ -513,14 +513,15 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       /*---(keyboard input)--------------*/
       rc = ykeys__input (myKEYS.c_env, &x_key, NULL, NULL);
       DEBUG_YKEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, x_key, chrvisible (x_key));
-      /*> yFILE_dump ("keys");      /+ DEBUGGING, remove +/                           <*/
+      if (x_key == G_KEY_SKIP) {
+         DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");
+         continue;
+      }
       /*---(handle keystroke)------------*/
-      rc = ykeys__handle (x_key, NULL);
-      DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
-      /*> if (x_key < 10)  {                                                                <* 
-       *>    DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");   <* 
-       *>    continue;                                                                      <* 
-       *> }                                                                                 <*/
+      if (x_key != G_KEY_NOOP) {
+         rc = ykeys__handle (x_key, NULL);
+         DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
+      }
       /*---(refresh maps)----------------*/
       rc = yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
