@@ -61,20 +61,20 @@ char
 ykeys__roll_every       (void)
 {
    /*---(locals)-----------+-----+-----+-*/
-   char        x_off       = LEN_HUGE / 2;
+   int         x_off       = LEN_HUGE / 2;
    char        t           [LEN_HUGE];
    /*---(log)----------------------------*/
-   strlcpy (t, myKEYS.e_log   + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_log  , t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_log    + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_log  , t         , LEN_HUGE);
    /*---(mode)---------------------------*/
-   strlcpy (t, myKEYS.e_mode  + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_mode , t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_mode   + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_mode , t         , LEN_HUGE);
    /*---(error)--------------------------*/
-   strlcpy (t, myKEYS.e_error + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_error, t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_error  + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_error, t         , LEN_HUGE);
    /*---(multi)--------------------------*/
-   strlcpy (t, myKEYS.e_multi + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_multi, t        , LEN_HUGE);
+   strlcpy (t, myKEYS.e_multi  + x_off, LEN_HUGE);
+   strlcpy (myKEYS.e_multi, t         , LEN_HUGE);
    /*---(status)-------------------------*/
    strlcpy (t, myKEYS.e_status + x_off, LEN_HUGE);
    strlcpy (myKEYS.e_status, t        , LEN_HUGE);
@@ -88,7 +88,7 @@ char
 ykeys__roll             (void)
 {
    /*---(locals)-----------+-----+-----+-*/
-   char        x_off       = LEN_FULL / 2;
+   int         x_off       = LEN_FULL / 2;
    char        t           [LEN_FULL];
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
