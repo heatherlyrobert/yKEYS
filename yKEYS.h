@@ -121,6 +121,7 @@ char        yKEYS_check_multi       (uchar a_major, uchar a_minor);
 char        yKEYS_keylog_status     (char a_size, short a_wide, char *a_list);
 char        yKEYS_logger_status     (char a_size, short a_wide, char *a_list);
 char        yKEYS_loop_status       (char a_size, short a_wide, char *a_list);
+char        yKEYS_replay_status     (char a_size, short a_wide, char *a_list);
 
 
 /*---(normal)---------------*/
@@ -139,6 +140,9 @@ char        yKEYS_edelay_info       (char n, char *a_terse, char *a_desc, float 
 char        yKEYS_eupdate_info      (char n, char *a_terse, char *a_desc, float *a_update);
 char        yKEYS_ddelay_info       (char a_abbr, char *a_terse, char *a_skip, char *a_desc);
 char        yKEYS_dupdate_info      (char a_abbr, char *a_terse, char *a_desc);
+
+
+char        yKEYS_replay            (void);
 
 #endif
 /*============================----end-of-source---============================*/

@@ -46,6 +46,10 @@ ykeys_logger_init       (void)
    myKEYS.h_open     = 0;
    myKEYS.h_close    = 0;
    myKEYS.h_balanced = 'y';
+   /*---(replaying)----------------------*/
+   myKEYS.r_capture  = '-';
+   strlcpy (myKEYS.r_reinput, "", LEN_RECD);
+   myKEYS.r_replay   = '-';
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -316,6 +320,70 @@ ykeys__normal           (uchar a_mode, uchar a_key)
    return 0;
 }
 
+char
+ykeys__reinput          (uchar a_mode, uchar a_key)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        t           [LEN_TERSE] = "";
+   /*---(defense)------------------------*/
+   if (myKEYS.r_replay != '-')                   return 0;
+   if (a_mode == 0)                              return 0;
+   if (a_key  == 0)                              return 0;
+   /*---(check bed)----------------------*/
+   if (myKEYS.r_capture == '-') {
+      if (a_mode != MODE_SOURCE)                 return 0;
+      if (strchr ("iIaArR", a_key) == NULL)      return 0;
+      strcpy (myKEYS.r_reinput, "");
+      myKEYS.r_capture = 'y';
+   }
+   /*---(check end)----------------------*/
+   else {
+      if (a_mode == UMOD_REPLACE)  myKEYS.r_capture = 'r';
+      if (myKEYS.r_capture == 'y' && a_mode != UMOD_INPUT) {
+         strcpy (myKEYS.r_reinput, "");
+         myKEYS.r_capture = '-';
+         return 0;
+      }
+      if (myKEYS.r_capture == 'r' && a_mode != UMOD_REPLACE) {
+         myKEYS.r_capture = '-';
+         return 0;
+      }
+      if (a_key == G_CHAR_RETURN) {  /* took quick exit, not replayable */
+         strcpy (myKEYS.r_reinput, "");
+         myKEYS.r_capture = '-';
+         return 0;
+      }
+      if (a_key == '`') {            /* calling wander mode  */
+         strcpy (myKEYS.r_reinput, "");
+         myKEYS.r_capture = '-';
+         return 0;
+      }
+      if (a_key == G_CHAR_ESCAPE) {  /* save and go to normal */
+         myKEYS.r_capture = '-';
+      }
+   }
+   /*---(save)---------------------------*/
+   sprintf (t, "%c", a_key);
+   strlcat (myKEYS.r_reinput, t, LEN_RECD);
+   /*---(complete)-----------------------*/
+   return 1;
+}
+
+char
+yKEYS_replay            (void)
+{
+   char        rce         =  -10;
+   char        rc          =    0;
+   --rce;  if (myKEYS.r_capture != '-')          return rce;
+   --rce;  if (yMODE_curr () != MODE_SOURCE)     return rce;
+   --rce;  if (strlen (myKEYS.r_reinput) == 0)   return rce;
+   --rce;  if (myKEYS.r_replay != '-')           return rce;
+   myKEYS.r_replay = 'y';
+   rc = yKEYS_string (myKEYS.r_reinput);
+   myKEYS.r_replay = '-';
+   return rc;
+}
+
 char         /*-> tbd --------------------------------[ ------ [gz.420.121.11]*/ /*-[01.0000.102.!]-*/ /*-[--.---.---.--]-*/
 yKEYS_logger            (uchar a_key)
 {
@@ -344,7 +412,8 @@ yKEYS_logger            (uchar a_key)
       DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
-   ykeys__normal (x_mode, x_key);
+   ykeys__normal  (x_mode, x_key);
+   ykeys__reinput (x_mode, x_key);
    /*---(mark unused)--------------------*/
    myKEYS.h_used = '-';
    /*---(check recording)----------------*/

@@ -191,6 +191,10 @@ yKEYS__unit             (char *a_question, char a_index)
       sprintf (t, "%s", myKEYS.e_status + x_beg);
       snprintf (unit_answer, LEN_FULL, "KEYS e_status    : %c%-.70sæ", x_open, t);
    }
+   /*---(replay)-------------------------*/
+   else if (strcmp (a_question, "replay"         )   == 0) {
+      snprintf (unit_answer, LEN_FULL, "KEYS replay      : %c %c %2då%-.40sæ", myKEYS.r_capture, myKEYS.r_replay, strlen (myKEYS.r_reinput), myKEYS.r_reinput);
+   }
    /*---(positioning)--------------------*/
    else if (strcmp (a_question, "pos"          )  == 0) {
       snprintf (unit_answer, LEN_FULL, "KEYS pos         : %4da  %4dn  %4dp", myKEYS.h_all, myKEYS.h_total, myKEYS.h_curr);

@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2g"
-#define     P_VERTXT    "fixed bug in every logger that seqfaulted on roll"
+#define     P_VERNUM    "2.2h"
+#define     P_VERTXT    "added reinput/replay for '.', mostly tested, working in prod"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -114,6 +114,10 @@ struct cMY {
    short       h_open;                      /* count of open parens           */
    short       h_close;                     /* count of close parens          */
    char        h_balanced;                  /* parens are balanced (y/-)      */
+   /*---(replay keys)----------*/
+   char        r_capture;                   /* capturing a replay (y/-)       */
+   char        r_reinput   [LEN_RECD];      /* catpured replay keys           */
+   char        r_replay;                    /* currently replaying (y/-)      */
    /*---(delay)----------------*/
    char        l_ndelay;                    /* number of delay options        */
    char        l_cdelay;                    /* current delay index            */
@@ -211,8 +215,9 @@ char        ykeys_logger_init       (void);
 /*---(history)--------------*/
 char        ykeys__roll             (void);
 char        ykeys__multi            (int a_pos);
-char        ykeys__every            (uchar a_key, uchar a_mode);
-char        ykeys__normal           (uchar a_key, uchar a_mode);
+char        ykeys__every            (uchar a_mode, uchar a_key);
+char        ykeys__normal           (uchar a_mode, uchar a_key);
+char        ykeys__reinput          (uchar a_mode, uchar a_key);
 char        yKEYS_logger            (uchar a_key);
 char        ykeys_logger_force      (uchar a_key);
 char        ykeys_logstr            (char a_mode, uchar *a_keys);

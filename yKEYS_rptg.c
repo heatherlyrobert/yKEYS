@@ -248,6 +248,13 @@ yKEYS_loop_status       (char a_size, short a_wide, char *a_list)
 }
 
 char
+yKEYS_replay_status     (char a_size, short a_wide, char *a_list)
+{
+   sprintf (a_list   , "replay %c %c %2då%sæ" , myKEYS.r_capture, myKEYS.r_replay, strlen (myKEYS.r_reinput), myKEYS.r_reinput);
+   return 0;
+}
+
+char
 ykeys_dump              (FILE *f)
 {
    /*---(header)-------------------------*/
