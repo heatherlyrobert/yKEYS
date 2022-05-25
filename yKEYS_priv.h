@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2h"
-#define     P_VERTXT    "added reinput/replay for '.', mostly tested, working in prod"
+#define     P_VERNUM    "2.2i"
+#define     P_VERTXT    "all existing unit tests passed"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

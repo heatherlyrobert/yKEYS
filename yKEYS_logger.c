@@ -392,6 +392,7 @@ yKEYS_logger            (uchar a_key)
    char        rc          =    0;
    uchar       x_mode      =    0;
    uchar       x_key       =    0;
+   uchar       x_rec       =    0;
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
    DEBUG_YKEYS   yLOG_value   ("a_key"     , a_key);
@@ -404,11 +405,22 @@ yKEYS_logger            (uchar a_key)
    /*---(prepare)------------------------*/
    x_mode = yMODE_curr ();
    x_key  = chrvisible (a_key);
+   /*---(check recording)----------------*/
+   IF_MACRO_RECORDING {
+      x_rec = x_key;
+      switch (a_key) {
+      case G_KEY_NOOP : case G_KEY_SKIP : case ' ' :
+         x_rec = '·';
+      default :
+         yMACRO_rec_key (x_rec, x_mode);
+         break;
+      }
+   }
    /*---(every)--------------------------*/
    rc = ykeys__every  (x_mode, x_key);
    DEBUG_YKEYS   yLOG_value   ("hidden"    , rc);
    if (rc == 0) {
-      DEBUG_YKEYS   yLOG_note    ("keys are not for normal log or macro recording");
+      DEBUG_YKEYS   yLOG_note    ("keys are not for normal log");
       DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
       return 0;
    }
@@ -416,10 +428,6 @@ yKEYS_logger            (uchar a_key)
    ykeys__reinput (x_mode, x_key);
    /*---(mark unused)--------------------*/
    myKEYS.h_used = '-';
-   /*---(check recording)----------------*/
-   IF_MACRO_RECORDING {
-      yMACRO_rec_key (x_key, x_mode);
-   }
    /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return 0;

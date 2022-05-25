@@ -478,6 +478,7 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
    uchar       x_key       =  ' ';
    char        x_draw      =  '-';
    char        t           [LEN_DESC]  = "";
+   char        x_block     =  '-';
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_break   ();
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
@@ -503,12 +504,16 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       /*---(start loop)------------------*/
       yKEYS_loop_beg   ();
       /*---(alternate input)-------------*/
+      DEBUG_YKEYS  yLOG_point   ("c_altinput", myKEYS.c_altinput);
       if (myKEYS.c_altinput != NULL) {
          rc = myKEYS.c_altinput ();
          DEBUG_YKEYS  yLOG_value   ("altinput"  , rc);
       }
       /*---(get input)-------------------*/
-      rc = myKEYS.c_input (myKEYS.l_blocking, &x_key);
+      IF_MACRO_PLAYING   x_block = '-';
+      else               x_block = myKEYS.l_blocking;
+      DEBUG_YKEYS  yLOG_complex ("blocking"  , "%c, %c", myKEYS.l_blocking, x_block);
+      rc = myKEYS.c_input (x_block, &x_key);
       DEBUG_YKEYS  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_key, chrvisible (x_key));
       /*---(keyboard input)--------------*/
       rc = ykeys__input (myKEYS.c_env, &x_key, NULL, NULL);

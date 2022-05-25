@@ -268,31 +268,41 @@ ykeys__loop_calc        (void)
 {
    /*---(locals)-----------+-----+-----+-*/
    float       x_base      =  0.0;
+   /*---(header)-------------------------*/
+   DEBUG_LOOP    yLOG_senter  (__FUNCTION__);
    /*---(initialize)---------------------*/
    myKEYS.l_secs  = 0;
    myKEYS.l_nsec  = 0;
    myKEYS.l_loops = 1;
+   DEBUG_LOOP    yLOG_sint    (myKEYS.l_delay);
+   DEBUG_LOOP    yLOG_sint    (myKEYS.l_update);
    /*---(keyboard only)------------------*/
    if      (myKEYS.l_delay  == 0.0 && myKEYS.l_update == 0.0) {
+      DEBUG_LOOP    yLOG_snote   ("l_delay and l_update zero");
       x_base = myKEYS.l_delay;
    }
    /*---(delay, no update)---------------*/
    else if (myKEYS.l_delay  >  0.0 && myKEYS.l_update == 0.0) {
+      DEBUG_LOOP    yLOG_snote   ("l_delay positive but l_update zero");
       x_base = myKEYS.l_delay;
    }
    /*---(update, no delay)---------------*/
    else if (myKEYS.l_update  > 0.0 && myKEYS.l_delay  == 0.0) {
+      DEBUG_LOOP    yLOG_snote   ("l_update positive but l_delay zero");
       x_base = myKEYS.l_update;
    }
    /*---(fast enough)--------------------*/
    else if (myKEYS.l_delay <= myKEYS.l_update) {
+      DEBUG_LOOP    yLOG_snote   ("l_delay less than or equal l_update");
       x_base = myKEYS.l_delay;
    }
    /*---(too slow)-----------------------*/
    else {
+      DEBUG_LOOP    yLOG_snote   ("l_delay greater than l_update");
       x_base = myKEYS.l_update;
    }
    /*---(update timing)------------------*/
+   DEBUG_LOOP    yLOG_sint    (x_base);
    if (x_base >= 1.0)  myKEYS.l_secs  = trunc (x_base);
    myKEYS.l_nsec  = (x_base - myKEYS.l_secs) * NSEC;
    /*---(update loops)-------------------*/
@@ -303,6 +313,7 @@ ykeys__loop_calc        (void)
    /*---(flag blocking)------------------*/
    if (x_base == 0.0)        myKEYS.l_blocking = 'y';
    else                      myKEYS.l_blocking = '-';
+   DEBUG_LOOP    yLOG_schar   (myKEYS.l_blocking);
    /*---(progress advance)---------------*/
    /*> myVIKEYS.p_inc  = s_scale_info [myVIKEYS.p_scale].unit / 10.0;                                                 <* 
     *> /+> myVIKEYS.p_inc  = s_scale_info [myVIKEYS.p_scale].unit;                        <+/                         <* 
@@ -321,6 +332,7 @@ ykeys__loop_calc        (void)
    /*---(redraw)-------------------------*/
    /*> myVIKEYS.p_redraw = 'y';                                                       <*/
    /*---(complete)-----------------------*/
+   DEBUG_LOOP    yLOG_sexit   (__FUNCTION__);
    return 0;
 }
 
