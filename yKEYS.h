@@ -126,6 +126,7 @@ char        yKEYS_replay_status     (char a_size, short a_wide, char *a_list);
 
 /*---(normal)---------------*/
 char        yKEYS_loop_set          (char *a_delay, char *a_update);
+char        yKEYS_loop_get          (float *a_delay, char *a_dterse, float *a_update, char *a_uterse);
 /*---(macro)----------------*/
 char        yKEYS_loop_macro        (char a_delay, char a_update);
 char        yKEYS_loop_return       (void);
@@ -143,6 +144,17 @@ char        yKEYS_dupdate_info      (char a_abbr, char *a_terse, char *a_desc);
 
 
 char        yKEYS_replay            (void);
+
+
+char        yKEYS_progress_scale    (uchar *a_scale, uchar *a_terse, uchar *a_label, uchar *a_desc, char *a_power, float *a_unit);
+char        yKEYS_progress_speed    (uchar *a_speed, uchar *a_terse, uchar *a_desc, float *a_unit);
+char        yKEYS_progress_lines    (int a_lines);
+char        yKEYS_progress_length   (float a_beg, float a_end);
+char        yKEYS_progress_config   (char a_repeat, char *a_unit, char *a_scale, char *a_speed, char a_play);
+char        yKEYS_progress_cur      (float *a_len, char *a_anchor, float *a_sec, float *a_scale, float *a_inc, int *a_line);
+
+
+
 
 #endif
 /*============================----end-of-source---============================*/

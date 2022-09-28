@@ -239,6 +239,12 @@ yKEYS__unit             (char *a_question, char a_index)
             myKEYS.l_idle,
             myKEYS.l_avg_miss);
    }
+   else if (strcmp (a_question, "p_scale"     )   == 0) {
+      snprintf (unit_answer, LEN_RECD, "KEYS p_scale     : %-5s = %.3e", g_scale_info [myKEYS.p_scale].terse, g_scale_info [myKEYS.p_scale].unit);
+   }
+   else if (strcmp (a_question, "p_speed"     )   == 0) {
+      snprintf (unit_answer, LEN_RECD, "KEYS p_speed     : %-7s = %8.2f", g_speed_info [myKEYS.p_speed].terse, g_speed_info [myKEYS.p_speed].speed);
+   }
    /*> sprintf (a_list, "main, %8lldt, %8lldr, %8lldu, %6ldt, %6ldd, %6ldk, %6ldi",   <* 
     *>       s_loop_targ, s_loop_rem, s_loop_used, s_avg, myMACRO.c_draw, s_keys, s_idle);    <*/
    /*---(complete)-----------------------*/

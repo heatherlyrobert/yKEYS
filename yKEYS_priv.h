@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2i"
-#define     P_VERTXT    "all existing unit tests passed"
+#define     P_VERNUM    "2.2j"
+#define     P_VERTXT    "light updates to help with petal demo"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -165,6 +165,23 @@ struct cMY {
    uchar       r_macro   [LEN_LABEL];       /* macro abbr for level           */
    short       r_beg     [LEN_LABEL];       /* current position               */
    short       r_end     [LEN_LABEL];       /* current position               */
+   /*---(progress)--------*/
+   char        p_unit      [LEN_TERSE];
+   char        p_play;                      /* is progress playing            */
+   int         p_scale;                     /* progress bar scale             */
+   int         p_speed;                     /* progress bar speed             */
+   float       p_adv;                       /* progress play advancing        */
+   float       p_inc;                       /* progress horizontal moves      */
+   char        p_anchor;                    /* position of current bar (shcle)*/
+   float       p_cur;                       /* current timeline seconds       */
+   float       p_beg;                       /* beg second for timeline play   */
+   float       p_end;                       /* end second for timeline play   */
+   float       p_len;                       /* length of script               */
+   char        p_repeat;                    /* progress is loop/continuous    */
+   int         p_line;                      /* current progress window line   */
+   int         p_lines;                     /* progress window lines avail    */
+   char        p_debug; 
+   char        p_redraw;                    /* force redraw based on changes  */
    /*---(done)-----------------*/
 };
 extern tMY         myKEYS;
@@ -187,6 +204,26 @@ struct cUPDATE {
 };
 extern const tUPDATE g_updates [MAX_UPDATE];
 
+#define     MAX_SCALE   100
+typedef   struct cSCALE  tSCALE;
+struct cSCALE {
+   char        type;
+   char        terse       [LEN_TERSE];
+   char        label       [LEN_LABEL];
+   char        desc        [LEN_FULL  ];
+   char        power;
+   float       unit;
+};
+extern const tSCALE g_scale_info [MAX_SCALE];
+
+#define     MAX_SPEED   50
+typedef   struct cSPEED  tSPEED;
+struct cSPEED {
+   char        terse       [LEN_TERSE];
+   char        desc        [LEN_FULL  ];
+   float       speed;   
+};
+extern const tSPEED g_speed_info [MAX_SPEED];
 
 
 /*===[[ yKEYS_base.c ]]=======================================================*/
@@ -282,8 +319,19 @@ char        ykeys__loop_calc        (void);
 char        ykeys_loop_update       (char *a_update);
 char        ykeys_loop_delay        (char *a_delay);
 char        yKEYS_loop_normal       (void);
+char        ykeys_loop_prog         (void);
 
 
+
+/*===[[ yKEYS_scale.c ]]======================================================*/
+/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
+char        ykeys_scale_init        (void);
+char        ykeys_scale             (uchar a_mode, uchar *a_scale);
+char        yKEYS_progress_scale    (uchar *a_scale, uchar *a_terse, uchar *a_label, uchar *a_desc, char *a_power, float *a_unit);
+
+char        ykeys_speed_init        (void);
+char        ykeys_progress_init     (void);
+char        ykeys_progress_mode     (uchar a_major, uchar a_minor);
 
 #endif
 

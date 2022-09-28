@@ -88,9 +88,12 @@ yKEYS_init              (void)
    myKEYS.c_altinput  = NULL;
    myKEYS.c_max_loop  =    0;
    /*---(sub-inits)----------------------*/
-   rc = ykeys_logger_init ();
-   rc = ykeys_repeat_init ();
-   rc = ykeys_loop_init   ();
+   rc = ykeys_logger_init    ();
+   rc = ykeys_repeat_init    ();
+   rc = ykeys_loop_init      ();
+   rc = ykeys_progress_init  ();
+   rc = ykeys_scale_init     ();
+   rc = ykeys_speed_init     ();
    /*---(other updates)------------------*/
    rc = yFILE_dump_add ("keys"      , "", "log of keystrokes"           , ykeys_dump         );
    /*---(update status)------------------*/
@@ -547,6 +550,7 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       if ((myKEYS.loops % myKEYS.l_loops) == 0) {
          x_draw = 'y';
          yKEYS_loop_graf  ();
+         ykeys_loop_prog  ();
          rc = myKEYS.c_draw (0.0);
          DEBUG_YKEYS   yLOG_value   ("drawing"   , rc);
       }

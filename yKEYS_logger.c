@@ -393,6 +393,8 @@ yKEYS_logger            (uchar a_key)
    uchar       x_mode      =    0;
    uchar       x_key       =    0;
    uchar       x_rec       =    0;
+   uchar       x_macro     =  '-';
+   uchar      *x_anyway    = "-. ";
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
    DEBUG_YKEYS   yLOG_value   ("a_key"     , a_key);
@@ -407,13 +409,20 @@ yKEYS_logger            (uchar a_key)
    x_key  = chrvisible (a_key);
    /*---(check recording)----------------*/
    IF_MACRO_RECORDING {
-      x_rec = x_key;
-      switch (a_key) {
-      case G_KEY_NOOP : case G_KEY_SKIP : case ' ' :
-         x_rec = '·';
-      default :
-         yMACRO_rec_key (x_rec, x_mode);
-         break;
+      if (myKEYS.h_curr < myKEYS.h_total) {
+         DEBUG_YKEYS   yLOG_snote   ("old key, repeat groups, etc.");
+      } else {
+         IF_MACRO_PLAYING  yMACRO_exe_current (&x_macro, NULL, NULL, NULL, NULL);
+         if (strchr (x_anyway, x_macro) != NULL) {
+            x_rec = x_key;
+            switch (a_key) {
+            case G_KEY_NOOP : case G_KEY_SKIP : case ' ' :
+               x_rec = '·';
+            default :
+               yMACRO_rec_key (x_rec, x_mode);
+               break;
+            }
+         }
       }
    }
    /*---(every)--------------------------*/

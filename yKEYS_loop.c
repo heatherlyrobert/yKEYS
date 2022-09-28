@@ -95,6 +95,7 @@ static struct {
    char        terse       [LEN_TERSE];
    char        desc        [LEN_DESC];
 } const s_mupdate [20] = {
+   { MACRO_FAST   , "10ms" , "hundred times a sec"        },
    { MACRO_NORMAL , "100ms", "ten times a sec (normal)"   },
    { MACRO_SLOWER , "500ms", "twice times a sec"          },
    { MACRO_BLINKS , "2s"   , "two secs before update"     },
@@ -315,22 +316,22 @@ ykeys__loop_calc        (void)
    else                      myKEYS.l_blocking = '-';
    DEBUG_LOOP    yLOG_schar   (myKEYS.l_blocking);
    /*---(progress advance)---------------*/
-   /*> myVIKEYS.p_inc  = s_scale_info [myVIKEYS.p_scale].unit / 10.0;                                                 <* 
-    *> /+> myVIKEYS.p_inc  = s_scale_info [myVIKEYS.p_scale].unit;                        <+/                         <* 
-    *> /+> printf ("x_base   = %f\n", x_base);                                            <+/                         <* 
-    *> x_base         *= myKEYS.l_loops;                                                                              <* 
-    *> /+> printf ("x_base   = %f\n", x_base);                                            <+/                         <* 
-    *> if (x_base == 0.0) {                                                                                           <* 
-    *>    myVIKEYS.p_adv  = 0.0;                                                                                      <* 
-    *> } else {                                                                                                       <* 
-    *>    myVIKEYS.p_adv  = (float) (s_scale_info [myVIKEYS.p_scale].unit * s_speed_info [myVIKEYS.p_speed].speed);   <* 
-    *>    /+> printf ("p_adv    = %lf\n", myVIKEYS.p_adv);                                <+/                         <* 
-    *>    myVIKEYS.p_adv *= x_base;                                                                                   <* 
-    *>    /+> printf ("p_adv    = %lf\n", myVIKEYS.p_adv);                                <+/                         <* 
-    *>    /+> printf ("p_adv    = %28.14lf\n", myVIKEYS.p_adv);                           <+/                         <* 
-    *> }                                                                                                              <*/
+   myKEYS.p_inc  = g_scale_info [myKEYS.p_scale].unit / 10.0;
+   /*> myKEYS.p_inc  = g_scale_info [myKEYS.p_scale].unit;                        <*/
+   /*> printf ("x_base   = %f\n", x_base);                                            <*/
+   x_base         *= myKEYS.l_loops;
+   /*> printf ("x_base   = %f\n", x_base);                                            <*/
+   if (x_base == 0.0) {
+      myKEYS.p_adv  = 0.0;
+   } else {
+      myKEYS.p_adv  = (float) (g_scale_info [myKEYS.p_scale].unit * g_speed_info [myKEYS.p_speed].speed);
+      /*> printf ("p_adv    = %lf\n", myKEYS.p_adv);                                <*/
+      myKEYS.p_adv *= x_base;
+      /*> printf ("p_adv    = %lf\n", myKEYS.p_adv);                                <*/
+      /*> printf ("p_adv    = %28.14lf\n", myKEYS.p_adv);                           <*/
+   }
    /*---(redraw)-------------------------*/
-   /*> myVIKEYS.p_redraw = 'y';                                                       <*/
+   /*> myKEYS.p_redraw = 'y';                                                       <*/
    /*---(complete)-----------------------*/
    DEBUG_LOOP    yLOG_sexit   (__FUNCTION__);
    return 0;
@@ -343,41 +344,31 @@ ykeys__loop_calc        (void)
 /*====================------------------------------------====================*/
 static void      o___LOOPING_________________o (void) {;}
 
-int
-yvikeys_loop_getch      (void)
+char
+ykeys_loop_prog         (void)
 {
-   /*> /+---(locals)-----------+-----+-----+-+/                                            <* 
-    *> char        x_ch        =    0;                                                     <* 
-    *> XKeyEvent  *key_event;                                                              <* 
-    *> int         the_bytes;                                                              <* 
-    *> char        the_keys    [5];                                                        <* 
-    *> /+---(opengl)-------------------------+/                                            <* 
-    *> if (myKEYS.env == YVIKEYS_OPENGL) {                                                 <* 
-    *>    if (myKEYS.l_blocking == 'y') {                                                  <* 
-    *>       XNextEvent(YX_DISP, &YX_EVNT);                                                <* 
-    *>    }                                                                                <* 
-    *>    else {                                                                           <* 
-    *>       if (XPending(YX_DISP))   XNextEvent(YX_DISP, &YX_EVNT);                       <* 
-    *>       else                  return 0;                                               <* 
-    *>    }                                                                                <* 
-    *>    switch(YX_EVNT.type) {                                                           <* 
-    *>    case KeyPress:                                                                   <* 
-    *>       key_event  = (XKeyEvent *) &YX_EVNT;                                          <* 
-    *>       the_bytes = XLookupString((XKeyEvent *) &YX_EVNT, the_keys, 5, NULL, NULL);   <* 
-    *>       if (the_bytes < 1) break;                                                     <* 
-    *>       /+---(handle)----------------+/                                               <* 
-    *>       x_ch  = the_keys [0];                                                         <* 
-    *>       break;                                                                        <* 
-    *>    }                                                                                <* 
-    *> }                                                                                   <* 
-    *> /+---(ncurses)------------------------+/                                            <* 
-    *> else if (myKEYS.env == YVIKEYS_CURSES) {                                            <* 
-    *>    if (myKEYS.l_blocking == 'y')   nodelay  (stdscr, FALSE);                        <* 
-    *>    else                            nodelay  (stdscr, TRUE );                        <* 
-    *>    x_ch = getch ();                                                                 <* 
-    *> }                                                                                   <* 
-    *> /+---(complete)-----------------------+/                                            <* 
-    *> return x_ch;                                                                        <*/
+   if (myKEYS.p_play == 'y') {
+      myKEYS.p_cur += myKEYS.p_adv;
+   }
+   if (myKEYS.p_cur <  myKEYS.p_beg) {
+      if (myKEYS.p_repeat == 'y' && myKEYS.p_play == 'y') {
+         myKEYS.p_cur  = myKEYS.p_end;
+         myKEYS.p_play = 'y';
+      } else {
+         myKEYS.p_cur  = myKEYS.p_beg;
+         myKEYS.p_play = '-';
+      }
+   }
+   if (myKEYS.p_cur >  myKEYS.p_end) {
+      if (myKEYS.p_repeat == 'y' && myKEYS.p_play == 'y') {
+         myKEYS.p_cur  = myKEYS.p_beg;
+         myKEYS.p_play = 'y';
+      } else {
+         myKEYS.p_cur  = myKEYS.p_end;
+         myKEYS.p_play = '-';
+      }
+   }
+   return 0;
 }
 
 
@@ -509,6 +500,18 @@ yKEYS_loop_set          (char *a_delay, char *a_update)
    /*---(complete)-----------------------*/
    return rc;
 }
+
+char
+yKEYS_loop_get          (float *a_delay, char *a_dterse, float *a_update, char *a_uterse)
+{
+   char        n           =    0;
+   n = myKEYS.l_cdelay;
+   yKEYS_edelay_info  (n, a_dterse, NULL, a_delay);
+   n = myKEYS.l_cupdate;
+   yKEYS_eupdate_info (n, a_uterse, NULL, a_update);
+   return 0;
+}
+
 
 
 

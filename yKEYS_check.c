@@ -6,13 +6,13 @@
 
 static  uchar   s_repeat    [LEN_DESC ]   = "123456789";
 
-static  uchar   s_vsimple   [LEN_DESC ]   = "_ Kk jJ ~                 ©  ";
+static  uchar   s_vsimple   [LEN_DESC ]   = "_ Kk jJ ~     %           ©  ";
 static  uchar   s_vgoto     [LEN_DESC ]   = "TK tkmjb JB   azud AZUD .   g";
 static  uchar   s_vscroll   [LEN_DESC ]   = "   tkmjb      azud      .    ";
 static  uchar   s_vpage     [LEN_DESC ]   = "   tk jb      azud AZUD      ";
 static  uchar   s_vends     [LEN_DESC ]   = "T  tkmjb  B M azud AZUD . y!*";
 
-static  uchar   s_hsimple   [LEN_DESC ]   = "0 Hh lL $                 ©  ";
+static  uchar   s_hsimple   [LEN_DESC ]   = "0 Hh lL $     |           ©  ";
 static  uchar   s_hgoto     [LEN_DESC ]   = "SH shcle LE   azud AZUD .   g";
 static  uchar   s_hscroll   [LEN_DESC ]   = "   shcle      azud      .    ";
 static  uchar   s_hpage     [LEN_DESC ]   = "   sh le      azud AZUD      ";
