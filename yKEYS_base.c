@@ -105,6 +105,125 @@ yKEYS_init              (void)
 }
 
 char
+yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   int         n           =    1;
+   char        x_used      =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS  yLOG_enter   (__FUNCTION__);
+   /*---(pointer defense)----------------*/
+   DEBUG_YKEYS  yLOG_point   ("i"         , i);
+   --rce;  if (i         == NULL) {
+      DEBUG_YKEYS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YKEYS  yLOG_value   ("i"         , *i);
+   /*---(quick reset)--------------------*/
+   if (*i <= 1) {
+      DEBUG_YKEYS  yLOG_note    ("quick reset of before processing args");
+      strlcpy (myKEYS.a_script, "", LEN_RECD);
+      strlcpy (myKEYS.a_layout, "", LEN_LABEL);
+      if (*i < 1) {
+         DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
+         return 0;
+      }
+   }
+   /*---(pointer defense)----------------*/
+   DEBUG_YKEYS  yLOG_point   ("a_arg"     , a_arg);
+   --rce;  if (a_arg     == NULL) {
+      DEBUG_YKEYS  yLOG_exitr   (__FUNCTION__, rce);
+      return rce;
+   }
+   DEBUG_YKEYS  yLOG_info    ("a_arg"     , a_arg);
+   DEBUG_YKEYS  yLOG_point   ("a_next"    , a_next);
+   if (a_next    != NULL) {
+      ++n;
+      DEBUG_YKEYS  yLOG_info    ("a_next"    , a_next);
+   }
+   DEBUG_YKEYS  yLOG_value   ("n"         , n);
+   /*---(script running)-----------------*/
+   --rce;  if (strcmp (a_arg, "--script"        ) == 0) {
+      DEBUG_YKEYS  yLOG_note    ("found --script option");
+      if (n < 2 || a_next [0] == '-') {
+         DEBUG_YKEYS  yLOG_note    ("not provided script name as second argument");
+         DEBUG_YKEYS  yLOG_exitr   (__FUNCTION__, rce);
+         return rce;
+      }
+      strlcpy (myKEYS.a_script, a_next, LEN_RECD);
+      ++(*i);
+      ++x_used;
+      DEBUG_YKEYS  yLOG_info    ("a_script"  , myKEYS.a_script);
+   }
+   /*---(layout)-------------------------*/
+   --rce;  if (strncmp (a_arg, "--layout-"   ,  9) == 0) {
+      DEBUG_YKEYS  yLOG_note    ("found --layout option");
+      strlcpy (myKEYS.a_layout, a_arg + 9, LEN_LABEL);
+      ++(*i);
+      ++x_used;
+      DEBUG_YKEYS  yLOG_info    ("a_layout"  , myKEYS.a_layout);
+   }
+   /*---(status)-------------------------*/
+   --rce;  if (strncmp (a_arg, "--status-"   ,  9) == 0) {
+      DEBUG_YKEYS  yLOG_note    ("found --status option");
+      strlcpy (myKEYS.a_status, a_arg + 9, LEN_LABEL);
+      ++(*i);
+      ++x_used;
+      DEBUG_YKEYS  yLOG_info    ("a_status"  , myKEYS.a_status);
+   }
+   /*---(report-out)---------------------*/
+   DEBUG_YKEYS  yLOG_value   ("x_used"    , x_used);
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
+   return x_used;
+}
+
+/*> else if (strncmp (a, "--formula-"          , 10) == 0)  PROG_layout_set ("cli", "formula"  , a + 10);   <* 
+ *> else if (strncmp (a, "--command-"          , 10) == 0)  PROG_layout_set ("cli", "command"  , a + 10);   <* 
+ *> else if (strncmp (a, "--function-list"     ,  9) == 0)  CALC_func_list  ();                             <*/
+
+
+
+/*> /+---(locals)-----------+-----------+-+/                                                       <* 
+ *> int         i           = 0;             /+ loop iterator -- arguments     +/                  <* 
+ *> char       *a           = NULL;          /+ current argument               +/                  <* 
+ *> int         len         = 0;             /+ argument length                +/                  <* 
+ *> int         x_total     = 0;                                                                   <* 
+ *> int         x_args      = 0;                                                                   <* 
+ *> /+---(begin)--------------------------+/                                                       <* 
+ *> DEBUG_TOPS   yLOG_enter   (__FUNCTION__);                                                      <* 
+ *> /+---(process)------------------------+/                                                       <* 
+ *> for (i = 1; i < a_argc; ++i) {                                                                 <* 
+ *>    /+---(read)------------------------+/                                                       <* 
+ *>    a   = a_argv [i];                                                                           <* 
+ *>    len = strlen(a);                                                                            <* 
+ *>    ++x_total;                                                                                  <* 
+ *>    /+---(filter)----------------------+/                                                       <* 
+ *>    if (a[0] == '@')  continue;                                                                 <* 
+ *>    ++x_args;                                                                                   <* 
+ *>    DEBUG_ARGS  yLOG_complex ("argument"  , "%2d of %2d, %s", i, a_argc, a);                    <* 
+ *>    /+---(configuration)---------------+/                                                       <* 
+ *>    if      (strcmp (a, "--nav"          ) == 0)    yVIKEYS_cmds_direct   (":nav show");        <* 
+ *>    else if (strcmp (a, "--nonav"        ) == 0)    yVIKEYS_cmds_direct   (":nav hide");        <* 
+ *>    else if (strcmp (a, "--progress"     ) == 0)    yVIKEYS_cmds_direct   (":progress show");   <* 
+ *>    else if (strcmp (a, "--noprogress"   ) == 0)    yVIKEYS_cmds_direct   (":progress hide");   <* 
+ *>    else if (strcmp (a, "--play"         ) == 0)    yVIKEYS_cmds_direct   (":play");            <* 
+ *>    else if (strcmp (a, "--stop"         ) == 0)    yVIKEYS_cmds_direct   (":stop");            <* 
+ *>    else if (strcmp (a, "--status"       ) == 0)    yVIKEYS_cmds_direct   (":status show");     <* 
+ *>    else if (strcmp (a, "--nostatus"     ) == 0)    yVIKEYS_cmds_direct   (":status hide");     <* 
+ *>    else if (strcmp (a, "--script"       ) == 0) {                                              <* 
+ *>       DEBUG_TOPS   yLOG_note    ("found --script option");                                     <* 
+ *>       if (i < a_argc)  strlcpy (myVIKEYS.m_script, a_argv [++i], LEN_DESC);                    <* 
+ *>    }                                                                                           <* 
+ *> }                                                                                              <* 
+ *> DEBUG_TOPS   yLOG_info    ("m_script"  , myVIKEYS.m_script);                                   <* 
+ *> /+---(complete)-----------------------+/                                                       <* 
+ *> DEBUG_TOPS   yLOG_exit    (__FUNCTION__);                                                      <* 
+ *> return 0;                                                                                      <* 
+ *> }                                                                                              <*/
+
+char
 yKEYS_wrap              (void)
 {
    return 0;
@@ -470,6 +589,46 @@ char yKEYS_writequit   (void) { myKEYS.done = 'y'; }
 char yKEYS_writequitall(void) { myKEYS.done = 'y'; }
 char ykeys_quitting    (void) { if (myKEYS.done    == 'y') return 1; return 0; }
 
+char
+ykeys__premain          (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char        t           [LEN_DESC]  = "";
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
+   /*---(CLA for script)-----------------*/
+   DEBUG_YKEYS   yLOG_info    ("a_script"  , myKEYS.a_script);
+   if (strcmp (myKEYS.a_script, "") != 0) {
+      DEBUG_YKEYS   yLOG_note    ("command line script argument");
+      sprintf (t, ":script %s", myKEYS.a_script);
+      DEBUG_YKEYS   yLOG_info    ("t"         , t);
+      rc = yCMD_direct (t);
+      DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
+   }
+   /*---(CLA for layout)-----------------*/
+   DEBUG_YKEYS   yLOG_info    ("a_layout"  , myKEYS.a_layout);
+   if (strcmp (myKEYS.a_layout, "") != 0) {
+      DEBUG_YKEYS   yLOG_note    ("command line layout argument");
+      sprintf (t, ":layout %s", myKEYS.a_layout);
+      DEBUG_YKEYS   yLOG_info    ("t"         , t);
+      rc = yCMD_direct (t);
+      DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
+   }
+   /*---(CLA for status)-----------------*/
+   DEBUG_YKEYS   yLOG_info    ("a_status"  , myKEYS.a_status);
+   if (strcmp (myKEYS.a_status, "") != 0) {
+      DEBUG_YKEYS   yLOG_note    ("command line status argument");
+      sprintf (t, ":status %s", myKEYS.a_status);
+      DEBUG_YKEYS   yLOG_info    ("t"         , t);
+      rc = yCMD_direct (t);
+      DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
 char         /*-> handle main loop for ncurses -------[ ------ [gn.842.232.99]*/ /*-[01.0000.000.!]-*/ /*-[--.---.---.--]-*/
 yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput)
 {
@@ -492,15 +651,8 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   /*---(CLA for script)-----------------*/
-   /*> DEBUG_YKEYS   yLOG_info    ("script"    , myVIKEYS.m_script);                   <*/
-   /*> if (strcmp (myVIKEYS.m_script, "") != 0) {                                     <* 
-    *>    DEBUG_YKEYS   yLOG_note    ("command line script argument");                 <* 
-    *>    sprintf (t, ":script %s", myVIKEYS.m_script);                               <* 
-    *>    DEBUG_YKEYS   yLOG_info    ("t"         , t);                                <* 
-    *>    rc = yVIKEYS_cmds_direct (t);                                               <* 
-    *>    DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);                               <* 
-    *> }                                                                              <*/
+   /*---(command line args)--------------*/
+   rc = ykeys__premain ();
    /*---(main-loop)----------------------*/
    while (1) {
       DEBUG_YKEYS  yLOG_value   ("LOOP"      , myKEYS.loops);

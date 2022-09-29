@@ -17,6 +17,7 @@ typedef  unsigned char        uchar;
 /*---(base)-----------------*/
 char*       yKEYS_version           (void);
 char        yKEYS_init              (void);
+char        yKEYS_arg_handle        (int *i, char *a_arg, char *a_next);
 char        yKEYS_wrap              (void);
 char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        yKEYS_string            (uchar *a_keys);

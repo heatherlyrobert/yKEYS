@@ -38,8 +38,8 @@
 
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.2-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.2j"
-#define     P_VERTXT    "light updates to help with petal demo"
+#define     P_VERNUM    "2.2k"
+#define     P_VERTXT    "added command line argument evaluation"
 
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -74,6 +74,10 @@ struct cMY {
    char        done;                        /* flag indicating ready to quit  */
    char        redraw;                      /* force redraw based on changes  */
    char        log_keys;                    /* allows keys to be hidden       */
+   /*---(arguments)------------*/
+   char        a_script    [LEN_RECD];      /* cli script name request        */
+   char        a_layout    [LEN_LABEL];     /* cli screen layout request      */
+   char        a_status    [LEN_LABEL];     /* cli screen status request      */
    /*---(config)---------------*/
    char        c_env;
    char      (*c_draw)     (float);
