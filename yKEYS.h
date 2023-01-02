@@ -11,6 +11,24 @@ typedef  unsigned char        uchar;
 #define     YKEYS_ERROR       -110
 #define     YKEYS_WARN        -100
 
+/*---(speeds)----------*/
+#define     MACRO_BLITZ        '0'
+#define     MACRO_FAST         '1'
+#define     MACRO_THOU         '2'
+#define     MACRO_HUND         '3'
+#define     MACRO_TWENTY       '4'
+#define     MACRO_TENTH        '5'
+#define     MACRO_HALF         '6'
+#define     MACRO_SEC          '7'
+#define     MACRO_DOUBLE       '8'
+#define     MACRO_TRIPLE       '9'
+/*---(updates)---------*/
+#define     MACRO_FAST         'f'  /* fast   updates */
+#define     MACRO_NORMAL       'n'  /* normal updates */
+#define     MACRO_SLOWER       's'  /* slower updates */
+#define     MACRO_BLINKS       'b'  /* stop action looking */
+#define     MACRO_PEEKS        'p'  /* very slow screen updates */
+#define     MACRO_BLIND        'd'  /* no screen updates */
 
 
 /*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-123456*/
@@ -153,6 +171,8 @@ char        yKEYS_progress_lines    (int a_lines);
 char        yKEYS_progress_length   (float a_beg, float a_end);
 char        yKEYS_progress_config   (char a_repeat, char *a_unit, char *a_scale, char *a_speed, char a_play);
 char        yKEYS_progress_cur      (float *a_len, char *a_anchor, float *a_sec, float *a_scale, float *a_inc, int *a_line);
+
+
 
 
 

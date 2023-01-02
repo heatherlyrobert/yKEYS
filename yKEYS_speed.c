@@ -138,6 +138,7 @@ ykeys_speed             (uchar a_mode, uchar *a_speed)
    if (x_speed == x_index)  myKEYS.p_redraw = '-';
    DEBUG_YKEYS   yLOG_char    ("p_redraw"  , myKEYS.p_redraw);
    /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return rc;
 }
 

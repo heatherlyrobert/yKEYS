@@ -21,7 +21,7 @@ ykeys__unit_quiet       (void)
    char        rc           =    0;
    rc = yMODE_init  (MODE_MAP);
    rc = yKEYS_init  ();
-   rc = yMACRO_global_init  ();
+   /*> rc = yMACRO_global_init  ();                                                   <*/
    return rc;
 }
 
@@ -35,12 +35,13 @@ ykeys__unit_loud        (void)
    yURG_urgs     (x_narg, x_args);
    yURG_name  ("kitchen"      , YURG_ON);
    yURG_name  ("ystr"         , YURG_ON);
+   yURG_name  ("yvihub"       , YURG_ON);
    yURG_name  ("ymode"        , YURG_ON);
    yURG_name  ("ykeys"        , YURG_ON);
    DEBUG_YKEYS  yLOG_info     ("yKEYS"     , yKEYS_version   ());
    rc = yMODE_init  (MODE_MAP);
    rc = yKEYS_init  ();
-   rc = yMACRO_global_init  ();
+   /*> rc = yMACRO_global_init  ();                                                   <*/
    return rc;
 }
 
@@ -50,7 +51,6 @@ ykeys__unit_end         (void)
    DEBUG_YKEYS  yLOG_enter   (__FUNCTION__);
    yKEYS_wrap ();
    DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
-   yLOGS_end    ();
    return 0;
 }
 
@@ -225,7 +225,7 @@ yKEYS__unit             (char *a_question, char a_index)
       snprintf (unit_answer, LEN_RECD, "KEYS loop        : %s", t + 9);
    }
    else if (strcmp (a_question, "runs"         )  == 0) {
-      snprintf (unit_answer, LEN_FULL, "KEYS runs        : A %4d %c, D %-10.10p %-4d, I %-10.10p %-4d, A %-10.10p %d",
+      snprintf (unit_answer, LEN_FULL, "KEYS runs        : A %4d %c, D %-12.12p %-4d, I %-12.12p %-4d, A %-12.12p %d",
             myKEYS.c_max_loop, myKEYS.c_env,
             myKEYS.c_draw, s_draws,
             myKEYS.c_input, s_inputs,

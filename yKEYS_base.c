@@ -87,6 +87,8 @@ yKEYS_init              (void)
    myKEYS.c_input     = NULL;
    myKEYS.c_altinput  = NULL;
    myKEYS.c_max_loop  =    0;
+   /*---(hook to other libraries)--------*/
+   yVIHUB_from_yKEYS (yKEYS_init, yKEYS_quit, yKEYS_set_warning, yKEYS_check_repeat, yKEYS_repeat_umode, yKEYS_group_hmode, yKEYS_repeat_check);
    /*---(sub-inits)----------------------*/
    rc = ykeys_logger_init    ();
    rc = ykeys_repeat_init    ();
@@ -95,7 +97,7 @@ yKEYS_init              (void)
    rc = ykeys_scale_init     ();
    rc = ykeys_speed_init     ();
    /*---(other updates)------------------*/
-   rc = yFILE_dump_add ("keys"      , "", "log of keystrokes"           , ykeys_dump         );
+   /*> rc = yFILE_dump_add ("keys"      , "", "log of keystrokes"           , ykeys_dump         );   <*/
    /*---(update status)------------------*/
    DEBUG_YKEYS   yLOG_note    ("update status");
    yMODE_init_set   (FMOD_KEYS, NULL, NULL);
@@ -414,13 +416,13 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
          DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      x_key = yMACRO_exec  (x_key);
+      x_key = yVIHUB_yMACRO_exec  (x_key);
       x_source = 4;
    }
    /*---(get macro execution)------------*/
    else {
       DEBUG_YKEYS   yLOG_note    ("macro execution, call yMACRO");
-      x_key = yMACRO_exec  (*a_key);
+      x_key = yVIHUB_yMACRO_exec  (*a_key);
       x_source = 5;
    }
    /*---(double cleanse controls)--------*/
@@ -494,7 +496,7 @@ yKEYS_string            (uchar *a_keys)
    }
    /*---(walk characters)----------------*/
    DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3de", n, x_end);
-   while (n < x_end || yMACRO_exe_mode () != MACRO_STOP) {
+   while (n < x_end || yVIHUB_yMACRO_exe_mode ("play") == 1) {
       /*---(get next char)---------------*/
       rc = ykeys__input ('-', &x_key, x_keys, &n);
       DEBUG_YKEYS   yLOG_value   ("input"     , rc);
@@ -504,7 +506,7 @@ yKEYS_string            (uchar *a_keys)
       DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
       if (rc < 0)  ++x_error;
       /*---(refresh maps)----------------*/
-      rc = yMAP_refresh ();
+      rc = yVIHUB_yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
       /*---(next)------------------------*/
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
@@ -570,7 +572,7 @@ ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env,
    DEBUG_YKEYS   yLOG_point   ("a_altinput", a_altinput);
    myKEYS.c_altinput = a_altinput;
    /*---(initial mapping)----------------*/
-   rc = yMAP_refresh_full ();
+   rc = yVIHUB_yMAP_refresh_full ();
    DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
    /*---(run drawer)---------------------*/
    rc = myKEYS.c_draw (0.0);
@@ -603,7 +605,7 @@ ykeys__premain          (void)
       DEBUG_YKEYS   yLOG_note    ("command line script argument");
       sprintf (t, ":script %s", myKEYS.a_script);
       DEBUG_YKEYS   yLOG_info    ("t"         , t);
-      rc = yCMD_direct (t);
+      rc = yVIHUB_yCMD_direct (t);
       DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
    }
    /*---(CLA for layout)-----------------*/
@@ -612,7 +614,7 @@ ykeys__premain          (void)
       DEBUG_YKEYS   yLOG_note    ("command line layout argument");
       sprintf (t, ":layout %s", myKEYS.a_layout);
       DEBUG_YKEYS   yLOG_info    ("t"         , t);
-      rc = yCMD_direct (t);
+      rc = yVIHUB_yCMD_direct (t);
       DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
    }
    /*---(CLA for status)-----------------*/
@@ -621,7 +623,7 @@ ykeys__premain          (void)
       DEBUG_YKEYS   yLOG_note    ("command line status argument");
       sprintf (t, ":status %s", myKEYS.a_status);
       DEBUG_YKEYS   yLOG_info    ("t"         , t);
-      rc = yCMD_direct (t);
+      rc = yVIHUB_yCMD_direct (t);
       DEBUG_YKEYS   yLOG_value   ("cmds"      , rc);
    }
    /*---(complete)-----------------------*/
@@ -683,7 +685,7 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
          DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
       }
       /*---(refresh maps)----------------*/
-      rc = yMAP_refresh ();
+      rc = yVIHUB_yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
       /*---(exiting)---------------------*/
       ++myKEYS.loops;

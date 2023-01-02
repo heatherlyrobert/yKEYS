@@ -533,7 +533,7 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    }
    /*---(change to macro speed)----------*/
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
-   DEBUG_YKEYS   yLOG_schar   (yMACRO_exe_mode ());
+   DEBUG_YKEYS   yLOG_schar   (yVIHUB_yMACRO_exe_mode ("show"));
    /*---(run mode)-----------------------*/
    /*> IF_MACRO_RUN   a_delay = '0';                                                  <*/
    /*---(delay mode)---------------------*/
@@ -547,18 +547,6 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    DEBUG_YKEYS   yLOG_snote   (x_terse);
    DEBUG_YKEYS   yLOG_sint    (myKEYS.l_skip);
    ykeys_loop_delay (x_terse);
-   /*> switch (a_delay) {                                                                <* 
-    *> case MACRO_BLITZ  :  ykeys_loop_delay ("1us"  );   myKEYS.l_skip =  0;   break;   <* 
-    *> case MACRO_FAST   :  ykeys_loop_delay ("100us");   myKEYS.l_skip =  0;   break;   <* 
-    *> case MACRO_THOU   :  ykeys_loop_delay ("1ms"  );   myKEYS.l_skip =  0;   break;   <* 
-    *> case MACRO_HUND   :  ykeys_loop_delay ("10ms" );   myKEYS.l_skip =  0;   break;   <* 
-    *> case MACRO_TWENTY :  ykeys_loop_delay ("10ms" );   myKEYS.l_skip =  4;   break;   <* 
-    *> case MACRO_TENTH  :  ykeys_loop_delay ("100ms");   myKEYS.l_skip =  0;   break;   <* 
-    *> case MACRO_HALF   :  ykeys_loop_delay ("100ms");   myKEYS.l_skip =  4;   break;   <* 
-    *> case MACRO_SEC    :  ykeys_loop_delay ("100ms");   myKEYS.l_skip =  9;   break;   <* 
-    *> case MACRO_DOUBLE :  ykeys_loop_delay ("100ms");   myKEYS.l_skip = 19;   break;   <* 
-    *> case MACRO_TRIPLE :  ykeys_loop_delay ("100ms");   myKEYS.l_skip = 29;   break;   <* 
-    *> }                                                                                 <*/
    /*---(change update basis)------------*/
    DEBUG_YKEYS   yLOG_schar   (a_update);
    rc = yKEYS_dupdate_info (a_update, x_terse, NULL);
@@ -569,13 +557,6 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    }
    DEBUG_YKEYS   yLOG_snote   (x_terse);
    ykeys_loop_update (x_terse);
-   /*> switch (a_update) {                                                            <* 
-    *> case MACRO_NORMAL :  ykeys_loop_update ("100ms");  break;                      <* 
-    *> case MACRO_SLOWER :  ykeys_loop_update ("500ms");  break;                      <* 
-    *> case MACRO_BLINKS :  ykeys_loop_update ("2s");     break;                      <* 
-    *> case MACRO_PEEKS  :  ykeys_loop_update ("5s");     break;                      <* 
-    *> case MACRO_BLIND  :  ykeys_loop_update ("100s");   break;                      <* 
-    *> }                                                                              <*/
    /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
    return 0;
@@ -588,7 +569,7 @@ yKEYS_loop_return       (void)
    char        rc          =    0;
    /*---(return to normal)---------------*/
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
-   DEBUG_YKEYS   yLOG_char    ("emode"     , yMACRO_exe_mode ());
+   DEBUG_YKEYS   yLOG_char    ("emode"     , yVIHUB_yMACRO_exe_mode ("show"));
    DEBUG_YKEYS   yLOG_info    ("sdelay"    , myKEYS.l_sdelay);
    rc = ykeys_loop_delay   (myKEYS.l_sdelay);
    myKEYS.l_skip = 0;

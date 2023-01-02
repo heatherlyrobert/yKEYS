@@ -184,13 +184,13 @@ ykeys_progress_mode     (uchar a_major, uchar a_minor)
       switch (a_minor) {
       case ':' :
          DEBUG_YKEYS  yLOG_note    ("start the command mode");
-         ySRC_start   (":");
+         yVIHUB_ySRC_start   (":");
          DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
          rc = 'a';
          break;
       case ';' :
          DEBUG_YKEYS  yLOG_note    ("start the hint micro-mode");
-         ySRC_start   (";");
+         yVIHUB_ySRC_start   (";");
          DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
          rc = 'a';
          break;

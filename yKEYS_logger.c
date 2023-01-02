@@ -233,7 +233,7 @@ ykeys__every            (uchar a_mode, uchar a_key)
       myKEYS.e_status [myKEYS.e_total + 1] = 0;
       x_final = 0;
    }
-   DEBUG_YKEYS   yLOG_schar   (yMACRO_exe_mode ());
+   DEBUG_YKEYS   yLOG_schar   (yVIHUB_yMACRO_exe_mode ("show"));
    --rce;  IF_MACRO_PLAYING  {
       DEBUG_YKEYS   yLOG_snote   ("MACRO PLAYING");
       myKEYS.e_status [myKEYS.e_total    ] = '>';
@@ -412,14 +412,14 @@ yKEYS_logger            (uchar a_key)
       if (myKEYS.h_curr < myKEYS.h_total) {
          DEBUG_YKEYS   yLOG_snote   ("old key, repeat groups, etc.");
       } else {
-         IF_MACRO_PLAYING  yMACRO_exe_current (&x_macro, NULL, NULL, NULL, NULL);
+         IF_MACRO_PLAYING  yVIHUB_yMACRO_exe_cur (&x_macro, NULL, NULL, NULL, NULL);
          if (strchr (x_anyway, x_macro) != NULL) {
             x_rec = x_key;
             switch (a_key) {
             case G_KEY_NOOP : case G_KEY_SKIP : case ' ' :
                x_rec = '·';
             default :
-               yMACRO_rec_key (x_rec, x_mode);
+               yVIHUB_yMACRO_rec_key (x_rec, x_mode);
                break;
             }
          }

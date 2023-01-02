@@ -75,15 +75,15 @@ yKEYS_check_multi       (uchar a_major, uchar a_minor)
    if (a_major != G_KEY_SPACE)    return 0;
    switch (yMODE_curr ()) {
    case MODE_MAP    :
-      if (yMAP_visu_islive ())    return yKEYS_is_multi_visu (a_minor);
-      else                        return yKEYS_is_multi_map  (a_minor);
+      if (yVIHUB_yMAP_visual_islive ())  return yKEYS_is_multi_visu (a_minor);
+      else                               return yKEYS_is_multi_map  (a_minor);
       break;
    case UMOD_WANDER :
       return yKEYS_is_multi_wdr  (a_minor);
       break;
    case MODE_SOURCE :
-      if (ySRC_select_islive ())  return yKEYS_is_multi_selc (a_minor);
-      else                        return yKEYS_is_multi_src  (a_minor);
+      if (yVIHUB_ySRC_select_islive ())  return yKEYS_is_multi_selc (a_minor);
+      else                               return yKEYS_is_multi_src  (a_minor);
       break;
    }
    return 0;

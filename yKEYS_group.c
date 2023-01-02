@@ -39,7 +39,7 @@ yKEYS_group_beg         (void)
    DEBUG_YKEYS   yLOG_sint    (n);
    IF_MACRO_PLAYING {
       DEBUG_YKEYS   yLOG_snote   ("macro");
-      yMACRO_exe_pos (&(myKEYS.r_macro [n]), &(myKEYS.r_beg [n]));
+      yVIHUB_yMACRO_exe_pos (&(myKEYS.r_macro [n]), &(myKEYS.r_beg [n]));
    } else {
       DEBUG_YKEYS   yLOG_snote   ("normal");
       myKEYS.r_macro [n] = '´';
@@ -93,7 +93,7 @@ yKEYS_group_end         (void)
             DEBUG_YKEYS   yLOG_note    ("mark end macro");
             DEBUG_YKEYS   yLOG_value   ("r_end"   , myKEYS.r_end [n]);
             DEBUG_YKEYS   yLOG_point   ("r_end"   , &(myKEYS.r_end [n]));
-            yMACRO_exe_pos (NULL, &(myKEYS.r_end [n]));
+            yVIHUB_yMACRO_exe_pos (NULL, &(myKEYS.r_end [n]));
          } else {
             /*> DEBUG_YKEYS   yLOG_snote   ("mark end normal");                        <*/
             DEBUG_YKEYS   yLOG_note    ("mark end normal");
@@ -105,8 +105,8 @@ yKEYS_group_end         (void)
       /*---(update)----------------------*/
       /*> DEBUG_YKEYS   yLOG_snote   ("next");                                         <*/
       DEBUG_YKEYS   yLOG_note    ("next");
-      if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos       (myKEYS.r_beg  [n]);
-      else                                    yMACRO_exe_repos  (myKEYS.r_beg  [n]);
+      if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos            (myKEYS.r_beg  [n]);
+      else                                    yVIHUB_yMACRO_exe_repos (myKEYS.r_beg  [n]);
       --(myKEYS.r_reps [n]);
       /*> DEBUG_YKEYS   yLOG_sint    (myKEYS.r_reps  [n]);                             <*/
       /*> DEBUG_YKEYS   yLOG_schar   (myKEYS.r_macro [n]);                             <*/
@@ -137,7 +137,7 @@ ykeys_group_check_end   (void)
    short       x_end       =    0;
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
    IF_MACRO_PLAYING {
-      yMACRO_exe_pos (NULL, &(x_end));
+      yVIHUB_yMACRO_exe_pos (NULL, &(x_end));
    } else {
       x_end = yKEYS_position ();
    }
