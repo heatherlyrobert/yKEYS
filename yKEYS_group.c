@@ -104,14 +104,18 @@ yKEYS_group_end         (void)
       }
       /*---(update)----------------------*/
       /*> DEBUG_YKEYS   yLOG_snote   ("next");                                         <*/
-      DEBUG_YKEYS   yLOG_note    ("next");
-      if (myKEYS.r_macro [n] == (uchar) '´')  yKEYS_repos            (myKEYS.r_beg  [n]);
-      else                                    yVIHUB_yMACRO_exe_repos (myKEYS.r_beg  [n]);
+      DEBUG_YKEYS   yLOG_char    ("r_macro"   , myKEYS.r_macro [n]);
+      if (myKEYS.r_macro [n] == (uchar) '´') {
+         DEBUG_YKEYS   yLOG_note    ("just change in keys");
+         yKEYS_repos             (myKEYS.r_beg  [n]);
+      } else {
+         DEBUG_YKEYS   yLOG_note    ("reposition with macro");
+         yVIHUB_yMACRO_exe_repos (myKEYS.r_beg  [n]);
+      }
       --(myKEYS.r_reps [n]);
-      /*> DEBUG_YKEYS   yLOG_sint    (myKEYS.r_reps  [n]);                             <*/
-      /*> DEBUG_YKEYS   yLOG_schar   (myKEYS.r_macro [n]);                             <*/
-      /*> DEBUG_YKEYS   yLOG_sint    (myKEYS.r_beg   [n]);                             <*/
-      /*> DEBUG_YKEYS   yLOG_sint    (myKEYS.r_end   [n]);                             <*/
+      DEBUG_YKEYS   yLOG_value   ("r_reps"    , myKEYS.r_reps  [n]);
+      DEBUG_YKEYS   yLOG_value   ("r_beg"     , myKEYS.r_beg   [n]);
+      DEBUG_YKEYS   yLOG_value   ("r_end"     , myKEYS.r_end   [n]);
       rc = 1;
       /*---(done)------------------------*/
    }

@@ -232,6 +232,8 @@ ykeys__every            (uchar a_mode, uchar a_key)
       myKEYS.e_status [myKEYS.e_total    ] = '>';
       myKEYS.e_status [myKEYS.e_total + 1] = 0;
       x_final = 0;
+      /*> ++(myKEYS.h_curr);                                                          <*/
+      /*> DEBUG_YKEYS   yLOG_sint    (myKEYS.h_curr);                                 <*/
    }
    DEBUG_YKEYS   yLOG_schar   (yVIHUB_yMACRO_exe_mode ("show"));
    --rce;  IF_MACRO_PLAYING  {
@@ -408,17 +410,25 @@ yKEYS_logger            (uchar a_key)
    x_mode = yMODE_curr ();
    x_key  = chrvisible (a_key);
    /*---(check recording)----------------*/
+   DEBUG_YKEYS   yLOG_char    ("rec_mode"  , yVIHUB_yMACRO_rec_mode ("show"));
    IF_MACRO_RECORDING {
+      DEBUG_YKEYS   yLOG_note    ("knows its recording");
       if (myKEYS.h_curr < myKEYS.h_total) {
-         DEBUG_YKEYS   yLOG_snote   ("old key, repeat groups, etc.");
+         DEBUG_YKEYS   yLOG_note    ("old key, repeat groups, etc.");
       } else {
+         DEBUG_YKEYS   yLOG_note    ("new key, might record");
+         DEBUG_YKEYS   yLOG_char    ("exe_mode"  , yVIHUB_yMACRO_exe_mode ("show"));
          IF_MACRO_PLAYING  yVIHUB_yMACRO_exe_cur (&x_macro, NULL, NULL, NULL, NULL);
+         DEBUG_YKEYS   yLOG_char    ("x_macro"   , x_macro);
+         DEBUG_YKEYS   yLOG_info    ("x_anymay"  , x_anyway);
          if (strchr (x_anyway, x_macro) != NULL) {
             x_rec = x_key;
             switch (a_key) {
             case G_KEY_NOOP : case G_KEY_SKIP : case ' ' :
+               DEBUG_YKEYS   yLOG_note    ("noop, skip, or space, nothing to do");
                x_rec = '·';
             default :
+               DEBUG_YKEYS   yLOG_note    ("chosing to record");
                yVIHUB_yMACRO_rec_key (x_rec, x_mode);
                break;
             }

@@ -3,49 +3,60 @@
 #define yKEYS_priv yes
 
 
-
-/*===[[ BEG_HEADER ]]=========================================================*/
-/*345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-12345678901-*/
-
-/*===[[ ONE_LINERS ]]=========================================================*/
-
+/*===[[ HEADER BEG ]]=========================================================*/
+/*                      ´·········1·········2·········3·········4·········5·········6·········7*/
+/*--------- 12345678901 ´123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
+/*········· ··········· ´·····························´········································*/
+#define     P_NAME      "yKEYS"
+/*········· ··········· ´·····························´········································*/
 #define     P_FOCUS     "RS (run-time support)"
 #define     P_NICHE     "us (user control)"
-#define     P_SUBJECT   "keys tracking and control"
-#define     P_PURPOSE   ""
-
+#define     P_SUBJECT   "keyboard input and tracking"
+#define     P_PURPOSE   "gather, clean, and track all keyboard input for yvikeys"
+/*········· ··········· ´·····························´········································*/
 #define     P_NAMESAKE  "hermes-tresmegistus (thrice greatest)"
 #define     P_PRONOUNCE ""
 #define     P_HERITAGE  ""
-#define     P_SHORTER   "god of letters and writing"
+#define     P_BRIEFLY   "god of letters and writing"
 #define     P_IMAGERY   ""
 #define     P_REASON    ""
-
+/*········· ··········· ´·····························´········································*/
 #define     P_ONELINE   P_NAMESAKE " " P_SUBJECT
-
+/*········· ··········· ´·····························´········································*/
+#define     P_HOMEDIR   "/home/system/yKEYS.vi_keys_tracking"
 #define     P_BASENAME  "yKEYS"
 #define     P_FULLPATH  "/usr/local/lib64/libyKEYS"
-#define     P_SUFFIX    ""
-#define     P_CONTENT   ""
-
+#define     P_SUFFIX    "···"
+#define     P_CONTENT   "···"
+/*········· ··········· ´·····························´········································*/
 #define     P_SYSTEM    "gnu/linux   (powerful, ubiquitous, technical, and hackable)"
 #define     P_LANGUAGE  "ansi-c      (wicked, limitless, universal, and everlasting)"
-#define     P_CODESIZE  "large       (appoximately 10,000 slocl)"
-#define     P_DEPENDS   "none"
-
+#define     P_CODESIZE  "moderate    ()"
+#define     P_COMPILER  "gcc 11.3.0"
+/*········· ··········· ´·····························´········································*/
+#define     P_DEPSTDC   "stdio,stdlib,string,math,time"
+#define     P_DEPGRAPH  "···"
+#define     P_DEPCORE   "yURG,yLOG,ySTR"
+#define     P_DEPVIKEYS "yVIHUB,yMODE"
+#define     P_DEPOTHER  "···"
+/*········· ··········· ´·····························´········································*/
 #define     P_AUTHOR    "heatherlyrobert"
-#define     P_CREATED   ""
-
+#define     P_CREATED   "2016-11"
+/*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.3-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.3a"
-#define     P_VERTXT    "moved cross-library integration to yVIHUB reducing dependencies"
-
+#define     P_VERNUM    "2.3b"
+#define     P_VERTXT    "unit testing fully compliant, worked through yVIHUB yMACRO stuff too"
+/*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
 #define     P_REMINDER  "there are many better options, but i *own* every byte of this one"
+/*········· ··········· ´·····························´········································*/
+/*--------- 12345678901 ´123456789-123456789-123456789-123456789-123456789-123456789-123456789-*/
+/*                      ´·········1·········2·········3·········4·········5·········6·········7*/
+/*===[[ HEADER END ]]=========================================================*/
 
-/*===[[ END_HEADER ]]=========================================================*/
+
 
 /*---(ansi-c standard)-------------------*/
 #include    <stdio.h>             /* clibc  standard input/output             */
@@ -53,12 +64,14 @@
 #include    <string.h>            /* clibc  standard string handling          */
 #include    <math.h>              /* clibc  standard math library             */
 #include    <time.h>              /* clibc  time related functions            */
-/*---(custom)----------------------------*/
+/*---(custom core)-----------------------*/
 #include    <yURG.h>              /* heatherly urgent processing              */
 #include    <yLOG.h>              /* heatherly program logging                */
 #include    <ySTR.h>              /* heatherly string processing              */
-#include    <yMODE.h>             /* heatherly yVIKEYS mode tracking          */
+/*---(custom yvikeys)--------------------*/
 #include    <yVIHUB.h>            /* heatherly yVIKEYS integration            */
+#include    <yMODE.h>             /* heatherly yVIKEYS mode tracking          */
+/*---(done)------------------------------*/
 
 
 typedef     struct timespec   tTSPEC;
@@ -161,10 +174,10 @@ struct cMY {
    char        r_repeating;                 /* repeat status (y/-)            */
    /*---(repeat groups)--------*/
    char        r_level;                     /* repeat/grouping level          */
-   short       r_reps    [LEN_LABEL];       /* repeats by group level         */
-   uchar       r_macro   [LEN_LABEL];       /* macro abbr for level           */
-   short       r_beg     [LEN_LABEL];       /* current position               */
-   short       r_end     [LEN_LABEL];       /* current position               */
+   short       r_reps      [LEN_LABEL];     /* repeats by group level         */
+   uchar       r_macro     [LEN_LABEL];     /* macro abbr for level           */
+   short       r_beg       [LEN_LABEL];     /* current position               */
+   short       r_end       [LEN_LABEL];     /* current position               */
    /*---(progress)--------*/
    char        p_unit      [LEN_TERSE];
    char        p_play;                      /* is progress playing            */

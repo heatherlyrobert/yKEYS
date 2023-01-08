@@ -81,14 +81,14 @@ yKEYS_init              (void)
       DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
+   /*---(hook to yVIHUB)-----------------*/
+   yVIHUB_from_yKEYS (yKEYS_init, yKEYS_quit, yKEYS_set_warning, yKEYS_check_repeat, yKEYS_repeat_umode, yKEYS_group_hmode, yKEYS_repeat_check);
    /*---(globals)------------------------*/
    myKEYS.c_env       =  '-';
    myKEYS.c_draw      = NULL;
    myKEYS.c_input     = NULL;
    myKEYS.c_altinput  = NULL;
    myKEYS.c_max_loop  =    0;
-   /*---(hook to other libraries)--------*/
-   yVIHUB_from_yKEYS (yKEYS_init, yKEYS_quit, yKEYS_set_warning, yKEYS_check_repeat, yKEYS_repeat_umode, yKEYS_group_hmode, yKEYS_repeat_check);
    /*---(sub-inits)----------------------*/
    rc = ykeys_logger_init    ();
    rc = ykeys_repeat_init    ();
@@ -96,8 +96,6 @@ yKEYS_init              (void)
    rc = ykeys_progress_init  ();
    rc = ykeys_scale_init     ();
    rc = ykeys_speed_init     ();
-   /*---(other updates)------------------*/
-   /*> rc = yFILE_dump_add ("keys"      , "", "log of keystrokes"           , ykeys_dump         );   <*/
    /*---(update status)------------------*/
    DEBUG_YKEYS   yLOG_note    ("update status");
    yMODE_init_set   (FMOD_KEYS, NULL, NULL);
@@ -105,6 +103,32 @@ yKEYS_init              (void)
    DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return 0;
 }
+
+char
+yKEYS_init_after        (void)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rce         =  -10;
+   char        rc          =    0;
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
+   /*---(other updates)------------------*/
+   rc = yVIHUB_yFILE_dump_add ("keys"      , "", "log of keystrokes"           , ykeys_dump         );
+   DEBUG_YMODE   yLOG_value   ("dump_add"  , rc);
+   rc = yVIHUB_yVIEW_switch_add ('s', "key"   , "keylog"       , yKEYS_keylog_status    , "displays keystroke history"               );
+   DEBUG_YMODE   yLOG_value   ("switch_add", rc);
+   rc = yVIHUB_yVIEW_switch_add ('s', "log"   , "logger"       , yKEYS_logger_status    , "displays logging statistics"              );
+   DEBUG_YMODE   yLOG_value   ("switch_add", rc);
+   rc = yVIHUB_yVIEW_switch_add ('s', "loo"   , "loop"         , yKEYS_loop_status      , "displays main looping statistics"         );
+   DEBUG_YMODE   yLOG_value   ("switch_add", rc);
+   rc = yVIHUB_yVIEW_switch_add ('s', "repl"  , "replay"       , yKEYS_replay_status    , "displays main looping statistics"         );
+   DEBUG_YMODE   yLOG_value   ("switch_add", rc);
+   yMODE_after_set  (FMOD_KEYS);
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
 
 char
 yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
@@ -371,11 +395,11 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       DEBUG_YKEYS   yLOG_complex ("a_str"     , "%2då%sæ", strlen (a_str), a_str);
    }
    /*---(get normal key)-----------------*/
-   DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
+   DEBUG_YKEYS   yLOG_complex ("hist pos"  , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
    --rce;  IF_MACRO_OFF {
       if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
          DEBUG_YKEYS   yLOG_note    ("taking in new key from string");
-         DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dn, %3d len", *n, x_len);
+         DEBUG_YKEYS   yLOG_complex ("string pos", "%3dn, %3d len", *n, x_len);
          if (*n < 0 || *n >= x_len) {
             *a_key = 0;
             DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
@@ -400,7 +424,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       DEBUG_YKEYS   yLOG_note    ("macro playback, get key, then call yMACRO");
       if (a_str != NULL && n != NULL && myKEYS.h_curr >= myKEYS.h_total) {
          DEBUG_YKEYS   yLOG_note    ("taking in playback key from string");
-         DEBUG_YKEYS   yLOG_complex ("pos"       , "%3dn, %3d len", *n, x_len);
+         DEBUG_YKEYS   yLOG_complex ("string pos", "%3dn, %3d len", *n, x_len);
          if (*n < 0 || *n >= x_len) {
             *a_key = 0;
             DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
@@ -433,14 +457,17 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
     *>    else     x_key = 0;                                                         <* 
     *> }                                                                              <*/
    /*---(logger)-------------------------*/
+   DEBUG_YKEYS   yLOG_complex ("hist pos"  , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
    rc = yKEYS_logger (x_key);
    DEBUG_YKEYS   yLOG_value   ("logger"    , rc);
+   DEBUG_YKEYS   yLOG_complex ("hist pos"  , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
    /*---(check unlock)-------------------*/
    rc = yKEYS_check_unlock (&x_key);
    DEBUG_YKEYS   yLOG_value   ("unlock"    , rc);
    /*---(save-back)----------------------*/
    DEBUG_YKEYS   yLOG_value   ("x_source"  , x_source);
    *a_key = x_key;
+   DEBUG_YKEYS   yLOG_complex ("hist pos"  , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
    /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    return x_source;
@@ -495,8 +522,11 @@ yKEYS_string            (uchar *a_keys)
       return rc;
    }
    /*---(walk characters)----------------*/
-   DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3de", n, x_end);
+   /*> n = x_end - x_len;                                                             <*/
+   DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3dl, %3de", n, x_len, x_end);
    while (n < x_end || yVIHUB_yMACRO_exe_mode ("play") == 1) {
+      DEBUG_YKEYS   yLOG_char    ("rec_mode"  , yVIHUB_yMACRO_rec_mode ("show"));
+      DEBUG_YKEYS   yLOG_char    ("exe_mode"  , yVIHUB_yMACRO_exe_mode ("show"));
       /*---(get next char)---------------*/
       rc = ykeys__input ('-', &x_key, x_keys, &n);
       DEBUG_YKEYS   yLOG_value   ("input"     , rc);
@@ -509,11 +539,9 @@ yKEYS_string            (uchar *a_keys)
       rc = yVIHUB_yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
       /*---(next)------------------------*/
+      DEBUG_YKEYS   yLOG_char    ("notplay"   , yVIHUB_yMACRO_exe_mode ("notplaying"));
       IF_MACRO_NOT_PLAYING   yKEYS_nextpos ();
-      /*> else {                                                                      <* 
-       *>    if (n == x_end)   --n;                                                   <* 
-       *> }                                                                           <*/
-      DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3de", n, x_end);
+      DEBUG_YKEYS   yLOG_complex ("position"  , "%3dn, %3dl, %3de", n, x_len, x_end);
       /*---(done)------------------------*/
    }
    DEBUG_YKEYS   yLOG_note    ("main loop done");

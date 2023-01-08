@@ -4,6 +4,14 @@
 #include    "yKEYS_priv.h"
 
 
+char
+yKEYS_unit_handlers     (void)
+{
+   char        rc           =    0;
+   yMODE_unit_handlers ();
+   yMODE_results ();
+   return 0;
+}
 
 
 /*====================------------------------------------====================*/
@@ -20,7 +28,9 @@ ykeys__unit_quiet       (void)
    char       *x_args [20]  = {"yKEYS_unit" };
    char        rc           =    0;
    rc = yMODE_init  (MODE_MAP);
+   rc = yMODE_init_after ();
    rc = yKEYS_init  ();
+   rc = yKEYS_init_after ();
    /*> rc = yMACRO_global_init  ();                                                   <*/
    return rc;
 }
@@ -40,7 +50,9 @@ ykeys__unit_loud        (void)
    yURG_name  ("ykeys"        , YURG_ON);
    DEBUG_YKEYS  yLOG_info     ("yKEYS"     , yKEYS_version   ());
    rc = yMODE_init  (MODE_MAP);
+   rc = yMODE_init_after ();
    rc = yKEYS_init  ();
+   rc = yKEYS_init_after ();
    /*> rc = yMACRO_global_init  ();                                                   <*/
    return rc;
 }
@@ -109,6 +121,7 @@ yKEYS__unit             (char *a_question, char a_index)
    char        x_list      [LEN_RECD]  = "";
    char        c           =  '·';
    char        d           =  '·';
+   int         n           =    0;
    /*---(preprare)-----------------------*/
    strlcpy  (unit_answer, "KEYS unit        : question not understood", LEN_FULL);
    /*---(dependency list)----------------*/
