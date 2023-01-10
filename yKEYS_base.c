@@ -281,6 +281,17 @@ ykeys__input_fix        (char a_env, uchar a_key)
       }
       DEBUG_YKEYS   yLOG_sint    (x_key);
    }
+   /*---(opengl)-------------------------*/
+   if (a_env == 'c') {
+      DEBUG_YKEYS   yLOG_snote   ("curses");
+      switch (x_key) {
+      case  G_KEY_DEL   :
+         DEBUG_YKEYS   yLOG_snote   ("fix DEL");
+         x_key = G_KEY_BS;     /* X11 sends incorrectly  */
+         break;
+      }
+      DEBUG_YKEYS   yLOG_sint    (x_key);
+   }
    /*---(switch)-------------------------*/
    switch (x_key) {
    case  G_KEY_RETURN :

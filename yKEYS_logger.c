@@ -14,18 +14,18 @@ char
 ykeys_logger_init       (void)
 {
    /*---(every)--------------------------*/
-   strlcpy (myKEYS.e_log  , "", LEN_HUGE);
-   strlcpy (myKEYS.e_mode , "", LEN_HUGE);
-   strlcpy (myKEYS.e_multi, "", LEN_HUGE);
-   strlcpy (myKEYS.e_error, "", LEN_HUGE);
+   strlcpy (myKEYS.e_log   , "", LEN_HUGE);
+   strlcpy (myKEYS.e_mode  , "", LEN_HUGE);
+   strlcpy (myKEYS.e_multi , "", LEN_HUGE);
+   strlcpy (myKEYS.e_error , "", LEN_HUGE);
    strlcpy (myKEYS.e_status, "", LEN_HUGE);
    myKEYS.e_all      = 0;
    myKEYS.e_total    = 0;
    /*---(logs)---------------------------*/
    myKEYS.h_logkeys  = 'y';
-   strlcpy (myKEYS.h_log  , "", LEN_FULL);
-   strlcpy (myKEYS.h_mode , "", LEN_FULL);
-   strlcpy (myKEYS.h_multi, "", LEN_FULL);
+   strlcpy (myKEYS.h_log   , "", LEN_FULL);
+   strlcpy (myKEYS.h_mode  , "", LEN_FULL);
+   strlcpy (myKEYS.h_multi , "", LEN_FULL);
    strlcpy (myKEYS.h_error , "", LEN_FULL);
    myKEYS.h_locked   = '-';
    /*---(positions)----------------------*/
@@ -613,14 +613,18 @@ yKEYS_every_current     (uchar *a_mode, uchar *a_curr, uchar *a_multi, uchar *a_
    char        rce         =  -10;
    if (a_mode   != NULL)  *a_mode   = '-';
    if (a_curr   != NULL)  *a_curr   = '-';
-   if (a_multi  != NULL)  *a_multi  = '-';
+   if (a_multi  != NULL)  *a_multi  = '·';
    if (a_menu   != NULL)  *a_menu   =   0;
    if (a_error  != NULL)  *a_error  = '-';
    if (a_status != NULL)  *a_status = '-';
    --rce;  if (myKEYS.e_total <= 0)  return rce;
    if (a_mode   != NULL)  *a_mode   = myKEYS.e_mode   [myKEYS.e_total - 1];
    if (a_curr   != NULL)  *a_curr   = myKEYS.e_log    [myKEYS.e_total - 1];
-   if (a_multi  != NULL)  *a_multi  = myKEYS.e_multi  [myKEYS.e_total - 1];
+   if (a_multi  != NULL) {
+      if (myKEYS.e_multi  [myKEYS.e_total - 1] == 's') {
+         *a_multi  = myKEYS.e_log    [myKEYS.e_total - 2];
+      }
+   }
    if (a_menu   != NULL) { if (myKEYS.e_mode   [myKEYS.e_total - 1] == SMOD_MENUS)  *a_menu   = 1; }
    if (a_error  != NULL)  *a_error  = myKEYS.e_error  [myKEYS.e_total - 1];
    if (a_status != NULL)  *a_status = myKEYS.e_status [myKEYS.e_total - 1];
@@ -697,6 +701,7 @@ yKEYS_set_error         (void)
    /*---(normal)-------------------------*/
    if (myKEYS.h_total > 0) {
       myKEYS.h_error  [myKEYS.h_total - 1] = 'E';
+      myKEYS.e_error  [myKEYS.e_total - 1] = 'E';
       yKEYS_repeat_reset ();
       ++(myKEYS.h_errors);
    }
@@ -726,7 +731,7 @@ char
 yKEYS_set_warning       (void)
 {  /* set if not already set */
    /*---(every)--------------------------*/
-   if (myKEYS.e_total > 0 && myKEYS.e_error [myKEYS.e_total - 1] == '-') {
+   if (myKEYS.e_total > 0 && myKEYS.e_error  [myKEYS.e_total - 1] == '-') {
       myKEYS.e_error [myKEYS.e_total - 1] = 'w';
    }
    /*---(normal)-------------------------*/
@@ -834,7 +839,7 @@ yKEYS_is_error          (void)
 {
    if (myKEYS.h_total > 0) {
       if (myKEYS.h_error [myKEYS.h_total - 1] == 'E') return 1;
-      if (myKEYS.h_locked == 'y')                    return 1;
+      if (myKEYS.h_locked == 'y')                     return 1;
    }
    return 0;
 }
