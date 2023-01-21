@@ -24,8 +24,6 @@ char          unit_answer [LEN_RECD];
 char       /*----: set up program urgents/debugging --------------------------*/
 ykeys__unit_quiet       (void)
 {
-   int         x_narg       = 1;
-   char       *x_args [20]  = {"yKEYS_unit" };
    char        rc           =    0;
    rc = yMODE_init  (MODE_MAP);
    rc = yMODE_init_after ();
@@ -39,15 +37,15 @@ char       /*----: set up program urgents/debugging --------------------------*/
 ykeys__unit_loud        (void)
 {
    int         x_narg       = 1;
-   char       *x_args [20]  = {"yKEYS_unit" };
+   char       *x_args [ 1]  = {"yKEYS_unit" };
    char        rc           =    0;
    yURG_logger   (x_narg, x_args);
    yURG_urgs     (x_narg, x_args);
-   yURG_name  ("kitchen"      , YURG_ON);
-   yURG_name  ("ystr"         , YURG_ON);
-   yURG_name  ("yvihub"       , YURG_ON);
-   yURG_name  ("ymode"        , YURG_ON);
-   yURG_name  ("ykeys"        , YURG_ON);
+   yURG_by_name  ("kitchen"      , YURG_ON);
+   yURG_by_name  ("ystr"         , YURG_ON);
+   yURG_by_name  ("yvihub"       , YURG_ON);
+   yURG_by_name  ("ymode"        , YURG_ON);
+   yURG_by_name  ("ykeys"        , YURG_ON);
    DEBUG_YKEYS  yLOG_info     ("yKEYS"     , yKEYS_version   ());
    rc = yMODE_init  (MODE_MAP);
    rc = yMODE_init_after ();
