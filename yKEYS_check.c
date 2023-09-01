@@ -18,7 +18,7 @@ static  uchar   s_hscroll   [LEN_DESC ]   = "   shcle      azud      .    ";
 static  uchar   s_hpage     [LEN_DESC ]   = "   sh le      azud AZUD      ";
 static  uchar   s_hends     [LEN_DESC ]   = "S  shcle  E C azud AZUD . x!*";
 static  uchar   s_hword     [LEN_LABEL]   = "wbe WBE";
-static  uchar   s_hchar     [LEN_LABEL]   = "#fFnN";
+static  uchar   s_hchar     [LEN_LABEL]   = "fF[<>]";
 
 static  uchar   s_dsimple   [LEN_DESC ]   = "                             ";
 static  uchar   s_dgoto     [LEN_DESC ]   = "                             ";
