@@ -584,6 +584,13 @@ yKEYS_current           (void)
 }
 
 uchar
+yKEYS_ecurrent          (void)
+{
+   if (myKEYS.e_total <= 0)     return 0;
+   return myKEYS.e_log [myKEYS.e_total - 1];
+}
+
+uchar
 yKEYS_multi             (void)
 {
    if (myKEYS.e_total <= 0)                         return 0;

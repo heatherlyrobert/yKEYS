@@ -34,6 +34,7 @@ char        yKEYS_unique            (void);
 int         yKEYS_count             (void);
 int         yKEYS_position          (void);
 uchar       yKEYS_current           (void);
+uchar       yKEYS_ecurrent          (void);
 uchar       yKEYS_multi             (void);
 char        yKEYS_is_menu           (void);
 char        yKEYS_oldkeys           (void);
