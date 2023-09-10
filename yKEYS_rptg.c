@@ -151,9 +151,9 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
    ykeys_num2str (myKEYS.e_total, 4, x_grand);
    ykeys_num2str (myKEYS.h_total, 3, x_total);
    if (myKEYS.h_total > 0) {
-      x_mode = chrvisible (myKEYS.h_mode [myKEYS.h_curr]);
-      x_err  = chrvisible (myKEYS.h_error [myKEYS.h_curr]);
-      x_ch   = chrvisible (myKEYS.h_log  [myKEYS.h_curr]);
+      x_mode = ychrvisible (myKEYS.h_mode [myKEYS.h_curr]);
+      x_err  = ychrvisible (myKEYS.h_error [myKEYS.h_curr]);
+      x_ch   = ychrvisible (myKEYS.h_log  [myKEYS.h_curr]);
    }
    /*---(log part)-----------------------*/
    ystrlcpy (x_log, YSTR_PLUS, h + 1);

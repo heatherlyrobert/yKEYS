@@ -692,7 +692,7 @@ ykeys_loop_sleep        (uchar a_key, char a_draw)
    char        x_flag      =  '-';
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
-   DEBUG_YKEYS   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, chrvisible (a_key), a_draw, myKEYS.l_blocking);
+   DEBUG_YKEYS   yLOG_complex ("args"      , "%3d, %c, %c, %c blocking", a_key, ychrvisible (a_key), a_draw, myKEYS.l_blocking);
    /*---(get ending time)----------------*/
    yKEYS_loop_end ();
    /*---(statistics)---------------------*/

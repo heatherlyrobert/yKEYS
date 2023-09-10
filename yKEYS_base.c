@@ -416,7 +416,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
             DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
-         x_key = chrworking (a_str [*n]);
+         x_key = ychrworking (a_str [*n]);
          x_key = ykeys__input_fix (a_env, x_key);
          ++(*n);
          x_source = 2;
@@ -441,7 +441,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
             DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
             return rce;
          }
-         x_key = chrworking (a_str [*n]);
+         x_key = ychrworking (a_str [*n]);
          x_key = ykeys__input_fix (a_env, x_key);
          ++(*n);
          x_source = 3;
@@ -461,7 +461,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       x_source = 5;
    }
    /*---(double cleanse controls)--------*/
-   DEBUG_YKEYS   yLOG_complex ("x_key"     , "%ds, %3d, %c", x_source, x_key, chrvisible (x_key));
+   DEBUG_YKEYS   yLOG_complex ("x_key"     , "%ds, %3d, %c", x_source, x_key, ychrvisible (x_key));
    /*> if (x_key > 0 && x_key < 32) {                                                 <* 
     *>    if      (x_key == G_KEY_ESCAPE)  ;                                          <* 
     *>    else if (x_key == G_KEY_RETURN)  ;                                          <* 
@@ -500,13 +500,13 @@ ykeys__handle     (uchar a_key, int *a_error)
    if (!yKEYS_is_locked () && a_key != G_KEY_NOOP && a_key != G_KEY_SKIP) {
       rc = yMODE_handle (a_key);
       if (rc >= 0) {
-         DEBUG_YKEYS   yLOG_complex ("normal"    , "%3d, %c, %4d", a_key, chrvisible (a_key), rc);
+         DEBUG_YKEYS   yLOG_complex ("normal"    , "%3d, %c, %4d", a_key, ychrvisible (a_key), rc);
       } else {
-         DEBUG_YKEYS   yLOG_complex ("error"     , "%3d, %c, %4d", a_key, chrvisible (a_key), rc);
+         DEBUG_YKEYS   yLOG_complex ("error"     , "%3d, %c, %4d", a_key, ychrvisible (a_key), rc);
          if (a_error != NULL)  *a_error += 1;
       }
    } else {
-      DEBUG_YKEYS   yLOG_complex ("skipped"   , "%3d, %c", a_key, chrvisible (a_key));
+      DEBUG_YKEYS   yLOG_complex ("skipped"   , "%3d, %c", a_key, ychrvisible (a_key));
    }
    /*---(complete)-----------------------*/
    return rc;
@@ -710,10 +710,10 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       else               x_block = myKEYS.l_blocking;
       DEBUG_YKEYS  yLOG_complex ("blocking"  , "%c, %c", myKEYS.l_blocking, x_block);
       rc = myKEYS.c_input (x_block, &x_key);
-      DEBUG_YKEYS  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_key, chrvisible (x_key));
+      DEBUG_YKEYS  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_key, ychrvisible (x_key));
       /*---(keyboard input)--------------*/
       rc = ykeys__input (myKEYS.c_env, &x_key, NULL, NULL);
-      DEBUG_YKEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, x_key, chrvisible (x_key));
+      DEBUG_YKEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, x_key, ychrvisible (x_key));
       if (x_key == G_KEY_SKIP) {
          DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");
          continue;

@@ -154,7 +154,7 @@ ykeys_progress_mode     (uchar a_major, uchar a_minor)
    /*---(header)-------------------------*/
    DEBUG_YKEYS  yLOG_enter   (__FUNCTION__);
    DEBUG_YKEYS  yLOG_char    ("a_major"   , a_major);
-   DEBUG_YKEYS  yLOG_char    ("a_minor"   , chrvisible (a_minor));
+   DEBUG_YKEYS  yLOG_char    ("a_minor"   , ychrvisible (a_minor));
    /*---(defenses)-----------------------*/
    DEBUG_YKEYS  yLOG_char    ("mode"      , yMODE_curr ());
    --rce;  if (yMODE_not (MODE_PROGRESS)) {

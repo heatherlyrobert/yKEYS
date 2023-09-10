@@ -185,7 +185,7 @@ ykeys__every            (uchar a_mode, uchar a_key)
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
-   x_key  = chrvisible (a_key);
+   x_key  = ychrvisible (a_key);
    /*---(mode)---------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("mode");
    DEBUG_YKEYS   yLOG_schar   (a_mode);
@@ -272,7 +272,7 @@ ykeys__normal           (uchar a_mode, uchar a_key)
    /*---(header)-------------------------*/
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
    /*---(prepare)------------------------*/
-   x_key  = chrvisible (a_key);
+   x_key  = ychrvisible (a_key);
    /*---(mode)---------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("mode");
    DEBUG_YKEYS   yLOG_schar   (a_mode);
@@ -408,7 +408,7 @@ yKEYS_logger            (uchar a_key)
    }
    /*---(prepare)------------------------*/
    x_mode = yMODE_curr ();
-   x_key  = chrvisible (a_key);
+   x_key  = ychrvisible (a_key);
    /*---(check recording)----------------*/
    DEBUG_YKEYS   yLOG_char    ("rec_mode"  , yVIHUB_yMACRO_rec_mode ("show"));
    IF_MACRO_RECORDING {
