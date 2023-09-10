@@ -78,8 +78,8 @@ ykeys__unit_prep        (char *a_keys)
    s_inputs = 0;
    s_alts   = 0;
    s_pos    = 0;
-   if (a_keys != NULL)  strlcpy (s_keys, a_keys, LEN_RECD);
-   else                 strlcpy (s_keys, ""    , LEN_RECD);
+   if (a_keys != NULL)  ystrlcpy (s_keys, a_keys, LEN_RECD);
+   else                 ystrlcpy (s_keys, ""    , LEN_RECD);
    s_len = strlen (s_keys);
    return 0;
 }
@@ -121,7 +121,7 @@ yKEYS__unit             (char *a_question, char a_index)
    char        d           =  '·';
    int         n           =    0;
    /*---(preprare)-----------------------*/
-   strlcpy  (unit_answer, "KEYS unit        : question not understood", LEN_FULL);
+   ystrlcpy  (unit_answer, "KEYS unit        : question not understood", LEN_FULL);
    /*---(dependency list)----------------*/
    if (myKEYS.h_total > 40) {
       x_beg  = myKEYS.h_total - 40;
@@ -226,8 +226,8 @@ yKEYS__unit             (char *a_question, char a_index)
             else 
                sprintf (t, "%02d(%c)%03d:···", myKEYS.r_reps [i], myKEYS.r_macro [i], myKEYS.r_beg [i]);
          } else sprintf (t, "············");
-         strlcat (x_list, t, LEN_FULL);
-         if (i < 5)  strlcat (x_list, ", ", LEN_FULL);
+         ystrlcat (x_list, t, LEN_FULL);
+         if (i < 5)  ystrlcat (x_list, ", ", LEN_FULL);
       }
       snprintf (unit_answer, LEN_FULL, "KEYS groups      : %1d %s", myKEYS.r_level, x_list);
    }

@@ -151,14 +151,14 @@ yKEYS_progress_speed    (uchar *a_speed, uchar *a_terse, uchar *a_desc, float *a
    rc = ykeys_speed  (MODE_PROGRESS, a_speed);
    /*---(trouble)------------------------*/
    if (rc < 0 || myKEYS.p_speed < 0 || myKEYS.p_speed > s_max) {
-      if (a_terse  != NULL)  strlcpy (a_terse, "", LEN_TERSE);
-      if (a_desc   != NULL)  strlcpy (a_desc , "", LEN_FULL);
+      if (a_terse  != NULL)  ystrlcpy (a_terse, "", LEN_TERSE);
+      if (a_desc   != NULL)  ystrlcpy (a_desc , "", LEN_FULL);
       if (a_unit   != NULL)  *a_unit  = 0.0;
       return -1;
    }
    /*---(trouble)------------------------*/
-   if (a_terse  != NULL)  strlcpy (a_terse, g_speed_info [myKEYS.p_speed].terse, LEN_TERSE);
-   if (a_desc   != NULL)  strlcpy (a_desc , g_speed_info [myKEYS.p_speed].desc , LEN_FULL);
+   if (a_terse  != NULL)  ystrlcpy (a_terse, g_speed_info [myKEYS.p_speed].terse, LEN_TERSE);
+   if (a_desc   != NULL)  ystrlcpy (a_desc , g_speed_info [myKEYS.p_speed].desc , LEN_FULL);
    if (a_unit   != NULL)  *a_unit  = g_speed_info [myKEYS.p_speed].speed;
    /*---(complete)-----------------------*/
    return 0;

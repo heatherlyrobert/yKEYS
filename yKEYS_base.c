@@ -149,8 +149,8 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
    /*---(quick reset)--------------------*/
    if (*i <= 1) {
       DEBUG_YKEYS  yLOG_note    ("quick reset of before processing args");
-      strlcpy (myKEYS.a_script, "", LEN_RECD);
-      strlcpy (myKEYS.a_layout, "", LEN_LABEL);
+      ystrlcpy (myKEYS.a_script, "", LEN_RECD);
+      ystrlcpy (myKEYS.a_layout, "", LEN_LABEL);
       if (*i < 1) {
          DEBUG_YKEYS  yLOG_exit    (__FUNCTION__);
          return 0;
@@ -177,7 +177,7 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
          DEBUG_YKEYS  yLOG_exitr   (__FUNCTION__, rce);
          return rce;
       }
-      strlcpy (myKEYS.a_script, a_next, LEN_RECD);
+      ystrlcpy (myKEYS.a_script, a_next, LEN_RECD);
       ++(*i);
       ++x_used;
       DEBUG_YKEYS  yLOG_info    ("a_script"  , myKEYS.a_script);
@@ -185,7 +185,7 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
    /*---(layout)-------------------------*/
    --rce;  if (strncmp (a_arg, "--layout-"   ,  9) == 0) {
       DEBUG_YKEYS  yLOG_note    ("found --layout option");
-      strlcpy (myKEYS.a_layout, a_arg + 9, LEN_LABEL);
+      ystrlcpy (myKEYS.a_layout, a_arg + 9, LEN_LABEL);
       ++(*i);
       ++x_used;
       DEBUG_YKEYS  yLOG_info    ("a_layout"  , myKEYS.a_layout);
@@ -193,7 +193,7 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
    /*---(status)-------------------------*/
    --rce;  if (strncmp (a_arg, "--status-"   ,  9) == 0) {
       DEBUG_YKEYS  yLOG_note    ("found --status option");
-      strlcpy (myKEYS.a_status, a_arg + 9, LEN_LABEL);
+      ystrlcpy (myKEYS.a_status, a_arg + 9, LEN_LABEL);
       ++(*i);
       ++x_used;
       DEBUG_YKEYS  yLOG_info    ("a_status"  , myKEYS.a_status);
@@ -240,7 +240,7 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
  *>    else if (strcmp (a, "--nostatus"     ) == 0)    yVIKEYS_cmds_direct   (":status hide");     <* 
  *>    else if (strcmp (a, "--script"       ) == 0) {                                              <* 
  *>       DEBUG_TOPS   yLOG_note    ("found --script option");                                     <* 
- *>       if (i < a_argc)  strlcpy (myVIKEYS.m_script, a_argv [++i], LEN_DESC);                    <* 
+ *>       if (i < a_argc)  ystrlcpy (myVIKEYS.m_script, a_argv [++i], LEN_DESC);                    <* 
  *>    }                                                                                           <* 
  *> }                                                                                              <* 
  *> DEBUG_TOPS   yLOG_info    ("m_script"  , myVIKEYS.m_script);                                   <* 
@@ -369,8 +369,8 @@ ykeys__string_prepare   (uchar *a_keys, uchar *a_out, int *a_len, int *a_end)
       return rce;
    }
    /*---(transform)----------------------*/
-   strlcpy    (a_out, a_keys  , LEN_RECD);
-   strlencode (a_out, ySTR_MAX, LEN_RECD);
+   ystrlcpy    (a_out, a_keys  , LEN_RECD);
+   ystrlencode (a_out, ySTR_MAX, LEN_RECD);
    *a_len = strlen (a_out);
    DEBUG_YKEYS   yLOG_sint    (*a_len);
    DEBUG_YKEYS   yLOG_snote   (a_out);

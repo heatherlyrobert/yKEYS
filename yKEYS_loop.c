@@ -492,10 +492,10 @@ yKEYS_loop_set          (char *a_delay, char *a_update)
    char        rc2         =    0;
    /*---(set values)---------------------*/
    rc1 = ykeys_loop_delay   (a_delay);
-   if (rc1 >= 0)  strlcpy (myKEYS.l_sdelay , g_delays  [myKEYS.l_cdelay ].terse, LEN_LABEL);
+   if (rc1 >= 0)  ystrlcpy (myKEYS.l_sdelay , g_delays  [myKEYS.l_cdelay ].terse, LEN_LABEL);
    else           rc = rc1;
    rc2 = ykeys_loop_update  (a_update);
-   if (rc2 >= 0)  strlcpy (myKEYS.l_supdate, g_updates [myKEYS.l_cupdate].terse, LEN_LABEL);
+   if (rc2 >= 0)  ystrlcpy (myKEYS.l_supdate, g_updates [myKEYS.l_cupdate].terse, LEN_LABEL);
    else           rc = rc2;
    /*---(complete)-----------------------*/
    return rc;

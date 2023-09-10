@@ -46,8 +46,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.3-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.3f"
-#define     P_VERTXT    "added yKEYS_ecurrent to fix ySRC 'r' mode under macro execution"
+#define     P_VERNUM    "2.3g"
+#define     P_VERTXT    "updated ySTR functions to ¶ystr¶ prefix"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"

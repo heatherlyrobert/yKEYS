@@ -25,7 +25,7 @@ ykeys_num2str           (int a_val, char a_len, char *a_out)
    if (a_val > x_max)  a_val = x_max;
    /*---(print and fill)-----------------*/
    sprintf (t, "%d", a_val);
-   strlpad (t, a_out, '.', '>', a_len);
+   ystrlpad (t, a_out, '.', '>', a_len);
    /*---(complete)-----------------------*/
    return 0;
 }
@@ -156,7 +156,7 @@ yKEYS_keylog_status     (char a_size, short a_wide, char *a_list)
       x_ch   = chrvisible (myKEYS.h_log  [myKEYS.h_curr]);
    }
    /*---(log part)-----------------------*/
-   strlcpy (x_log, YSTR_PLUS, h + 1);
+   ystrlcpy (x_log, YSTR_PLUS, h + 1);
    x_max = myKEYS.h_total;
    if (x_max > h) { x_max = h; x_cont = '<'; }
    for (i = 0; i <= x_max; ++i) {
@@ -196,19 +196,19 @@ yKEYS_loop_status       (char a_size, short a_wide, char *a_list)
    sprintf (x_delay  , "%8.6f", myKEYS.l_delay);
    sprintf (x_bdelay , "%8.6f", myKEYS.l_bdelay);
    sprintf (t        , "%d"   , myKEYS.l_skip);
-   strlpad (t, x_skip  , '.', '>', 2);
+   ystrlpad (t, x_skip  , '.', '>', 2);
    sprintf (t        , "%d"   , myKEYS.l_bskip);
-   strlpad (t, x_bskip , '.', '>', 2);
+   ystrlpad (t, x_bskip , '.', '>', 2);
    /*---(updates)------------------------*/
    sprintf (t        , "%.4f" , myKEYS.l_update);
-   strlpad (t, x_update , '.' , '>', 8);
+   ystrlpad (t, x_update , '.' , '>', 8);
    sprintf (t        , "%.4f" , myKEYS.l_bupdate);
-   strlpad (t, x_bupdate, '.' , '>', 8);
+   ystrlpad (t, x_bupdate, '.' , '>', 8);
    /*---(timing)-------------------------*/
    sprintf (t        , "%ld"  , myKEYS.l_nsec);
-   strlpad (t, x_nsec   , '.' , '>', 9);
+   ystrlpad (t, x_nsec   , '.' , '>', 9);
    sprintf (t        , "%d"   , myKEYS.l_loops);
-   strlpad (t, x_loops  , '.' , '>', 4);
+   ystrlpad (t, x_loops  , '.' , '>', 4);
    /*---(output)-------------------------*/
    switch (a_size) {
    case 'u' :

@@ -14,19 +14,19 @@ char
 ykeys_logger_init       (void)
 {
    /*---(every)--------------------------*/
-   strlcpy (myKEYS.e_log   , "", LEN_HUGE);
-   strlcpy (myKEYS.e_mode  , "", LEN_HUGE);
-   strlcpy (myKEYS.e_multi , "", LEN_HUGE);
-   strlcpy (myKEYS.e_error , "", LEN_HUGE);
-   strlcpy (myKEYS.e_status, "", LEN_HUGE);
+   ystrlcpy (myKEYS.e_log   , "", LEN_HUGE);
+   ystrlcpy (myKEYS.e_mode  , "", LEN_HUGE);
+   ystrlcpy (myKEYS.e_multi , "", LEN_HUGE);
+   ystrlcpy (myKEYS.e_error , "", LEN_HUGE);
+   ystrlcpy (myKEYS.e_status, "", LEN_HUGE);
    myKEYS.e_all      = 0;
    myKEYS.e_total    = 0;
    /*---(logs)---------------------------*/
    myKEYS.h_logkeys  = 'y';
-   strlcpy (myKEYS.h_log   , "", LEN_FULL);
-   strlcpy (myKEYS.h_mode  , "", LEN_FULL);
-   strlcpy (myKEYS.h_multi , "", LEN_FULL);
-   strlcpy (myKEYS.h_error , "", LEN_FULL);
+   ystrlcpy (myKEYS.h_log   , "", LEN_FULL);
+   ystrlcpy (myKEYS.h_mode  , "", LEN_FULL);
+   ystrlcpy (myKEYS.h_multi , "", LEN_FULL);
+   ystrlcpy (myKEYS.h_error , "", LEN_FULL);
    myKEYS.h_locked   = '-';
    /*---(positions)----------------------*/
    myKEYS.h_all      = 0;
@@ -48,7 +48,7 @@ ykeys_logger_init       (void)
    myKEYS.h_balanced = 'y';
    /*---(replaying)----------------------*/
    myKEYS.r_capture  = '-';
-   strlcpy (myKEYS.r_reinput, "", LEN_RECD);
+   ystrlcpy (myKEYS.r_reinput, "", LEN_RECD);
    myKEYS.r_replay   = '-';
    /*---(complete)-----------------------*/
    return 0;
@@ -68,20 +68,20 @@ ykeys__roll_every       (void)
    int         x_off       = LEN_HUGE / 2;
    char        t           [LEN_HUGE];
    /*---(log)----------------------------*/
-   strlcpy (t, myKEYS.e_log    + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_log  , t         , LEN_HUGE);
+   ystrlcpy (t, myKEYS.e_log    + x_off, LEN_HUGE);
+   ystrlcpy (myKEYS.e_log  , t         , LEN_HUGE);
    /*---(mode)---------------------------*/
-   strlcpy (t, myKEYS.e_mode   + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_mode , t         , LEN_HUGE);
+   ystrlcpy (t, myKEYS.e_mode   + x_off, LEN_HUGE);
+   ystrlcpy (myKEYS.e_mode , t         , LEN_HUGE);
    /*---(error)--------------------------*/
-   strlcpy (t, myKEYS.e_error  + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_error, t         , LEN_HUGE);
+   ystrlcpy (t, myKEYS.e_error  + x_off, LEN_HUGE);
+   ystrlcpy (myKEYS.e_error, t         , LEN_HUGE);
    /*---(multi)--------------------------*/
-   strlcpy (t, myKEYS.e_multi  + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_multi, t         , LEN_HUGE);
+   ystrlcpy (t, myKEYS.e_multi  + x_off, LEN_HUGE);
+   ystrlcpy (myKEYS.e_multi, t         , LEN_HUGE);
    /*---(status)-------------------------*/
-   strlcpy (t, myKEYS.e_status + x_off, LEN_HUGE);
-   strlcpy (myKEYS.e_status, t        , LEN_HUGE);
+   ystrlcpy (t, myKEYS.e_status + x_off, LEN_HUGE);
+   ystrlcpy (myKEYS.e_status, t        , LEN_HUGE);
    /*---(position)-----------------------*/
    myKEYS.e_total -= x_off;
    /*---(complete)-----------------------*/
@@ -98,20 +98,20 @@ ykeys__roll             (void)
    DEBUG_YKEYS   yLOG_senter  (__FUNCTION__);
    /*---(log)----------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("log");
-   strlcpy (t, myKEYS.h_log   + x_off, LEN_FULL);
-   strlcpy (myKEYS.h_log  , t        , LEN_FULL);
+   ystrlcpy (t, myKEYS.h_log   + x_off, LEN_FULL);
+   ystrlcpy (myKEYS.h_log  , t        , LEN_FULL);
    /*---(mode)---------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("mode");
-   strlcpy (t, myKEYS.h_mode  + x_off, LEN_FULL);
-   strlcpy (myKEYS.h_mode , t        , LEN_FULL);
+   ystrlcpy (t, myKEYS.h_mode  + x_off, LEN_FULL);
+   ystrlcpy (myKEYS.h_mode , t        , LEN_FULL);
    /*---(error)--------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("error");
-   strlcpy (t, myKEYS.h_error  + x_off, LEN_FULL);
-   strlcpy (myKEYS.h_error, t         , LEN_FULL);
+   ystrlcpy (t, myKEYS.h_error  + x_off, LEN_FULL);
+   ystrlcpy (myKEYS.h_error, t         , LEN_FULL);
    /*---(multi)--------------------------*/
    DEBUG_YKEYS   yLOG_snote   ("multi");
-   strlcpy (t, myKEYS.h_multi + x_off, LEN_FULL);
-   strlcpy (myKEYS.h_multi, t        , LEN_FULL);
+   ystrlcpy (t, myKEYS.h_multi + x_off, LEN_FULL);
+   ystrlcpy (myKEYS.h_multi, t        , LEN_FULL);
    /*---(position)-----------------------*/
    myKEYS.h_total -= x_off;
    myKEYS.h_curr  -= x_off;
@@ -366,7 +366,7 @@ ykeys__reinput          (uchar a_mode, uchar a_key)
    }
    /*---(save)---------------------------*/
    sprintf (t, "%c", a_key);
-   strlcat (myKEYS.r_reinput, t, LEN_RECD);
+   ystrlcat (myKEYS.r_reinput, t, LEN_RECD);
    /*---(complete)-----------------------*/
    return 1;
 }

@@ -20,7 +20,7 @@ ykeys_progress_init     (void)
    }
    /*---(globals)------------------------*/
    DEBUG_YKEYS  yLOG_note    ("globals");
-   strlcpy (myKEYS.p_unit, "", LEN_TERSE);
+   ystrlcpy (myKEYS.p_unit, "", LEN_TERSE);
    myKEYS.p_play   = '-';
    myKEYS.p_anchor = 's';
    myKEYS.p_adv    =  0.00;
@@ -116,7 +116,7 @@ yKEYS_progress_config   (char a_repeat, char *a_unit, char *a_scale, char *a_spe
       return rce;
    }
    /*---(save data)----------------------*/
-   if (a_unit  != NULL)  strlcpy (myKEYS.p_unit, a_unit, LEN_TERSE);
+   if (a_unit  != NULL)  ystrlcpy (myKEYS.p_unit, a_unit, LEN_TERSE);
    if (a_scale != NULL)  yKEYS_progress_scale (a_scale, NULL, NULL, NULL, NULL, NULL);
    if (a_speed != NULL)  yKEYS_progress_speed (a_speed, NULL, NULL, NULL);
    /*---(set play and repeat)------------*/

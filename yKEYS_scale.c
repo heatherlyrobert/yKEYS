@@ -231,17 +231,17 @@ yKEYS_progress_scale    (uchar *a_scale, uchar *a_terse, uchar *a_label, uchar *
    rc = ykeys_scale  (MODE_PROGRESS, a_scale);
    /*---(trouble)------------------------*/
    if (rc < 0 || myKEYS.p_scale < 0 || myKEYS.p_scale > s_max) {
-      if (a_terse  != NULL)  strlcpy (a_terse, "", LEN_TERSE);
-      if (a_label  != NULL)  strlcpy (a_label, "", LEN_LABEL);
-      if (a_desc   != NULL)  strlcpy (a_desc , "", LEN_FULL);
+      if (a_terse  != NULL)  ystrlcpy (a_terse, "", LEN_TERSE);
+      if (a_label  != NULL)  ystrlcpy (a_label, "", LEN_LABEL);
+      if (a_desc   != NULL)  ystrlcpy (a_desc , "", LEN_FULL);
       if (a_power  != NULL)  *a_power = 0;
       if (a_unit   != NULL)  *a_unit  = 0.0;
       return -1;
    }
    /*---(normal)-------------------------*/
-   if (a_terse  != NULL)  strlcpy (a_terse, g_scale_info [myKEYS.p_scale].terse, LEN_TERSE);
-   if (a_label  != NULL)  strlcpy (a_label, g_scale_info [myKEYS.p_scale].label, LEN_LABEL);
-   if (a_desc   != NULL)  strlcpy (a_desc , g_scale_info [myKEYS.p_scale].desc , LEN_FULL);
+   if (a_terse  != NULL)  ystrlcpy (a_terse, g_scale_info [myKEYS.p_scale].terse, LEN_TERSE);
+   if (a_label  != NULL)  ystrlcpy (a_label, g_scale_info [myKEYS.p_scale].label, LEN_LABEL);
+   if (a_desc   != NULL)  ystrlcpy (a_desc , g_scale_info [myKEYS.p_scale].desc , LEN_FULL);
    if (a_power  != NULL)  *a_power = g_scale_info [myKEYS.p_scale].power;
    if (a_unit   != NULL)  *a_unit  = g_scale_info [myKEYS.p_scale].unit;
    /*---(complete)-----------------------*/
