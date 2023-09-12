@@ -670,6 +670,49 @@ ykeys__premain          (void)
    return 0;
 }
 
+char
+ykeys__handler          (char a_key)
+{
+   /*---(locals)-----------+-----+-----+-*/
+   char        rc          =    0;
+   char        x_one       =  '·';
+   char        x_two       =  '·';
+   /*---(header)-------------------------*/
+   DEBUG_YKEYS   yLOG_enter   (__FUNCTION__);
+   /*---(if control key)--------------*/
+   switch (a_key) {
+   case  14 : x_one = 'g'; x_two = 'T'; rc = 1; break;
+   case  15 : x_one = 'g'; x_two = 'B'; rc = 1; break;
+   case  16 : x_one = 'g'; x_two = 'S'; rc = 1; break;
+   case  17 : x_one = 'g'; x_two = 'E'; rc = 1; break;
+   default :
+   }
+   /*---(handle control)--------------*/
+   if (rc == 1) {
+      rc = yKEYS_logger  (x_one);
+      rc = ykeys__handle (x_one, NULL);
+      rc = yKEYS_logger  (x_two);
+      rc = ykeys__handle (x_two, NULL);
+   }
+   /*---(handle normal)---------------*/
+   else {
+      /*---(keyboard input)--------------*/
+      rc = ykeys__input (myKEYS.c_env, &a_key, NULL, NULL);
+      DEBUG_YKEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, a_key, ychrvisible (a_key));
+      if (a_key == G_KEY_SKIP) {
+         DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");
+      }
+      /*---(handle keystroke)------------*/
+      else if (a_key != G_KEY_NOOP) {
+         rc = ykeys__handle (a_key, NULL);
+         DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
+      }
+   }
+   /*---(complete)-----------------------*/
+   DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
+   return 0;
+}
+
 char         /*-> handle main loop for ncurses -------[ ------ [gn.842.232.99]*/ /*-[01.0000.000.!]-*/ /*-[--.---.---.--]-*/
 yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput)
 {
@@ -711,18 +754,9 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       DEBUG_YKEYS  yLOG_complex ("blocking"  , "%c, %c", myKEYS.l_blocking, x_block);
       rc = myKEYS.c_input (x_block, &x_key);
       DEBUG_YKEYS  yLOG_complex ("input"     , "%-4d, %d, %c", rc, x_key, ychrvisible (x_key));
-      /*---(keyboard input)--------------*/
-      rc = ykeys__input (myKEYS.c_env, &x_key, NULL, NULL);
-      DEBUG_YKEYS  yLOG_complex ("input_adj" , "%-4d, %d, %c", rc, x_key, ychrvisible (x_key));
-      if (x_key == G_KEY_SKIP) {
-         DEBUG_YKEYS   yLOG_note    ("non-action key, do not wait or update screen");
-         continue;
-      }
-      /*---(handle keystroke)------------*/
-      if (x_key != G_KEY_NOOP) {
-         rc = ykeys__handle (x_key, NULL);
-         DEBUG_YKEYS   yLOG_value   ("handle"    , rc);
-      }
+      /*---(if control key)--------------*/
+      rc = ykeys__handler (x_key);
+      DEBUG_YKEYS   yLOG_value   ("handler"   , rc);
       /*---(refresh maps)----------------*/
       rc = yVIHUB_yMAP_refresh ();
       DEBUG_YKEYS   yLOG_value   ("refresh"   , rc);
@@ -751,9 +785,9 @@ yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env,
       ykeys_loop_sleep (x_key, x_draw);
       /*---(done)------------------------*/
    }
+   /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_exit    (__FUNCTION__);
    DEBUG_YKEYS  yLOG_break   ();
-   /*---(complete)-----------------------*/
    return 0;
 }
 
