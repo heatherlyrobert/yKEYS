@@ -22,6 +22,9 @@ static long long s_miss_time  =    0;
 const tUPDATE g_updates [MAX_UPDATE] = {
    /*---(default)--------------------------*/
    { "every" , "every loop"         ,   0.00     },
+   /*---(veryfast)-------------------------*/
+   { "100us" , "hundred-millionth"  ,   0.0001   },
+   { "1ms"   , "thousandth"         ,   0.001    },
    /*---(faster)---------------------------*/
    { "10ms"  , "very fast"          ,   0.01     },
    { "20ms"  , "faster"             ,   0.02     },
@@ -77,7 +80,7 @@ static struct {
    char        desc        [LEN_DESC];
 } const s_mdelay [20] = {
    { MACRO_BLITZ  , "1us"  ,   0, "million times a sec"   },
-   { MACRO_FAST   , "100us",   0, "ten-thousand a sec"    },
+   { MACRO_BLUR   , "100us",   0, "ten-thousand a sec"    },
    { MACRO_THOU   , "1ms"  ,   0, "thousand times a sec"  },
    { MACRO_HUND   , "10ms" ,   0, "hundred a sec (normal)"},
    { MACRO_TWENTY , "10ms" ,   4, "twenty times a sec"    },

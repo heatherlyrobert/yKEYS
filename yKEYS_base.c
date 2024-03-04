@@ -401,9 +401,13 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
       DEBUG_YKEYS   yLOG_exitr   (__FUNCTION__, rce);
       return rce;
    }
-   --rce;  if (a_str != NULL) {
+   DEBUG_YKEYS   yLOG_complex ("*a_key"    , "%3d, %c", *a_key, ychrvisible (*a_key));
+   if (a_str != NULL) {
       x_len = strlen (a_str);
       DEBUG_YKEYS   yLOG_complex ("a_str"     , "%2då%sæ", strlen (a_str), a_str);
+      if (n != NULL) {
+         DEBUG_YKEYS   yLOG_value   ("*n"        , *n);
+      }
    }
    /*---(get normal key)-----------------*/
    DEBUG_YKEYS   yLOG_complex ("hist pos"  , "%3dc, %3dt", myKEYS.h_curr, myKEYS.h_total);
@@ -442,8 +446,7 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
             return rce;
          }
          x_key = ychrworking (a_str [*n]);
-         x_key = ykeys__input_fix (a_env, x_key);
-         ++(*n);
+         x_key = ykeys__input_fix (a_env, x_key); ++(*n);
          x_source = 3;
       } else {
          DEBUG_YKEYS   yLOG_note    ("no new playback keys, just wait");
@@ -457,7 +460,8 @@ ykeys__input             (char a_env, uchar *a_key, uchar *a_str, int *n)
    /*---(get macro execution)------------*/
    else {
       DEBUG_YKEYS   yLOG_note    ("macro execution, call yMACRO");
-      x_key = yVIHUB_yMACRO_exec  (*a_key);
+      if (a_str == NULL)    x_key = yVIHUB_yMACRO_exec  (*a_key);
+      else                  x_key = yVIHUB_yMACRO_exec  (0);
       x_source = 5;
    }
    /*---(double cleanse controls)--------*/
