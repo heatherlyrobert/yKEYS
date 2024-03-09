@@ -1,6 +1,6 @@
 /*============================----beg-of-source---============================*/
 #ifndef yKEYS
-#define yKEYS yes
+#define yKEYS "yes"
 
 
 
@@ -19,6 +19,7 @@ char*       yKEYS_version           (void);
 char        yKEYS_init              (void);
 char        yKEYS_init_after        (void);
 char        yKEYS_arg_handle        (int *i, char *a_arg, char *a_next);
+char        yKEYS_reinit            (void);
 char        yKEYS_wrap              (void);
 /*---(exec)-----------------*/
 char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int *n);
@@ -27,6 +28,8 @@ char        yKEYS_quit              (void);
 char        yKEYS_writequit         (void);
 char        yKEYS_writequitall      (void);
 char        yKEYS_main              (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput);
+char        yKEYS__unit_main        (char *a_delay, char *a_update, int a_loops, char a_env, char *a_keys);
+char*       yKEYS_main_dur_msec     (int *r_beg, int *r_end, int *r_dur, int *r_loop, int *r_draw, int *r_keys);
 /*---(base)-----------------*/
 char        yKEYS_logger            (uchar a_key);
 char        yKEYS_unique            (void);

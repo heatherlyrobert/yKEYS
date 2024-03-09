@@ -46,8 +46,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.3-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.3j"
-#define     P_VERTXT    "small fix to make testing yKEYS_string more like real-use for unit testing"
+#define     P_VERNUM    "2.3k"
+#define     P_VERTXT    "couple of fixes to handle increased gyges and intensive yMACRO testing"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -76,6 +76,7 @@
 
 
 typedef     struct timespec   tTSPEC;
+typedef     long long  llong;
 
 typedef    struct    cMY    tMY;
 struct cMY {
@@ -85,6 +86,7 @@ struct cMY {
    char        redraw;                      /* force redraw based on changes  */
    char        log_keys;                    /* allows keys to be hidden       */
    /*---(arguments)------------*/
+   char        a_style;                     /* script running style           */
    char        a_script    [LEN_RECD];      /* cli script name request        */
    char        a_layout    [LEN_LABEL];     /* cli screen layout request      */
    char        a_status    [LEN_LABEL];     /* cli screen status request      */
@@ -116,10 +118,12 @@ struct cMY {
    char        h_used;                      /* is last logged handled already */
    char        h_last      [LEN_LABEL];     /* last keys for display          */
    /*---(history counts)-------*/
-   short       h_acks;                      /* count of display acks          */
+   short       h_acks;                      /* count of display acks        not sure they exist anymore ?!                                     */
    short       h_spaces;                    /* count of spaces/no action      */
-   short       h_noops;                     /* count of no-op keys            */
+   short       h_noops;                     /* count of no-op keys          loops without either input or macro keys (really empty)            */
    short       h_combos;                    /* count of combo (p multi)       */
+   short       h_macks;                     /* count of macro acks (SKIP)   all forms of delays · ´ Ï «                                        */
+   short       h_mnoops;                    /* count of macro no-op (NOOP)  includes macro start £ and end £, plus things skipped outside RUN  */
    /*---(history errors)-------*/
    short       h_errors;                    /* count of key errors            */
    short       h_warnings;                  /* count of key warnings          */
@@ -128,6 +132,10 @@ struct cMY {
    short       h_open;                      /* count of open parens           */
    short       h_close;                     /* count of close parens          */
    char        h_balanced;                  /* parens are balanced (y/-)      */
+   /*---(full timing)----------*/
+   llong       m_beg;                       /* nsec of main start             */
+   llong       m_end;                       /* nsec of main end               */
+   llong       m_dur;                       /* nsec of main duration          */
    /*---(replay keys)----------*/
    char        r_capture;                   /* capturing a replay (y/-)       */
    char        r_reinput   [LEN_RECD];      /* catpured replay keys           */
@@ -152,22 +160,22 @@ struct cMY {
    int         l_loops;                     /* loops before screen update     */
    char        l_blocking;                  /* keyboard input blocks          */
    /*---(loop timing)----------*/
-   long long   l_exp;                       /* expected loop duration         */
-   long long   l_act;                       /* actual loop duration           */
-   long long   l_slept;                     /* actual dur of last sleep       */
-   long long   l_used;                      /* actual dur of processing       */
-   long long   l_sleep;                     /* expected dur of next sleep     */
-   long long   l_beg;                       /* nsec of current start          */
-   long long   l_graf;                      /* nsec of graphics/drawing start */
-   long long   l_end;                       /* nsec of current end            */
-   long long   l_prev;                      /* nsec of previous end           */
-   long long   l_avg_all;                   /* average processing time        */
-   long long   l_avg_miss;                  /* total variance of exp to act   */
+   llong       l_exp;                       /* expected loop duration         */
+   llong       l_act;                       /* actual loop duration           */
+   llong       l_slept;                     /* actual dur of last sleep       */
+   llong       l_used;                      /* actual dur of processing       */
+   llong       l_sleep;                     /* expected dur of next sleep     */
+   llong       l_beg;                       /* nsec of current start          */
+   llong       l_graf;                      /* nsec of graphics/drawing start */
+   llong       l_end;                       /* nsec of current end            */
+   llong       l_prev;                      /* nsec of previous end           */
+   llong       l_avg_all;                   /* average processing time        */
+   llong       l_avg_miss;                  /* total variance of exp to act   */
    /*---(loop stats)-----------*/
    long        l_draw;                      /* count of drawing loops         */
-   long long   l_avg_draw;                  /* average drawing time           */
+   llong       l_avg_draw;                  /* average drawing time           */
    long        l_keys;                      /* count of key handling loops    */
-   long long   l_avg_keys;                  /* average key processing time    */
+   llong       l_avg_keys;                  /* average key processing time    */
    long        l_idle;                      /* count of idle/noop loops       */
    /*---(repeat main)----------*/
    int         r_asked;                     /* originally requested repeats   */
@@ -248,6 +256,8 @@ char        ykeys__input            (char a_env, uchar *a_key, uchar *a_str, int
 char        ykeys__input_force      (char a_env, uchar *a_key, uchar *a_str, int *n);
 char        ykeys_quitting          (void);
 char        ykeys__prepare          (char *a_delay, char *a_update, int a_loops, char a_env, void *a_draw, void *a_input, void *a_altinput);
+char        ykeys_main_beg          (void);
+char        ykeys_main_end          (void);
 /*---(unittest)-------------*/
 char        ykeys__unit_quiet       (void);
 char        ykeys__unit_loud        (void);

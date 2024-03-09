@@ -10,10 +10,10 @@
 
 static float     s_pct    = 0.0;
 
-static long long s_total_time =    0;
-static long long s_draw_time  =    0;
-static long long s_keys_time  =    0;
-static long long s_miss_time  =    0;
+static llong     s_total_time =    0;
+static llong     s_draw_time  =    0;
+static llong     s_keys_time  =    0;
+static llong     s_miss_time  =    0;
 
 
 
@@ -251,9 +251,6 @@ ykeys_loop_init         (void)
    }
    /*---(initial setting)----------------*/
    yKEYS_loop_set ("10ms" , "100ms");
-   /*---(saves)--------------------------*/
-   /*> strcpy (myKEYS.l_sdelay , "keys" );                                                   <*/
-   /*> strcpy (myKEYS.l_supdate, "every");                                                   <*/
    /*---(blitzing)-----------------------*/
    myKEYS.l_bupdate = 0.0;
    /*---(complete)-----------------------*/
@@ -541,25 +538,29 @@ yKEYS_loop_macro        (char a_delay, char a_update)
    /*> IF_MACRO_RUN   a_delay = '0';                                                  <*/
    /*---(delay mode)---------------------*/
    DEBUG_YKEYS   yLOG_schar   (a_delay);
-   rc = yKEYS_ddelay_info (a_delay, x_terse, &(myKEYS.l_skip), NULL);
-   DEBUG_YKEYS   yLOG_sint    (rc);
-   --rce;  if (rc < 0) {
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
+   if (a_delay != '-') {
+      rc = yKEYS_ddelay_info (a_delay, x_terse, &(myKEYS.l_skip), NULL);
+      DEBUG_YKEYS   yLOG_sint    (rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
+         return rce;
+      }
+      DEBUG_YKEYS   yLOG_snote   (x_terse);
+      DEBUG_YKEYS   yLOG_sint    (myKEYS.l_skip);
+      ykeys_loop_delay (x_terse);
    }
-   DEBUG_YKEYS   yLOG_snote   (x_terse);
-   DEBUG_YKEYS   yLOG_sint    (myKEYS.l_skip);
-   ykeys_loop_delay (x_terse);
    /*---(change update basis)------------*/
    DEBUG_YKEYS   yLOG_schar   (a_update);
-   rc = yKEYS_dupdate_info (a_update, x_terse, NULL);
-   DEBUG_YKEYS   yLOG_sint    (rc);
-   --rce;  if (rc < 0) {
-      DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
-      return rce;
+   if (a_update != '-') {
+      rc = yKEYS_dupdate_info (a_update, x_terse, NULL);
+      DEBUG_YKEYS   yLOG_sint    (rc);
+      --rce;  if (rc < 0) {
+         DEBUG_YKEYS   yLOG_sexitr  (__FUNCTION__, rce);
+         return rce;
+      }
+      DEBUG_YKEYS   yLOG_snote   (x_terse);
+      ykeys_loop_update (x_terse);
    }
-   DEBUG_YKEYS   yLOG_snote   (x_terse);
-   ykeys_loop_update (x_terse);
    /*---(complete)-----------------------*/
    DEBUG_YKEYS   yLOG_sexit   (__FUNCTION__);
    return 0;
@@ -719,10 +720,12 @@ ykeys_loop_sleep        (uchar a_key, char a_draw)
    }
    DEBUG_YKEYS   yLOG_complex ("counts"    , "%6dd, %6dk, %6di", x_draws, myKEYS.l_keys, x_idles);
    /*---(sleeping)-----------------------*/
-   if (myKEYS.l_blocking != 'y') {
+   if (a_key == G_KEY_NOOP && yVIHUB_yMACRO_exe_mode ("playing") == 1) {
+      DEBUG_YKEYS   yLOG_note    ("key was a NOOP while macro playing, so no nanosleep");
+   } else if (myKEYS.l_blocking != 'y') {
+      DEBUG_YKEYS   yLOG_note    ("normal key, nanosleep requested");
       x_dur.tv_sec  = myKEYS.l_sleep / NSEC;
       x_dur.tv_nsec = myKEYS.l_sleep % NSEC;
-      DEBUG_YKEYS   yLOG_note    ("nano-sleeping");
       nanosleep      (&x_dur, NULL);
    }
    /*---(complete)-----------------------*/

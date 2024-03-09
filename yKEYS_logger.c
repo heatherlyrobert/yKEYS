@@ -42,6 +42,8 @@ ykeys_logger_init       (void)
    myKEYS.h_spaces   = 0;
    myKEYS.h_noops    = 0;
    myKEYS.h_combos   = 0;
+   myKEYS.h_macks    = 0;
+   myKEYS.h_mnoops   = 0;
    /*---(grouping)-----------------------*/
    myKEYS.h_open     = 0;
    myKEYS.h_close    = 0;
