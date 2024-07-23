@@ -46,8 +46,8 @@
 /*········· ··········· ´·····························´········································*/
 #define     P_VERMAJOR  "2.--, clean, improve, and expand"
 #define     P_VERMINOR  "2.3-, moved into SSH githud and nearly done"
-#define     P_VERNUM    "2.3k"
-#define     P_VERTXT    "couple of fixes to handle increased gyges and intensive yMACRO testing"
+#define     P_VERNUM    "2.3l"
+#define     P_VERTXT    "update for new DEBUG_ macro calls"
 /*········· ··········· ´·····························´········································*/
 #define     P_PRIORITY  "direct, simple, brief, vigorous, and lucid (h.w. fowler)"
 #define     P_PRINCIPAL "[grow a set] and build your wings on the way down (r. bradbury)"
@@ -122,7 +122,7 @@ struct cMY {
    short       h_spaces;                    /* count of spaces/no action      */
    short       h_noops;                     /* count of no-op keys          loops without either input or macro keys (really empty)            */
    short       h_combos;                    /* count of combo (p multi)       */
-   short       h_macks;                     /* count of macro acks (SKIP)   all forms of delays · ´ Ï «                                        */
+   short       h_macks;                     /* count of macro acks (SKIP)   all forms of delays · « ´ Ï                                        */
    short       h_mnoops;                    /* count of macro no-op (NOOP)  includes macro start £ and end £, plus things skipped outside RUN  */
    /*---(history errors)-------*/
    short       h_errors;                    /* count of key errors            */

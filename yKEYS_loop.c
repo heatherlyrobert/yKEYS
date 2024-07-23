@@ -657,6 +657,7 @@ yKEYS_loop_graf         (void)
    /*---(complete)-----------------------*/
    return 0;
 }
+
 char
 yKEYS_loop_end          (void)
 {

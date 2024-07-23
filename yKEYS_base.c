@@ -213,7 +213,7 @@ yKEYS_arg_handle        (int *i, char *a_arg, char *a_next)
       case 'r' :  myKEYS.a_style = '>';   break;
       case 'b' :  myKEYS.a_style = '¬';   break;
       }
-      DEBUG_YKEYS  yLOG_info    ("a_style"   , myKEYS.a_style);
+      DEBUG_YKEYS  yLOG_char    ("a_style"   , myKEYS.a_style);
       ystrlcpy (myKEYS.a_script, a_next, LEN_RECD);
       ++(*i);
       ++x_used;
